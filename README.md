@@ -1,10 +1,10 @@
 [![CircleCI](https://circleci.com/gh/giantswarm/{APP-NAME}-app.svg?style=shield)](https://circleci.com/gh/giantswarm/{APP-NAME}-app)
 
-# {APP-NAME}-app chart
+# linkerd2-app chart
 
-Giant Swarm offers a {APP-NAME} Managed App which can be installed in tenant clusters.
-Here we define the {APP-NAME} chart with its templates and default configuration.
+Giant Swarm offers a linkerd2 Managed App which can be installed in tenant clusters.
+Here we define the linkerd2 chart with its templates and default configuration.
 
 ## Credit
 
-* {APP HELM REPOSITORY}
+* https://helm.linkerd.io/stable
