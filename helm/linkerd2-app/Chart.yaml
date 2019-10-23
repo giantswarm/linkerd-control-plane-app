@@ -11,7 +11,7 @@ maintainers:
 - email: cncf-linkerd-dev@lists.cncf.io
   name: Linkerd authors
   url: https://linkerd.io/
-name: linkerd2
+name: linkerd2-app
 sources:
 - https://github.com/linkerd/linkerd2/
-version: 2.6.0
+version: 0.0.1
