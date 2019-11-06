@@ -12,6 +12,8 @@ metadata:
     {{.ControllerNamespaceLabel}}: {{.Namespace}}
   annotations:
     {{.CreatedByAnnotation}}: {{default (printf "linkerd/helm %s" .LinkerdVersion) .CliVersion}}
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
 spec:
   selfSigned: {}
 ---
@@ -25,6 +27,8 @@ metadata:
     {{.ControllerNamespaceLabel}}: {{.Namespace}}
   annotations:
     {{.CreatedByAnnotation}}: {{default (printf "linkerd/helm %s" .LinkerdVersion) .CliVersion}}
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
 spec:
   secretName: linkerd-ca-tls
   commonName: linkerd
@@ -42,6 +46,8 @@ metadata:
     {{.ControllerNamespaceLabel}}: {{.Namespace}}
   annotations:
     {{.CreatedByAnnotation}}: {{default (printf "linkerd/helm %s" .LinkerdVersion) .CliVersion}}
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
 spec:
   ca:
     secretName: linkerd-ca-tls
@@ -56,6 +62,8 @@ metadata:
     {{.ControllerNamespaceLabel}}: {{.Namespace}}
   annotations:
     {{.CreatedByAnnotation}}: {{default (printf "linkerd/helm %s" .LinkerdVersion) .CliVersion}}
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
 spec:
   secretName: linkerd-identity-issuer
   commonName: linkerd

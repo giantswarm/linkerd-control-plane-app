@@ -5,7 +5,7 @@
   "version": "{{.LinkerdVersion}}",
   "identityContext":{
     "trustDomain": "{{.Identity.TrustDomain}}",
-    "trustAnchorsPem": "{{required "Please provide the identity trust anchors" .Identity.TrustAnchorsPEM | trim | replace "\n" "\\n"}}",
+    "trustAnchorsPem": "REPLACE_ME",
     "issuanceLifeTime": "{{.Identity.Issuer.IssuanceLifeTime}}",
     "clockSkewAllowance": "{{.Identity.Issuer.ClockSkewAllowance}}",
     "scheme": "{{.Identity.Issuer.Scheme}}"
@@ -15,7 +15,6 @@
   "clusterDomain": "{{.ClusterDomain}}"
 }
 {{- end -}}
-
 {{- define "linkerd.configs.proxy" -}}
 {
   "proxyImage":{

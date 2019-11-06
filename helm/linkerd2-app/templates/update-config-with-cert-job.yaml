@@ -1,80 +1,101 @@
+---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name: {{ .Values.name }}
+  name: global-config-creator
+  namespace: {{ .Values.Namespace }}
   annotations:
-    "helm.sh/hook": "post-install"
-    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook": "pre-install"
+    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: {{ .Values.name }}
+    app: global-config-creator
     giantswarm.io/service-type: "managed"
 rules:
 - apiGroups:
   - ""
   resources:
-  - namespaces
+  - configmap
   resourceName:
-  - kube-system
+  - linkerd-config
   verbs:
   - "get"
-  - "patch"
+  - "replace"
+- apiGroups:
+  - ""
+  resources:
+  - secret
+  resourceName:
+  - linkerd-identity-issuer
+  verbs:
+  - "get"
 - apiGroups:
   - extensions
   resources:
   - podsecuritypolicies
   resourceNames:
-  - {{ .Values.name }}
+  - linkerd-{{.Values.Namespace}}-control-plane
   verbs:
   - "use"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: global-config-creator
+  namespace: {{ .Values.Namespace }}
+  annotations:
+    "helm.sh/hook": "pre-install"
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
+  namespace: {{ .Values.Namespace }}
+  labels:
+    app: global-config-creator
+    giantswarm.io/service-type: "managed"
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: {{ .Values.name }}
+  name: global-config-creator
+  namespace: {{ .Values.Namespace }}
   annotations:
-    "helm.sh/hook": "post-install"
-    "helm.sh/hook-weight": "-2"
-    "helm.sh/hook-delete-policy": "hook-succeeded"
+    "helm.sh/hook": "pre-install"
+    "helm.sh/hook-weight": "-4"
+    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: {{ .Values.name }}
+    app: global-config-creator
     giantswarm.io/service-type: "managed"
 subjects:
   - kind: ServiceAccount
-    name: {{ .Values.name }}
-    namespace: {{ .Values.namespace }}
+    name: global-config-creator
+    namespace: {{ .Values.Namespace }}
 roleRef:
   kind: Role
-  name: {{ .Values.name }}
-  namespace: {{ .Values.namespace }}
+  name: global-config-creator
+  namespace: {{ .Values.Namespace }}
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.name }}
-  namespace: {{ .Values.namespace }}
+  name: global-config-creator
+  namespace: {{ .Values.Namespace }}
   annotations:
     "helm.sh/hook": "pre-install"
     "helm.sh/hook-delete-policy": "hook-succeeded"
   labels:
-    app: {{ .Values.name }}
+    app: global-config-creator
     giantswarm.io/service-type: "managed"
 spec:
   template:
     spec:
-      serviceAccountName: {{ .Values.name }}
-      securityContext:
-        runAsUser: {{ .Values.userID }}
-        runAsGroup: {{ .Values.groupID }}
+      serviceAccountName: global-config-creator
       containers:
-      - name: {{ .Values.name }}
-        image: "quay.io/giantswarm/docker-kubectl:latest"
+      - name: global-config-creator
+        image: "bitnami/kubectl:latest"
         command:
         - /bin/bash
         - -c 
-        - "while true; do CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath=\"{.data['ca\.crt']}\"`; if [[ $? == 0 ]]; then break; fi; sleep 1; done; echo $CERT; kubectl -n linkerd get cm linkerd-config -o yaml --export | sed \"s/REPLACE_ME/$CERT/\" | kubectl -n linkerd replace cm linkerd-config -f -"
-        resources:
-{{ toYaml .Values.resources | indent 10 }}
+        - >-
+          "while true; do CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath=\"{.data['ca\.crt']}\"`; if [[ $? == 0 ]]; then break; fi; sleep 1; done; echo $CERT; kubectl -n linkerd get cm linkerd-config -o yaml --export | sed \"s/REPLACE_ME/$CERT/\" | kubectl -n linkerd replace cm linkerd-config -f -"
       restartPolicy: Never
   backoffLimit: 4
