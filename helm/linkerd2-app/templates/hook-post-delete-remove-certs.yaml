@@ -2,14 +2,13 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
-  name: global-config-creator
+  name: linkerd-janitor
   namespace: {{ .Values.Namespace }}
   annotations:
-    "helm.sh/hook": "pre-install"
-    "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
+    "helm.sh/hook": "post-delete"
+    #    "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: global-config-creator
+    app: linkerd-janitor
 rules:
 - apiGroups:
   - ""
@@ -18,17 +17,34 @@ rules:
   resourceName:
   - linkerd-config
   verbs:
-  - "*"
+  - "delete"
 - apiGroups:
   - ""
   resources:
   - secrets
   resourceName:
   - linkerd-identity-issuer
+  - linkerd-ca-tls
   verbs:
-  - "get"
-  - "list"
-  - "watch"
+  - "delete"
+- apiGroups:
+  - "certmanager.k8s.io"
+  resources:
+  - "issuer"
+  resourceName:
+  - linkerd-ca-issuer
+  - linkerd-selfsigning-issuer
+  verbs:
+  - delete
+- apiGroups:
+  - "certmanager.k8s.io"
+  resources:
+  - "certificate"
+  resourceName:
+  - linkerd-ca
+  - linkerd
+  verbs:
+  - delete
 - apiGroups:
   - extensions
   resources:
@@ -41,59 +57,60 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: global-config-creator
+  name: linkerd-janitor
   namespace: {{ .Values.Namespace }}
   annotations:
-    "helm.sh/hook": "pre-install"
+    "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   namespace: {{ .Values.Namespace }}
   labels:
-    app: global-config-creator
+    app: linkerd-janitor
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: global-config-creator
+  name: linkerd-janitor
   namespace: {{ .Values.Namespace }}
   annotations:
-    "helm.sh/hook": "pre-install"
+    "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-4"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: global-config-creator
+    app: linkerd-janitor
 subjects:
   - kind: ServiceAccount
-    name: global-config-creator
+    name: linkerd-janitor
     namespace: {{ .Values.Namespace }}
 roleRef:
   kind: Role
-  name: global-config-creator
+  name: linkerd-janitor
   namespace: {{ .Values.Namespace }}
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: global-config-creator
+  name: linkerd-janitor
   namespace: {{ .Values.Namespace }}
   annotations:
-    "helm.sh/hook": "pre-install"
+    "helm.sh/hook": "post-delete"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: global-config-creator
+    app: linkerd-janitor
 spec:
   template:
     spec:
-      serviceAccountName: global-config-creator
+      serviceAccountName: linkerd-janitor
       containers:
-      - name: global-config-creator
+      - name: janitor
         image: "bitnami/kubectl:latest"
         command:
         - /bin/bash
         - -e
         - -c
         - |
-          while true; do export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}"`; if [[ $? == 0 && -n $CERT ]]; then break; fi; echo \"waiting for cert\"; sleep 1; done; while true; do kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; if [[ $? == 0 ]]; then break; fi; echo "waiting for config"; sleep 1; done; sed -i "s/REPLACE_ME/$CERT/" /tmp/config.yaml; kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yaml
+          kubectl -n linkerd delete secret linkerd-ca-tls;
+          kubectl -n linkerd delete secret linkerd-identity-issuer;
       restartPolicy: Never
   backoffLimit: 6
