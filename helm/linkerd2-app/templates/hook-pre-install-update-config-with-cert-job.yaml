@@ -94,6 +94,23 @@ spec:
         - -e
         - -c
         - |
-          while true; do export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}"`; if [[ $? == 0 && -n $CERT ]]; then break; fi; echo \"waiting for cert\"; sleep 1; done; while true; do kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; if [[ $? == 0 ]]; then break; fi; echo "waiting for config"; sleep 1; done; sed -i "s/REPLACE_ME/$CERT/" /tmp/config.yaml; kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yaml
+          while true; do 
+              export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}"`;
+              if [[ $? == 0 && -n $CERT ]]; then 
+                  break; 
+              fi; 
+              echo \"waiting for cert\"; 
+              sleep 1; 
+         done; 
+         while true; do 
+             kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; 
+             if [[ $? == 0 ]]; then 
+                 break; 
+             fi; 
+             echo "waiting for config"; 
+             sleep 1; 
+         done; 
+         sed -i "s/REPLACE_ME/$CERT/" /tmp/config.yaml; 
+         kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yaml;
       restartPolicy: Never
   backoffLimit: 6
