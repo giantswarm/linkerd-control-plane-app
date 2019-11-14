@@ -15,20 +15,24 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - configmap
+  - configmaps
   resourceName:
   - linkerd-config
   verbs:
   - "get"
+  - "list"
+  - "watch"
   - "replace"
 - apiGroups:
   - ""
   resources:
-  - secret
+  - secrets
   resourceName:
   - linkerd-identity-issuer
   verbs:
   - "get"
+  - "list"
+  - "watch"
 - apiGroups:
   - extensions
   resources:
@@ -81,7 +85,7 @@ metadata:
   namespace: {{ .Values.Namespace }}
   annotations:
     "helm.sh/hook": "pre-install"
-    "helm.sh/hook-delete-policy": "hook-succeeded"
+    #    "helm.sh/hook-delete-policy": "hook-succeeded"
   labels:
     app: global-config-creator
     giantswarm.io/service-type: "managed"
@@ -94,8 +98,11 @@ spec:
         image: "bitnami/kubectl:latest"
         command:
         - /bin/bash
-        - -c 
-        - >-
-          "while true; do CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath=\"{.data['ca\.crt']}\"`; if [[ $? == 0 ]]; then break; fi; sleep 1; done; echo $CERT; kubectl -n linkerd get cm linkerd-config -o yaml --export | sed \"s/REPLACE_ME/$CERT/\" | kubectl -n linkerd replace cm linkerd-config -f -"
+        - -e
+        - -x
+        - -c
+        - |
+          "export CERT=\"`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath=\"{.data['ca\.crt']}\"`\"; kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; sed -i \"s/REPLACE_ME/\$CERT/\" /tmp/config.yaml; #kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yam"
+          #          "set -e; while true; do export CERT=\"`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath=\"{.data['ca\.crt']}\"`\"; if [[ $? == 0 ]]; then break; fi; echo \"waiting for cert\"; sleep 1; done; set +e; kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; sed -i \"s/REPLACE_ME/\$CERT/\" /tmp/config.yaml; #kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yam"
       restartPolicy: Never
   backoffLimit: 4
