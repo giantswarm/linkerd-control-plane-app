@@ -19,10 +19,7 @@ rules:
   resourceName:
   - linkerd-config
   verbs:
-  - "get"
-  - "list"
-  - "watch"
-  - "replace"
+  - "*"
 - apiGroups:
   - ""
   resources:
@@ -102,7 +99,7 @@ spec:
         - -x
         - -c
         - |
-          "export CERT=\"`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath=\"{.data['ca\.crt']}\"`\"; kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; sed -i \"s/REPLACE_ME/\$CERT/\" /tmp/config.yaml; #kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yam"
-          #          "set -e; while true; do export CERT=\"`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath=\"{.data['ca\.crt']}\"`\"; if [[ $? == 0 ]]; then break; fi; echo \"waiting for cert\"; sleep 1; done; set +e; kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; sed -i \"s/REPLACE_ME/\$CERT/\" /tmp/config.yaml; #kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yam"
+          set -e; while true; do export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}"`; if [[ $? == 0 && -n $CERT ]]; then break; fi; echo \"waiting for cert\"; sleep 1; done; while true; do kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; if [[ $? == 0 ]]; then break; fi; echo "waiting for config"; sleep 1; done; sed -i "s/REPLACE_ME/$CERT/" /tmp/config.yaml; kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yaml
+          #          export CERT=\"`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath=\"{.data['ca\.crt']}\"`\" && kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml && sed -i \"s/REPLACE_ME/\$CERT/\" /tmp/config.yaml; #kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yam
       restartPolicy: Never
-  backoffLimit: 4
+  backoffLimit: 6
