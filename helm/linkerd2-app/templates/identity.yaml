@@ -82,9 +82,6 @@ spec:
       - args:
         - identity
         - -log-level={{.ControllerLogLevel}}
-        {{if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/cert-manager") -}}
-        - -identity-external-issuer
-        {{- end }}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
         image: {{.ControllerImage}}:{{default .LinkerdVersion .ControllerImageVersion}}
         imagePullPolicy: {{.ImagePullPolicy}}
