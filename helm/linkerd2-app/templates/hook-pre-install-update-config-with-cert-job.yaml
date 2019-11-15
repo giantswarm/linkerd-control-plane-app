@@ -92,6 +92,7 @@ spec:
         command:
         - /bin/bash
         - -e
+        - -x
         - -c
         - >-
           while true; do 
@@ -110,7 +111,7 @@ spec:
               echo "waiting for config"; 
               sleep 1; 
           done; 
-          sed -i "s/REPLACE_ME/$CERT/" /tmp/config.yaml; 
-          kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yaml;
+          awk -v CERT="$CERT" '{gsub("REPLACE_ME", CERT);print $0}' /tmp/config.yaml > /tmp/config-out.yaml;
+          kubectl -n linkerd replace configmap linkerd-config -f /tmp/config-out.yaml;
       restartPolicy: Never
   backoffLimit: 6
