@@ -17,7 +17,6 @@ rules:
   - configmaps
   resourceName:
   - linkerd-config
-  - linkerd-identity-ca-crt
   verbs:
   - delete
 - apiGroups:
@@ -120,6 +119,5 @@ spec:
           kubectl -n linkerd delete secret linkerd-ca-tls;
           kubectl -n linkerd delete secret linkerd-identity-issuer;
           kubectl -n linkerd delete configmap linkerd-config;
-          kubectl -n linkerd delete configmap linkerd-identity-ca-crt;
       restartPolicy: Never
   backoffLimit: 6

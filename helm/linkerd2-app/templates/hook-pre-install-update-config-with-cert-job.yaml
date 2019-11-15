@@ -17,7 +17,6 @@ rules:
   - configmaps
   resourceName:
   - linkerd-config
-  - linkerd-identity-ca-crt
   verbs:
   - "*"
 - apiGroups:
@@ -96,7 +95,7 @@ spec:
         - -c
         - >-
           while true; do 
-              export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}"`;
+              export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}" | base64 -d -w 0`;
               if [[ $? == 0 && -n $CERT ]]; then 
                   break; 
               fi; 
@@ -113,6 +112,5 @@ spec:
           done; 
           sed -i "s/REPLACE_ME/$CERT/" /tmp/config.yaml; 
           kubectl -n linkerd replace configmap linkerd-config -f /tmp/config.yaml;
-          kubectl -n linkerd create configmap linkerd-identity-ca-crt --from-literal=ca.crt="-----BEGIN CERTIFICATE-----\n$CERT\n-----END CERTIFICATE-----";
       restartPolicy: Never
   backoffLimit: 6

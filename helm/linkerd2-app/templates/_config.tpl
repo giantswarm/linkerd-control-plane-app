@@ -5,7 +5,7 @@
   "version": "{{.LinkerdVersion}}",
   "identityContext":{
     "trustDomain": "{{.Identity.TrustDomain}}",
-    "trustAnchorsPem": "-----BEGIN CERTIFICATE-----\nREPLACE_ME\n-----END CERTIFICATE-----",
+    "trustAnchorsPem": "-----BEGIN CERTIFICATE-----REPLACE_ME-----END CERTIFICATE-----",
     "issuanceLifeTime": "{{.Identity.Issuer.IssuanceLifeTime}}",
     "clockSkewAllowance": "{{.Identity.Issuer.ClockSkewAllowance}}",
     "scheme": "{{.Identity.Issuer.Scheme}}"
