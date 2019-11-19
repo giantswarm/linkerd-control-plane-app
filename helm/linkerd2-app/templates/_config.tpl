@@ -15,6 +15,7 @@
   "clusterDomain": "{{.ClusterDomain}}"
 }
 {{- end -}}
+
 {{- define "linkerd.configs.proxy" -}}
 {
   "proxyImage":{
@@ -73,7 +74,6 @@
 
 {{- define "linkerd.configs.install" -}}
 {
-  "uuid":"{{ uuidv4 }}",
   "cliVersion":"{{ .LinkerdVersion }}",
   "flags":[]
 }
