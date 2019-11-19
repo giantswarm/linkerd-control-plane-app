@@ -14,4 +14,4 @@ maintainers:
 name: linkerd2
 sources:
 - https://github.com/linkerd/linkerd2/
-version: 19.11.2
+version: [[ .Version ]]
