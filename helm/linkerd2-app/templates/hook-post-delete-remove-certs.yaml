@@ -25,7 +25,6 @@ rules:
   - secrets
   resourceName:
   - linkerd-identity-issuer
-  - linkerd-ca-tls
   verbs:
   - delete
 - apiGroups:
@@ -33,7 +32,6 @@ rules:
   resources:
   - issuers
   resourceName:
-  - linkerd-ca-issuer
   - linkerd-selfsigning-issuer
   verbs:
   - delete
@@ -42,8 +40,7 @@ rules:
   resources:
   - certificates
   resourceName:
-  - linkerd-ca
-  - linkerd
+  - linkerd-identity-issuer
   verbs:
   - delete
 - apiGroups:
@@ -112,11 +109,8 @@ spec:
         - -e
         - -c
         - >-
-          kubectl -n linkerd delete certificate linkerd;
-          kubectl -n linkerd delete certificate linkerd-ca;
-          kubectl -n linkerd delete issuer linkerd-ca-issuer;
+          kubectl -n linkerd delete certificate linkerd-identity-issuer;
           kubectl -n linkerd delete issuer linkerd-selfsigning-issuer;
-          kubectl -n linkerd delete secret linkerd-ca-tls;
           kubectl -n linkerd delete secret linkerd-identity-issuer;
           kubectl -n linkerd delete configmap linkerd-config;
       restartPolicy: Never

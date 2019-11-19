@@ -89,9 +89,6 @@ spec:
       containers:
       - name: global-config-creator
         image: "bitnami/kubectl:latest"
-        volumeMounts:
-        - mountPath: /tmp
-          name: tmp-volume
         command:
         - /bin/bash
         - -e
@@ -115,14 +112,6 @@ spec:
               sleep 1; 
           done; 
           awk -v CERT="$CERT" 'BEGIN{gsub("\n", "\\n", CERT)}; {gsub("REPLACE_ME", CERT);print $0}' /tmp/config.yaml > /tmp/config-out.yaml;
-          cat /tmp/config-out.yaml;
           kubectl -n linkerd replace configmap linkerd-config -f /tmp/config-out.yaml;
       restartPolicy: Never
-      volumes:
-      - name: tmp-volume
-        hostPath:
-          # directory location on host
-          path: /tmp
-          # this field is optional
-          type: Directory
   backoffLimit: 6
