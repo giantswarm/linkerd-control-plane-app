@@ -9,7 +9,7 @@ workflows:
           name: "package and push linkerd2 chart"
           app_catalog: "giantswarm-playground-catalog"
           app_catalog_test: "giantswarm-playground-test-catalog"
-          chart: "linkerd2-app"
+          chart: "linkerd2"
           # Trigger job on git tag.
           filters:
             tags:
