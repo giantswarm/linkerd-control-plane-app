@@ -28,6 +28,14 @@ rules:
   verbs:
   - delete
 - apiGroups:
+  - ""
+  resources:
+  - namespaces
+  resourceName:
+  - {{ .Values.Namespace }}
+  verbs:
+  - delete
+- apiGroups:
   - certmanager.k8s.io
   resources:
   - issuers
@@ -113,5 +121,6 @@ spec:
           kubectl -n linkerd delete issuer linkerd-selfsigning-issuer;
           kubectl -n linkerd delete secret linkerd-identity-issuer;
           kubectl -n linkerd delete configmap linkerd-config;
+          kubectl delete ns {{ .Values.Namespace }};
       restartPolicy: Never
   backoffLimit: 6
