@@ -91,16 +91,16 @@ spec:
       serviceAccountName: global-config-creator
       containers:
       - name: global-config-creator
-        image: "bitnami/kubectl:latest"
+        image: "quay.io/giantswarm/docker-kubectl:latest"
         command:
-        - /bin/bash
+        - /bin/sh
         - -e
         - -x
         - -c
         - >-
           while true; do 
               export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}" | base64 -d -w 0`;
-              if [[ $? == 0 && -n $CERT ]]; then 
+              if [ $? -eq 0 ] && [ ! -z $CERT ]; then 
                   break; 
               fi; 
               echo \"waiting for cert\"; 
@@ -108,7 +108,7 @@ spec:
           done; 
           while true; do 
               kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; 
-              if [[ $? == 0 ]]; then 
+              if [ $? -eq 0 ]; then 
                   break; 
               fi; 
               echo "waiting for config"; 

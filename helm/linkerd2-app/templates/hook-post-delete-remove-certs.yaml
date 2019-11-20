@@ -112,9 +112,9 @@ spec:
       serviceAccountName: linkerd-janitor
       containers:
       - name: janitor
-        image: "bitnami/kubectl:latest"
+        image: "quay.io/giantswarm/docker-kubectl:latest"
         command:
-        - /bin/bash
+        - /bin/sh
         - -e
         - -c
         - >-
