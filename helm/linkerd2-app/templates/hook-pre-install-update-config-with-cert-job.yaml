@@ -1,3 +1,6 @@
+{{with .Values -}}
+{{if .Identity -}}
+{{if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/cert-manager") -}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
@@ -115,3 +118,6 @@ spec:
           kubectl -n linkerd replace configmap linkerd-config -f /tmp/config-out.yaml;
       restartPolicy: Never
   backoffLimit: 6
+{{- end}}
+{{- end}}
+{{- end}}
