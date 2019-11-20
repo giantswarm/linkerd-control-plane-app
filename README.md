@@ -23,3 +23,4 @@ helm install -n linkerd2 giantswarm-playground-catalog/linkerd2 --set Identity.I
 ## Credit
 
 * https://helm.linkerd.io/stable
+
