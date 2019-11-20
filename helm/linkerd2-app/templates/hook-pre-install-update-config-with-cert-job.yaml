@@ -99,8 +99,8 @@ spec:
         - -c
         - >-
           while true; do 
-              export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}" | base64 -d -w 0`;
-              if [ $? -eq 0 ] && [ ! -z $CERT ]; then 
+              export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}" | base64 -d`;
+              if [ $? -eq 0 ] && [ ! -z "$CERT" ]; then 
                   break; 
               fi; 
               echo \"waiting for cert\"; 
