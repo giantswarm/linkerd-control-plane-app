@@ -14,5 +14,4 @@ maintainers:
 name: linkerd2-app
 sources:
 - https://github.com/linkerd/linkerd2/
-#version: [[ .Version ]]
-version: 0.0.1
+version: [[ .Version ]]
