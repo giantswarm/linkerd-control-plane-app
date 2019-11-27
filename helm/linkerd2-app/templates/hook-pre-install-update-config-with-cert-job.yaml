@@ -50,7 +50,6 @@ metadata:
     "helm.sh/hook": "pre-install"
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
-  namespace: {{ .Namespace }}
   labels:
     app: global-config-creator
 ---
