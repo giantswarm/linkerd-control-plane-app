@@ -14,6 +14,7 @@ metadata:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-10"
   labels:
+    {{.ControllerNamespaceLabel}}: {{.Namespace}}
     {{.LinkerdNamespaceLabel}}: "true"
     config.linkerd.io/admission-webhooks: disabled
 {{ end -}}
