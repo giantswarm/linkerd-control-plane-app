@@ -5,9 +5,15 @@
   "version": "{{.LinkerdVersion}}",
   "identityContext":{
     "trustDomain": "{{.Identity.TrustDomain}}",
+{{if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/cert-manager") -}}
+    "trustAnchorsPem": "REPLACE_ME",
+{{- end}}
+{{if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/tls") -}}
     "trustAnchorsPem": "{{required "Please provide the identity trust anchors" .Identity.TrustAnchorsPEM | trim | replace "\n" "\\n"}}",
+{{- end}}
     "issuanceLifeTime": "{{.Identity.Issuer.IssuanceLifeTime}}",
-    "clockSkewAllowance": "{{.Identity.Issuer.ClockSkewAllowance}}"
+    "clockSkewAllowance": "{{.Identity.Issuer.ClockSkewAllowance}}",
+    "scheme": "{{.Identity.Issuer.Scheme}}"
   },
   "autoInjectContext": null,
   "omitWebhookSideEffects": {{.OmitWebhookSideEffects}},
@@ -73,7 +79,6 @@
 
 {{- define "linkerd.configs.install" -}}
 {
-  "uuid":"{{ uuidv4 }}",
   "cliVersion":"{{ .LinkerdVersion }}",
   "flags":[]
 }
