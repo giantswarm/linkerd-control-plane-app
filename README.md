@@ -5,6 +5,8 @@
 Giant Swarm offers a linkerd2 Managed App which can be installed in tenant clusters.
 Here we define the linkerd2 chart with its templates and default configuration.
 
+Currently based on "edge" release of linkerd2.
+
 ## Usage
 
 This application requires the [`cert-manager`](https://github.com/giantswarm/cert-manager-app)
