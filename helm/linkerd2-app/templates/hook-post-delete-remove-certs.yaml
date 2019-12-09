@@ -110,8 +110,8 @@ spec:
       serviceAccountName: linkerd-janitor
       containers:
       - name: janitor
-        image: "{{ .Values.kubectlImage.registry }}/{{ .Values.kubectlImage.name }}:{{ .Values.kubectlImage.tag }}"
-        imagePullPolicy: "{{ .Values.kubectlImage.pullPolicy }}"
+        image: "{{ .kubectlImage.registry }}/{{ .kubectlImage.name }}:{{ .kubectlImage.tag }}"
+        imagePullPolicy: "{{ .kubectlImage.pullPolicy }}"
         command:
         - /bin/sh
         - -e
