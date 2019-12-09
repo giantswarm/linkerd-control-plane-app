@@ -110,7 +110,8 @@ spec:
       serviceAccountName: linkerd-janitor
       containers:
       - name: janitor
-        image: "quay.io/giantswarm/docker-kubectl:latest"
+        image: "{{ .Values.kubectlImage.registry }}/{{ .Values.kubectlImage.name }}:{{ .Values.kubectlImage.tag }}"
+        imagePullPolicy: "{{ .Values.kubectlImage.pullPolicy }}"
         command:
         - /bin/sh
         - -e

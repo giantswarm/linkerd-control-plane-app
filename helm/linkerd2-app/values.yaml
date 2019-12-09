@@ -150,3 +150,9 @@ InstallNamespace: true
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector.
 NodeSelector:
   beta.kubernetes.io/os: linux
+
+kubectlImage:
+  registry: quay.io
+  name: giantswarm/docker-kubectl
+  tag: 933ac043b7bec33104aac58b16849ea28bace26c
+  pullPolicy: IfNotPresent
