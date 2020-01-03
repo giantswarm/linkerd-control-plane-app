@@ -11,7 +11,7 @@ from `cert-manager` prepared secrets.
 
 ## Requirements
 
-- you should install only one release of this chart per kubernetes cluster
+- you can install only one release of this chart per kubernetes cluster
 
 ## Installation
 
@@ -30,7 +30,7 @@ When `cert-manager` is ready, you can install linkerd2 with the command below. P
 we have to pass `-set Identity.Issuer.Scheme='linkerd.io/cert-manager` to make the chart use
 `cert-manager`. Also, for compatibility with upstream chart, please note that we need to specify the namespace
 to install to twice: first in the `--namespace` parameter of helm, then as `--set Namespace` parameter
-of the chart.
+of the chart. Recommended namespace name is `linkerd`, which is already included below:
 
 ```text
 helm install --namespace linkerd -n linkerd giantswarm-playground-catalog/linkerd2 --set Identity.Issuer.Scheme='linkerd.io/cert-manager' --set Namespace=linkerd
@@ -38,7 +38,9 @@ helm install --namespace linkerd -n linkerd giantswarm-playground-catalog/linker
 
 ## Configuration
 
-You shouldn't need to change the defaults. Still, you can check available chart options [here](helm/link/../linkerd2-app/values.yaml).
+Two installation options, `Identity.Issuer.Scheme` and `Namespace` are required to install this chart,
+as shown above. You shouldn't need to change other defaults. Still, you can check available chart
+options [here](helm/linkerd2-app/values.yaml).
 
 ## Compatibility
 
