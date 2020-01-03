@@ -117,15 +117,13 @@ spec:
         - -e
         - -c
         - >-
-          kubectl -n linkerd delete configmap linkerd-config;
+          kubectl -n {{ .Namespace }} delete configmap linkerd-config;
 {{- if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/cert-manager") }}
-          kubectl -n linkerd delete issuer linkerd-selfsigning-issuer;
-          kubectl -n linkerd delete certificate linkerd-identity-issuer;
-          kubectl -n linkerd delete secret linkerd-identity-issuer;
+          kubectl -n {{ .Namespace }} delete issuer linkerd-selfsigning-issuer;
+          kubectl -n {{ .Namespace }} delete certificate linkerd-identity-issuer;
+          kubectl -n {{ .Namespace }} delete secret linkerd-identity-issuer;
 {{- end }}
-{{- if (.InstallNamespace) }}
           kubectl delete ns {{ .Namespace }};
-{{- end }}
       restartPolicy: Never
   backoffLimit: 6
 {{- end -}}

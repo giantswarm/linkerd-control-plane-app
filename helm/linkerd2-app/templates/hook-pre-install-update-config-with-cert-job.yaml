@@ -99,7 +99,7 @@ spec:
         - -c
         - >-
           while true; do 
-              export CERT=`kubectl -n linkerd get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}" | base64 -d`;
+              export CERT=`kubectl -n {{ .Namespace }} get secret linkerd-identity-issuer -o jsonpath="{.data['ca\.crt']}" | base64 -d`;
               if [ $? -eq 0 ] && [ ! -z "$CERT" ]; then 
                   break; 
               fi; 
@@ -107,7 +107,7 @@ spec:
               sleep 1; 
           done; 
           while true; do 
-              kubectl -n linkerd get cm linkerd-config -o yaml --export > /tmp/config.yaml; 
+              kubectl -n {{ .Namespace }} get cm linkerd-config -o yaml --export > /tmp/config.yaml; 
               if [ $? -eq 0 ]; then 
                   break; 
               fi; 
@@ -115,7 +115,7 @@ spec:
               sleep 1; 
           done; 
           awk -v CERT="$CERT" 'BEGIN{gsub("\n", "\\n", CERT)}; {gsub("REPLACE_ME", CERT);print $0}' /tmp/config.yaml > /tmp/config-out.yaml;
-          kubectl -n linkerd replace configmap linkerd-config -f /tmp/config-out.yaml;
+          kubectl -n {{ .Namespace }} replace configmap linkerd-config -f /tmp/config-out.yaml;
       restartPolicy: Never
   backoffLimit: 6
 {{- end}}

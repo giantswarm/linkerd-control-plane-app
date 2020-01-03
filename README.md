@@ -21,17 +21,19 @@ This application requires the [`cert-manager`](https://github.com/giantswarm/cer
 application to be already deployed in the cluster. You can install it with the following command:
 
 ```bash
-helm install -n cert-manager giantswarm-default-catalog/cert-manager-app
+helm install --namespace kube-system -n cert-manager --version=1.0.1 giantswarm/cert-manager-app
 ```
 
 ### Deployment
 
 When `cert-manager` is ready, you can install linkerd2 with the command below. Please note that
 we have to pass `-set Identity.Issuer.Scheme='linkerd.io/cert-manager` to make the chart use
-`cert-manager`.
+`cert-manager`. Also, for compatibility with upstream chart, please note that we need to specify the namespace
+to install to twice: first in the `--namespace` parameter of helm, then as `--set Namespace` parameter
+of the chart.
 
 ```text
-helm install -n linkerd2 giantswarm-playground-catalog/linkerd2 --set Identity.Issuer.Scheme='linkerd.io/cert-manager'
+helm install --namespace linkerd -n linkerd giantswarm-playground-catalog/linkerd2 --set Identity.Issuer.Scheme='linkerd.io/cert-manager' --set Namespace=linkerd
 ```
 
 ## Configuration
