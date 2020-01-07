@@ -44,7 +44,7 @@ options [here](helm/linkerd2-app/values.yaml).
 
 ## Compatibility
 
-Tested on Giant Swarm release 9.0.0 on AWS with Kubernetes 1.15.5.
+Tested on Giant Swarm release 10.1.0 on AWS with Kubernetes 1.15.5.
 
 ## Credit
 
