@@ -31,7 +31,7 @@ metadata:
     "helm.sh/hook-weight": "-5"
 spec:
   secretName: linkerd-identity-issuer
-  commonName: identity.linkerd.{{.ClusterDomain}}
+  commonName: identity.{{.Namespace}}.{{.ClusterDomain}}
   isCA: true
   keyAlgorithm: ecdsa
   issuerRef:
