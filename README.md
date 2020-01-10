@@ -12,6 +12,11 @@ from `cert-manager` prepared secrets.
 ## Requirements
 
 - you can install only one release of this chart per kubernetes cluster
+- *Warning*: Currently (as of 20.1.1 edge release) Linkerd has
+  [a bug](https://github.com/linkerd/linkerd2/issues/2800#issuecomment-492016952) related to the
+  [CoreDNS autopath](https://coredns.io/plugins/autopath/) module. If you want to test this release
+  of Linkerd before the bug is fixed, be sure to disable `autopath` in your `CoreDNS` config and
+  restart `CoreDNS` pods.
 
 ## Installation
 
