@@ -18,3 +18,4 @@ sources:
 - https://github.com/linkerd/linkerd2/
 - https://github.com/giantswarm/linkerd2-app
 version: [[ .Version ]]
+#version: 2.7.1

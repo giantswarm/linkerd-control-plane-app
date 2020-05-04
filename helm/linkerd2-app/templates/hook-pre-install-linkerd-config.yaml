@@ -1,40 +1,38 @@
-{{with .Values -}}
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: linkerd-config
-  namespace: {{.Namespace}}
+  namespace: {{.Values.global.namespace}}
   labels:
-    {{.ControllerComponentLabel}}: controller
-    {{.ControllerNamespaceLabel}}: {{.Namespace}}
+    {{.Values.global.controllerComponentLabel}}: controller
+    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
   annotations:
-    {{.CreatedByAnnotation}}: {{default (printf "linkerd/helm %s" .LinkerdVersion) .CliVersion}}
+    {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-4"
 data:
   global: |
-  {{- if .Configs -}}
-  {{- if .Configs.Global -}}
-  {{.Configs.Global | nindent 4}}
+  {{- if .Values.configs -}}
+  {{- if .Values.configs.global -}}
+  {{.Values.configs.global | nindent 4}}
   {{- end }}
   {{- else -}}
   {{- include "linkerd.configs.global" . | nindent 4}}
   {{- end }}
   proxy: |
-  {{- if .Configs -}}
-  {{- if .Configs.Proxy -}}
-  {{.Configs.Proxy | nindent 4}}
+  {{- if .Values.configs -}}
+  {{- if .Values.configs.proxy -}}
+  {{.Values.configs.proxy | nindent 4}}
   {{- end }}
   {{- else -}}
   {{- include "linkerd.configs.proxy" . | nindent 4}}
   {{- end }}
   install: |
-  {{- if .Configs -}}
-  {{- if .Configs.Install -}}
-  {{.Configs.Install | nindent 4}}
+  {{- if .Values.configs -}}
+  {{- if .Values.configs.install -}}
+  {{.Values.configs.install | nindent 4}}
   {{- end }}
   {{- else -}}
   {{- include "linkerd.configs.install" . | nindent 4}}
   {{- end }}
-{{- end }}

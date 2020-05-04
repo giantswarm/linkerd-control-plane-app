@@ -5,7 +5,7 @@
   "version": "{{.Values.global.linkerdVersion}}",
   "identityContext":{
     "trustDomain": "{{.Values.global.identityTrustDomain}}",
-{{if and (Values.identity.issuer) (eq Values.identity.issuer.scheme "linkerd.io/cert-manager") -}}
+{{if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") -}}
     "trustAnchorsPem": "REPLACE_ME",
 {{- end}}
 {{if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/tls") -}}

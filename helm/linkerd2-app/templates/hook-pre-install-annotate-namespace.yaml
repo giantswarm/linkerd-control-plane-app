@@ -78,9 +78,8 @@ spec:
         - -x
         - -c
         - >-
-          kubectl annotate --overwrite ns {{ .Release.Namespace }} {{.Values.ProxyInjectAnnotation}}={{.Values.ProxyInjectDisabled}};
-          kubectl label --overwrite ns {{ .Release.Namespace }} {{.Values.ControllerNamespaceLabel}}={{.Release.Namespace}};
-          kubectl label --overwrite ns {{ .Release.Namespace }} {{.Values.LinkerdNamespaceLabel}}="true";
+          kubectl annotate --overwrite ns {{ .Release.Namespace }} {{.Values.global.proxyInjectAnnotation}}={{.Values.global.proxyInjectDisabled}}
+          kubectl label --overwrite ns {{ .Release.Namespace }} {{.Values.global.linkerdNamespaceLabel}}="true";
           kubectl label --overwrite ns {{ .Release.Namespace }} config.linkerd.io/admission-webhooks=disabled;
       restartPolicy: Never
   backoffLimit: 6
