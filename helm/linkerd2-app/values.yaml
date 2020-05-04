@@ -2,146 +2,163 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-ClusterDomain: &cluster_domain cluster.local
-EnableH2Upgrade: true
-ImagePullPolicy: &image_pull_policy IfNotPresent
+# Values that are passed along to sub-charts
+global:
+  clusterDomain: &cluster_domain cluster.local
+  imagePullPolicy: &image_pull_policy IfNotPresent
+  
+  # Control Plane Trace Configuration
+  controlPlaneTracing: false
 
-# control plane version. See Proxy section for proxy version
-LinkerdVersion: &linkerd_version edge-19.11.2
+  # control plane version. See Proxy section for proxy version
+  linkerdVersion: &linkerd_version stable-2.7.1
 
-Namespace: default
-OmitWebhookSideEffects: false
-WebhookFailurePolicy: Ignore
+  namespace: linkerd
+
+  identityTrustAnchorsPEM: |
+
+  identityTrustDomain: *cluster_domain
+
+  # proxy configuration
+  proxy:
+    enableExternalProfiles: false
+    image:
+      name: gcr.io/linkerd-io/proxy
+      pullPolicy: *image_pull_policy
+      version: *linkerd_version
+    logLevel: warn,linkerd=info
+    ports:
+      admin: 4191
+      control: 4190
+      inbound: 4143
+      outbound: 4140
+    resources:
+      cpu:
+        limit: ""
+        request: ""
+      memory:
+        limit: ""
+        request: ""
+    trace:
+      collectorSvcAddr: ""
+      collectorSvcAccount: default
+    uid: 2102
+    # If set, the proxy's pre-stop hook will postpone the Kubernetes's SIGTERM signal
+    # and wait for this duration before letting the proxy process the SIGTERM signal.
+    # See https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
+    # for more info on container lifecycle hooks.
+    waitBeforeExitSeconds: 0
+
+  # proxy-init configuration
+  proxyInit:
+    ignoreInboundPorts: ""
+    ignoreOutboundPorts: ""
+    image:
+      name: gcr.io/linkerd-io/proxy-init
+      pullPolicy: *image_pull_policy
+      version: v1.3.2
+    resources:
+      cpu:
+        limit: 100m
+        request: 10m
+      memory:
+        limit: 50Mi
+        request: 10Mi
+
+  # control plane annotations - do not edit
+  createdByAnnotation: linkerd.io/created-by
+  proxyInjectAnnotation: linkerd.io/inject
+  proxyInjectDisabled: disabled
+
+  # control plane labels - do not edit
+  controllerComponentLabel: linkerd.io/control-plane-component
+  controllerNamespaceLabel: linkerd.io/control-plane-ns
+  linkerdNamespaceLabel: linkerd.io/is-control-plane
+
+
+enableH2Upgrade: true
+
+omitWebhookSideEffects: false
+webhookFailurePolicy: Ignore
 
 # controller configuration
-ControllerImage: gcr.io/linkerd-io/controller
-ControllerLogLevel: &controller_log_level info
-ControllerReplicas: 1
-ControllerUID: 2103
+controllerImage: gcr.io/linkerd-io/controller
+controllerLogLevel: &controller_log_level info
+controllerReplicas: 1
+controllerUID: 2103
 
 # web dashboard configuration
-Dashboard:
-  Replicas: 1
+dashboard:
+  replicas: 1
+
+# debug configuration
+debugContainer:
+  image:
+    name: gcr.io/linkerd-io/debug
+    pullPolicy: *image_pull_policy
+    version: *linkerd_version
 
 # identity configuration
-Identity:
-  Issuer:
-    Scheme: linkerd.io/tls
+identity:
+  issuer:
+    scheme: linkerd.io/tls
 
-    ClockSkewAllowance: 20s
+    clockSkewAllowance: 20s
 
-    # must match the expiry date in CrtPEM
-    CrtExpiry:
+    # must match the expiry date in crtPEM
+    crtExpiry:
 
     # control plane annotation - do not edit
-    CrtExpiryAnnotation: linkerd.io/identity-issuer-expiry
+    crtExpiryAnnotation: linkerd.io/identity-issuer-expiry
 
-    IssuanceLifeTime: 86400s
+    issuanceLifetime: 86400s
 
-    TLS:
+    tls:
       # PEM-encoded certificate
-      CrtPEM: |
+      crtPEM: |
 
       # PEM-encoded ECDSA private key
-      KeyPEM: |
-
-  TrustAnchorsPEM: |
-
-  TrustDomain: *cluster_domain
+      keyPEM: |
 
 # grafana configuration
-GrafanaImage: gcr.io/linkerd-io/grafana
-GrafanaUserRole: Editor
+grafanaImage: gcr.io/linkerd-io/grafana
+grafanaUserRole: Editor
 
 # heartbeat configuration
-DisableHeartBeat: false
-HeartbeatSchedule: "0 0 * * *"
+disableHeartBeat: false
+heartbeatSchedule: "0 0 * * *"
 
 # prometheus configuration
-PrometheusImage: prom/prometheus:v2.11.1
-PrometheusLogLevel: *controller_log_level
-
-# Control Plane Trace Configuration
-ControlPlaneTracing: false
-
-# proxy configuration
-Proxy:
-  EnableExternalProfiles: false
-  Image:
-    Name: gcr.io/linkerd-io/proxy
-    PullPolicy: *image_pull_policy
-    Version: *linkerd_version
-  LogLevel: warn,linkerd2_proxy=info
-  Ports:
-    Admin: 4191
-    Control: 4190
-    Inbound: 4143
-    Outbound: 4140
-  Resources:
-    CPU:
-      Limit: ""
-      Request: ""
-    Memory:
-      Limit: ""
-      Request: ""
-  Trace:
-    CollectorSvcAddr: ""
-    CollectorSvcAccount: default
-  UID: 2102
-
-# proxy-init configuration
-ProxyInit:
-  IgnoreInboundPorts: ""
-  IgnoreOutboundPorts: ""
-  Image:
-    Name: gcr.io/linkerd-io/proxy-init
-    PullPolicy: *image_pull_policy
-    Version: v1.1.0
-  Resources:
-    CPU:
-      Limit: 100m
-      Request: 10m
-    Memory:
-      Limit: 50Mi
-      Request: 10Mi
+prometheusImage: prom/prometheus:v2.15.2
+prometheusLogLevel: *controller_log_level
 
 # proxy injector configuration
-ProxyInjector:
+proxyInjector:
   # if empty, Helm will auto-generate these fields
-  CrtPEM: |
+  crtPEM: |
 
-  KeyPEM: |
+  keyPEM: |
 
 # service profile validator configuration
-ProfileValidator:
+profileValidator:
   # if empty, Helm will auto-generate these fields
-  CrtPEM: |
+  crtPEM: |
 
-  KeyPEM: |
+  keyPEM: |
 
 # tap configuration
-Tap:
+tap:
   # if empty, Helm will auto-generate these fields
-  CrtPEM: |
+  crtPEM: |
 
-  KeyPEM: |
+  keyPEM: |
 
 # web configuration
-WebImage: gcr.io/linkerd-io/web
-
-# control plane annotations - do not edit
-CreatedByAnnotation: linkerd.io/created-by
-ProxyInjectAnnotation: linkerd.io/inject
-ProxyInjectDisabled: disabled
-
-# control plane labels - do not edit
-ControllerComponentLabel: linkerd.io/control-plane-component
-ControllerNamespaceLabel: linkerd.io/control-plane-ns
-LinkerdNamespaceLabel: linkerd.io/is-control-plane
+webImage: gcr.io/linkerd-io/web
 
 # Node selection constraints for control-plane components
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector.
-NodeSelector:
+nodeSelector:
   beta.kubernetes.io/os: linux
 
 kubectlImage:

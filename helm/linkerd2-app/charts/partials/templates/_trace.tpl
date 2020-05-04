@@ -1,5 +1,5 @@
 {{ define "partials.linkerd.trace" -}}
-{{ if .ControlPlaneTracing -}}
-- -trace-collector=linkerd-collector.{{.Namespace}}.svc.{{.ClusterDomain}}:55678
+{{ if .Values.global.controlPlaneTracing -}}
+- -trace-collector=linkerd-collector.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:55678
 {{ end -}}
 {{- end }}

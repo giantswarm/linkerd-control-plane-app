@@ -1,23 +1,23 @@
 {{ define "partials.proxy" -}}
 env:
 - name: LINKERD2_PROXY_LOG
-  value: {{.Proxy.LogLevel}}
+  value: {{.Values.global.proxy.logLevel}}
 - name: LINKERD2_PROXY_DESTINATION_SVC_ADDR
-  value: {{ternary "localhost.:8086" (printf "linkerd-dst.%s.svc.%s:8086" .Namespace .ClusterDomain) (eq .Proxy.Component "linkerd-destination")}}
+  value: {{ternary "localhost.:8086" (printf "linkerd-dst.%s.svc.%s:8086" .Values.global.namespace .Values.global.clusterDomain) (eq .Values.global.proxy.component "linkerd-destination")}}
 - name: LINKERD2_PROXY_CONTROL_LISTEN_ADDR
-  value: 0.0.0.0:{{.Proxy.Ports.Control}}
+  value: 0.0.0.0:{{.Values.global.proxy.ports.control}}
 - name: LINKERD2_PROXY_ADMIN_LISTEN_ADDR
-  value: 0.0.0.0:{{.Proxy.Ports.Admin}}
+  value: 0.0.0.0:{{.Values.global.proxy.ports.admin}}
 - name: LINKERD2_PROXY_OUTBOUND_LISTEN_ADDR
-  value: 127.0.0.1:{{.Proxy.Ports.Outbound}}
+  value: 127.0.0.1:{{.Values.global.proxy.ports.outbound}}
 - name: LINKERD2_PROXY_INBOUND_LISTEN_ADDR
-  value: 0.0.0.0:{{.Proxy.Ports.Inbound}}
+  value: 0.0.0.0:{{.Values.global.proxy.ports.inbound}}
 - name: LINKERD2_PROXY_DESTINATION_GET_SUFFIXES
-  {{- $internalProfileSuffix := printf "svc.%s." .ClusterDomain }}
-  value: {{ternary "." $internalProfileSuffix .Proxy.EnableExternalProfiles}}
+  {{- $internalProfileSuffix := printf "svc.%s." .Values.global.clusterDomain }}
+  value: {{ternary "." $internalProfileSuffix .Values.global.proxy.enableExternalProfiles}}
 - name: LINKERD2_PROXY_DESTINATION_PROFILE_SUFFIXES
-  {{- $internalProfileSuffix := printf "svc.%s." .ClusterDomain }}
-  value: {{ternary "." $internalProfileSuffix .Proxy.EnableExternalProfiles}}
+  {{- $internalProfileSuffix := printf "svc.%s." .Values.global.clusterDomain }}
+  value: {{ternary "." $internalProfileSuffix .Values.global.proxy.enableExternalProfiles}}
 - name: LINKERD2_PROXY_INBOUND_ACCEPT_KEEPALIVE
   value: 10000ms
 - name: LINKERD2_PROXY_OUTBOUND_CONNECT_KEEPALIVE
@@ -28,40 +28,40 @@ env:
       fieldPath: metadata.namespace
 - name: LINKERD2_PROXY_DESTINATION_CONTEXT
   value: ns:$(_pod_ns)
-{{ if eq .Proxy.Component "linkerd-prometheus" -}}
+{{ if eq .Values.global.proxy.component "linkerd-prometheus" -}}
 - name: LINKERD2_PROXY_OUTBOUND_ROUTER_CAPACITY
   value: "10000"
 {{ end -}}
-{{ if .Proxy.DisableIdentity -}}
+{{ if .Values.global.proxy.disableIdentity -}}
 - name: LINKERD2_PROXY_IDENTITY_DISABLED
   value: disabled
 {{ else -}}
 - name: LINKERD2_PROXY_IDENTITY_DIR
   value: /var/run/linkerd/identity/end-entity
 - name: LINKERD2_PROXY_IDENTITY_TRUST_ANCHORS
-{{- if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/cert-manager") }}
+{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") }}
   valueFrom:
     secretKeyRef:
       name: linkerd-identity-issuer
       key: ca.crt
-{{- end}}
-{{- if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/tls") }}
+{{- end }}
+{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/tls") }}
   value: |
-  {{- required "Please provide the identity trust anchors" .Identity.TrustAnchorsPEM | trim | nindent 4 }}
-{{- end}}
+  {{- required "Please provide the identity trust anchors" .Values.global.identityTrustAnchorsPEM | trim | nindent 4 }}
+{{- end }}
 - name: LINKERD2_PROXY_IDENTITY_TOKEN_FILE
   value: /var/run/secrets/kubernetes.io/serviceaccount/token
 - name: LINKERD2_PROXY_IDENTITY_SVC_ADDR
-  {{- $identitySvcAddr := printf "linkerd-identity.%s.svc.%s:8080" .Namespace .ClusterDomain }}
-  value: {{ternary "localhost.:8080" $identitySvcAddr (eq .Proxy.Component "linkerd-identity")}}
+  {{- $identitySvcAddr := printf "linkerd-identity.%s.svc.%s:8080" .Values.global.namespace .Values.global.clusterDomain }}
+  value: {{ternary "localhost.:8080" $identitySvcAddr (eq .Values.global.proxy.component "linkerd-identity")}}
 - name: _pod_sa
   valueFrom:
     fieldRef:
       fieldPath: spec.serviceAccountName
 - name: _l5d_ns
-  value: {{.Namespace}}
+  value: {{.Values.global.namespace}}
 - name: _l5d_trustdomain
-  value: {{.Identity.TrustDomain}}
+  value: {{.Values.global.identityTrustDomain}}
 - name: LINKERD2_PROXY_IDENTITY_LOCAL_NAME
   value: $(_pod_sa).$(_pod_ns).serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
 - name: LINKERD2_PROXY_IDENTITY_SVC_NAME
@@ -69,65 +69,74 @@ env:
 - name: LINKERD2_PROXY_DESTINATION_SVC_NAME
   value: linkerd-destination.$(_l5d_ns).serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
 {{ end -}}
-{{ if .Proxy.DisableTap -}}
+{{ if .Values.global.proxy.disableTap -}}
 - name: LINKERD2_PROXY_TAP_DISABLED
   value: "true"
-{{ else if not .Proxy.DisableIdentity -}}
+{{ else if not .Values.global.proxy.disableIdentity -}}
 - name: LINKERD2_PROXY_TAP_SVC_NAME
   value: linkerd-tap.$(_l5d_ns).serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
 {{ end -}}
-{{ if .ControlPlaneTracing -}}
+{{ if .Values.global.controlPlaneTracing -}}
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_ADDR
-  value: linkerd-collector.{{.Namespace}}.svc.{{.ClusterDomain}}:55678
+  value: linkerd-collector.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:55678
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_NAME
-  value: linkerd-collector.{{.Namespace}}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
-{{ else if .Proxy.Trace -}}
-{{ if .Proxy.Trace.CollectorSvcAddr -}}
+  value: linkerd-collector.{{.Values.global.namespace}}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
+{{ else if .Values.global.proxy.trace -}}
+{{ if .Values.global.proxy.trace.collectorSvcAddr -}}
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_ADDR
-  value: {{ .Proxy.Trace.CollectorSvcAddr }}
+  value: {{ .Values.global.proxy.trace.collectorSvcAddr }}
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_NAME
-  value: {{ .Proxy.Trace.CollectorSvcAccount }}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
+  value: {{ .Values.global.proxy.trace.collectorSvcAccount }}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
 {{ end -}}
 {{ end -}}
-image: {{.Proxy.Image.Name}}:{{.Proxy.Image.Version}}
-imagePullPolicy: {{.Proxy.Image.PullPolicy}}
+image: {{.Values.global.proxy.image.name}}:{{.Values.global.proxy.image.version}}
+imagePullPolicy: {{.Values.global.proxy.image.pullPolicy}}
 livenessProbe:
   httpGet:
     path: /metrics
-    port: {{.Proxy.Ports.Admin}}
+    port: {{.Values.global.proxy.ports.admin}}
   initialDelaySeconds: 10
 name: linkerd-proxy
 ports:
-- containerPort: {{.Proxy.Ports.Inbound}}
+- containerPort: {{.Values.global.proxy.ports.inbound}}
   name: linkerd-proxy
-- containerPort: {{.Proxy.Ports.Admin}}
+- containerPort: {{.Values.global.proxy.ports.admin}}
   name: linkerd-admin
 readinessProbe:
   httpGet:
     path: /ready
-    port: {{.Proxy.Ports.Admin}}
+    port: {{.Values.global.proxy.ports.admin}}
   initialDelaySeconds: 2
-{{- if .Proxy.Resources }}
-{{ include "partials.resources" .Proxy.Resources }}
+{{- if .Values.global.proxy.resources }}
+{{ include "partials.resources" .Values.global.proxy.resources }}
 {{- end }}
 securityContext:
   allowPrivilegeEscalation: false
-  {{- if .Proxy.Capabilities -}}
-  {{- include "partials.proxy.capabilities" .Proxy | nindent 2 -}}
+  {{- if .Values.global.proxy.capabilities -}}
+  {{- include "partials.proxy.capabilities" . | nindent 2 -}}
   {{- end }}
   readOnlyRootFilesystem: true
-  runAsUser: {{.Proxy.UID}}
+  runAsUser: {{.Values.global.proxy.uid}}
 terminationMessagePolicy: FallbackToLogsOnError
-{{- if or (not .Proxy.DisableIdentity) (.Proxy.SAMountPath) }}
+{{- if .Values.global.proxy.waitBeforeExitSeconds }}
+lifecycle:
+  preStop:
+    exec:
+      command:
+        - /bin/bash
+        - -c
+        - sleep {{.Values.global.proxy.waitBeforeExitSeconds}}
+{{- end }}
+{{- if or (not .Values.global.proxy.disableIdentity) (.Values.global.proxy.saMountPath) }}
 volumeMounts:
-{{- if not .Proxy.DisableIdentity }}
+{{- if not .Values.global.proxy.disableIdentity }}
 - mountPath: /var/run/linkerd/identity/end-entity
   name: linkerd-identity-end-entity
 {{- end -}}
-{{- if .Proxy.SAMountPath }}
-- mountPath: {{.Proxy.SAMountPath.MountPath}}
-  name: {{.Proxy.SAMountPath.Name}}
-  readOnly: {{.Proxy.SAMountPath.ReadOnly}}
+{{- if .Values.global.proxy.saMountPath }}
+- mountPath: {{.Values.global.proxy.saMountPath.mountPath}}
+  name: {{.Values.global.proxy.saMountPath.name}}
+  readOnly: {{.Values.global.proxy.saMountPath.readOnly}}
 {{- end -}}
 {{- end -}}
 {{- end }}

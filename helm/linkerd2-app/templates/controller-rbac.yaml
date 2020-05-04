@@ -1,4 +1,3 @@
-{{with .Values -}}
 ---
 ###
 ### Controller RBAC
@@ -7,16 +6,16 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Namespace}}-controller
+  name: linkerd-{{.Values.global.namespace}}-controller
   labels:
-    {{.ControllerComponentLabel}}: controller
-    {{.ControllerNamespaceLabel}}: {{.Namespace}}
+    {{.Values.global.controllerComponentLabel}}: controller
+    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
 rules:
 - apiGroups: ["extensions", "apps"]
   resources: ["daemonsets", "deployments", "replicasets", "statefulsets"]
   verbs: ["list", "get", "watch"]
 - apiGroups: ["extensions", "batch"]
-  resources: ["jobs"]
+  resources: ["cronjobs", "jobs"]
   verbs: ["list" , "get", "watch"]
 - apiGroups: [""]
   resources: ["pods", "endpoints", "services", "replicationcontrollers", "namespaces"]
@@ -31,25 +30,24 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Namespace}}-controller
+  name: linkerd-{{.Values.global.namespace}}-controller
   labels:
-    {{.ControllerComponentLabel}}: controller
-    {{.ControllerNamespaceLabel}}: {{.Namespace}}
+    {{.Values.global.controllerComponentLabel}}: controller
+    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: linkerd-{{.Namespace}}-controller
+  name: linkerd-{{.Values.global.namespace}}-controller
 subjects:
 - kind: ServiceAccount
   name: linkerd-controller
-  namespace: {{.Namespace}}
+  namespace: {{.Values.global.namespace}}
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: linkerd-controller
-  namespace: {{.Namespace}}
+  namespace: {{.Values.global.namespace}}
   labels:
-    {{.ControllerComponentLabel}}: controller
-    {{.ControllerNamespaceLabel}}: {{.Namespace}}
-{{ end -}}
+    {{.Values.global.controllerComponentLabel}}: controller
+    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
