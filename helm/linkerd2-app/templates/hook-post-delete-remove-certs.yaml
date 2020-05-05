@@ -1,10 +1,9 @@
-{{ with .Values -}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: linkerd-janitor
-  namespace: {{ .global.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-5"
@@ -33,7 +32,7 @@ rules:
   resources:
   - namespaces
   resourceNames:
-  - {{ .global.namespace }}
+  - {{ .Release.Namespace }}
   verbs:
   - delete
 - apiGroups:
@@ -57,7 +56,7 @@ rules:
   resources:
   - podsecuritypolicies
   resourceNames:
-  - linkerd-{{ .Namespace }}-control-plane
+  - linkerd-{{ .Release.Namespace }}-control-plane
   verbs:
   - use
 ---
@@ -65,7 +64,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: linkerd-janitor
-  namespace: {{ .global.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-5"
@@ -77,7 +76,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: linkerd-janitor
-  namespace: {{ .global.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-4"
@@ -87,7 +86,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: linkerd-janitor
-    namespace: {{ .global.namespace }}
+    namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
   name: linkerd-janitor
@@ -97,7 +96,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: linkerd-janitor
-  namespace: {{ .global.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-3"
@@ -110,20 +109,19 @@ spec:
       serviceAccountName: linkerd-janitor
       containers:
       - name: janitor
-        image: "{{ .kubectlImage.registry }}/{{ .kubectlImage.name }}:{{ .kubectlImage.tag }}"
-        imagePullPolicy: "{{ .kubectlImage.pullPolicy }}"
+        image: "{{ .Values.kubectlImage.registry }}/{{ .Values.kubectlImage.name }}:{{ .Values.kubectlImage.tag }}"
+        imagePullPolicy: "{{ .Values.kubectlImage.pullPolicy }}"
         command:
         - /bin/sh
         - -e
         - -c
         - >-
-          kubectl -n {{ .global.namespace }} delete configmap linkerd-config;
-{{- if and (.identity.issuer) (eq .identity.issuer.scheme "linkerd.io/cert-manager") }}
-          kubectl -n {{ .global.namespace }} delete issuer linkerd-selfsigning-issuer;
-          kubectl -n {{ .global.namespace }} delete certificate linkerd-identity-issuer;
-          kubectl -n {{ .global.namespace }} delete secret linkerd-identity-issuer;
+          kubectl -n {{ .Release.Namespace }} delete configmap linkerd-config;
+{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") }}
+          kubectl -n {{ .Release.Namespace }} delete issuer linkerd-selfsigning-issuer;
+          kubectl -n {{ .Release.Namespace }} delete certificate linkerd-identity-issuer;
+          kubectl -n {{ .Release.Namespace }} delete secret linkerd-identity-issuer;
 {{- end }}
-          kubectl delete ns {{ .global.namespace }};
+          kubectl delete ns {{ .Release.Namespace }};
       restartPolicy: Never
   backoffLimit: 6
-{{- end -}}
