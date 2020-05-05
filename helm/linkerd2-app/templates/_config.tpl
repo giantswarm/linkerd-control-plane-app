@@ -1,85 +1,78 @@
 {{- define "linkerd.configs.global" -}}
 {
-  "linkerdNamespace": "{{.Namespace}}",
-  "cniEnabled": false,
-  "version": "{{.LinkerdVersion}}",
+  "linkerdNamespace": "{{.Values.global.namespace}}",
+  "cniEnabled": {{ default false .Values.global.cniEnabled }},
+  "version": "{{.Values.global.linkerdVersion}}",
   "identityContext":{
-    "trustDomain": "{{.Identity.TrustDomain}}",
-{{if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/cert-manager") -}}
+    "trustDomain": "{{.Values.global.identityTrustDomain}}",
+{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") }}
     "trustAnchorsPem": "REPLACE_ME",
 {{- end}}
-{{if and (.Identity.Issuer) (eq .Identity.Issuer.Scheme "linkerd.io/tls") -}}
-    "trustAnchorsPem": "{{required "Please provide the identity trust anchors" .Identity.TrustAnchorsPEM | trim | replace "\n" "\\n"}}",
-{{- end}}
-    "issuanceLifeTime": "{{.Identity.Issuer.IssuanceLifeTime}}",
-    "clockSkewAllowance": "{{.Identity.Issuer.ClockSkewAllowance}}",
-    "scheme": "{{.Identity.Issuer.Scheme}}"
+{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/tls") }}
+    "trustAnchorsPem": "{{required "Please provide the identity trust anchors" .Values.global.identityTrustAnchorsPEM | trim | replace "\n" "\\n"}}",
+{{- end }}
+    "issuanceLifetime": "{{.Values.identity.issuer.issuanceLifetime}}",
+    "clockSkewAllowance": "{{.Values.identity.issuer.clockSkewAllowance}}",
+    "scheme": "{{.Values.identity.issuer.scheme}}"
   },
   "autoInjectContext": null,
-  "omitWebhookSideEffects": {{.OmitWebhookSideEffects}},
-  "clusterDomain": "{{.ClusterDomain}}"
+  "omitWebhookSideEffects": {{.Values.omitWebhookSideEffects}},
+  "clusterDomain": "{{.Values.global.clusterDomain}}"
 }
 {{- end -}}
 
 {{- define "linkerd.configs.proxy" -}}
 {
   "proxyImage":{
-    "imageName":"{{.Proxy.Image.Name}}",
-    "pullPolicy":"{{.Proxy.Image.PullPolicy}}"
+    "imageName":"{{.Values.global.proxy.image.name}}",
+    "pullPolicy":"{{.Values.global.proxy.image.pullPolicy}}"
   },
   "proxyInitImage":{
-    "imageName":"{{.ProxyInit.Image.Name}}",
-    "pullPolicy":"{{.ProxyInit.Image.PullPolicy}}"
+    "imageName":"{{.Values.global.proxyInit.image.name}}",
+    "pullPolicy":"{{.Values.global.proxyInit.image.pullPolicy}}"
   },
   "controlPort":{
-    "port": {{.Proxy.Ports.Control}}
+    "port": {{.Values.global.proxy.ports.control}}
   },
   "ignoreInboundPorts":[
-    {{- $ports := splitList "," .ProxyInit.IgnoreInboundPorts -}}
-    {{- if gt (len $ports) 1}}
-    {{- $last := sub (len $ports) 1 -}}
-    {{- range $i,$port := $ports -}}
-    {"port":{{$port}}}{{ternary "," "" (ne $i $last)}}
-    {{- end -}}
-    {{- end -}}
+    {{- include "partials.splitStringListToPorts" .Values.global.proxyInit.ignoreInboundPorts -}}
   ],
   "ignoreOutboundPorts":[
-    {{- $ports := splitList "," .ProxyInit.IgnoreOutboundPorts -}}
-    {{- if gt (len $ports) 1}}
-    {{- $last := sub (len $ports) 1 -}}
-    {{- range $i,$port := $ports -}}
-    {"port":{{$port}}}{{ternary "," "" (ne $i $last)}}
-    {{- end -}}
-    {{- end -}}
+    {{- include "partials.splitStringListToPorts" .Values.global.proxyInit.ignoreOutboundPorts -}}
   ],
   "inboundPort":{
-    "port": {{.Proxy.Ports.Inbound}}
+    "port": {{.Values.global.proxy.ports.inbound}}
   },
   "adminPort":{
-    "port": {{.Proxy.Ports.Admin}}
+    "port": {{.Values.global.proxy.ports.admin}}
   },
   "outboundPort":{
-    "port": {{.Proxy.Ports.Outbound}}
+    "port": {{.Values.global.proxy.ports.outbound}}
   },
   "resource":{
-    "requestCpu": "{{.Proxy.Resources.CPU.Request}}",
-    "limitCpu": "{{.Proxy.Resources.CPU.Limit}}",
-    "requestMemory": "{{.Proxy.Resources.Memory.Request}}",
-    "limitMemory": "{{.Proxy.Resources.Memory.Limit}}"
+    "requestCpu": "{{.Values.global.proxy.resources.cpu.request}}",
+    "limitCpu": "{{.Values.global.proxy.resources.cpu.limit}}",
+    "requestMemory": "{{.Values.global.proxy.resources.memory.request}}",
+    "limitMemory": "{{.Values.global.proxy.resources.memory.limit}}"
   },
-  "proxyUid": {{.Proxy.UID}},
+  "proxyUid": {{.Values.global.proxy.uid}},
   "logLevel":{
-    "level": "{{.Proxy.LogLevel}}"
+    "level": "{{.Values.global.proxy.logLevel}}"
   },
-  "disableExternalProfiles": {{not .Proxy.EnableExternalProfiles}},
-  "proxyVersion": "{{.Proxy.Image.Version}}",
-  "proxyInitImageVersion": "{{.ProxyInit.Image.Version}}"
+  "disableExternalProfiles": {{not .Values.global.proxy.enableExternalProfiles}},
+  "proxyVersion": "{{.Values.global.proxy.image.version}}",
+  "proxyInitImageVersion": "{{.Values.global.proxyInit.image.version}}",
+  "debugImage":{
+    "imageName":"{{.Values.debugContainer.image.name}}",
+    "pullPolicy":"{{.Values.debugContainer.image.pullPolicy}}"
+  },
+  "debugImageVersion": "{{.Values.debugContainer.image.version}}"
 }
 {{- end -}}
 
 {{- define "linkerd.configs.install" -}}
 {
-  "cliVersion":"{{ .LinkerdVersion }}",
+  "cliVersion":"{{ .Values.global.linkerdVersion }}",
   "flags":[]
 }
 {{- end -}}

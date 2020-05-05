@@ -1,5 +1,4 @@
-{{ with .Values -}}
-{{ if not .DisableHeartBeat -}}
+{{ if not .Values.disableHeartBeat -}}
 ---
 ###
 ### Heartbeat
@@ -9,40 +8,42 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: linkerd-heartbeat
-  namespace: {{.Namespace}}
+  namespace: {{.Values.global.namespace}}
   labels:
-    {{.ControllerComponentLabel}}: heartbeat
-    {{.ControllerNamespaceLabel}}: {{.Namespace}}
+    app.kubernetes.io/name: heartbeat
+    app.kubernetes.io/part-of: Linkerd
+    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+    {{.Values.global.controllerComponentLabel}}: heartbeat
+    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
   annotations:
-    {{.CreatedByAnnotation}}: {{default (printf "linkerd/helm %s" .LinkerdVersion) .CliVersion}}
+    {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
-  schedule: "{{.HeartbeatSchedule}}"
+  schedule: "{{.Values.heartbeatSchedule}}"
   successfulJobsHistoryLimit: 0
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-            {{.ControllerComponentLabel}}: heartbeat
+            {{.Values.global.controllerComponentLabel}}: heartbeat
           annotations:
-            {{.CreatedByAnnotation}}: {{default (printf "linkerd/helm %s" .LinkerdVersion) .CliVersion}}
+            {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
         spec:
           {{- include "linkerd.node-selector" . | nindent 10 }}
           serviceAccountName: linkerd-heartbeat
           restartPolicy: Never
           containers:
           - name: heartbeat
-            image: {{.ControllerImage}}:{{default .LinkerdVersion .ControllerImageVersion}}
-            imagePullPolicy: {{.ImagePullPolicy}}
+            image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+            imagePullPolicy: {{.Values.global.imagePullPolicy}}
             args:
             - "heartbeat"
-            - "-prometheus-url=http://linkerd-prometheus.{{.Namespace}}.svc.{{.ClusterDomain}}:9090"
-            - "-controller-namespace={{.Namespace}}"
-            - "-log-level={{.ControllerLogLevel}}"
-            {{- if .HeartbeatResources -}}
-            {{- include "partials.resources" .HeartbeatResources | nindent 12 }}
+            - "-prometheus-url=http://linkerd-prometheus.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:9090"
+            - "-controller-namespace={{.Values.global.namespace}}"
+            - "-log-level={{.Values.controllerLogLevel}}"
+            {{- if .Values.heartbeatResources -}}
+            {{- include "partials.resources" .Values.heartbeatResources | nindent 12 }}
             {{- end }}
             securityContext:
-              runAsUser: {{.ControllerUID}}
-{{- end }}
+              runAsUser: {{.Values.controllerUID}}
 {{- end }}
