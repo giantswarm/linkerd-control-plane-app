@@ -2,5 +2,5 @@ dependencies:
 - name: partials
   repository: file://../partials
   version: 0.1.0
-digest: sha256:2202cf6f3783f79e78414e7a94b651589f322f3724ab220f0ea3bf8f31954de4
-generated: "2020-05-01T17:24:16.918227568+05:30"
+digest: sha256:8e42f9c9d4a2dc883f17f94d6044c97518ced19ad0922f47b8760e47135369ba
+generated: "2020-10-07T15:36:31.538332668+01:00"
