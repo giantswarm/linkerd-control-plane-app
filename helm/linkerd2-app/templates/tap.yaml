@@ -36,7 +36,7 @@ metadata:
   labels:
     app.kubernetes.io/name: tap
     app.kubernetes.io/part-of: Linkerd
-    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: tap
     {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
   name: linkerd-tap
@@ -48,6 +48,11 @@ spec:
       {{.Values.global.controllerComponentLabel}}: tap
       {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
+  {{- if .Values.enablePodAntiAffinity }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  {{- end }}
   template:
     metadata:
       annotations:
@@ -59,6 +64,7 @@ spec:
       labels:
         {{.Values.global.controllerComponentLabel}}: tap
         {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Values.global.namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}
@@ -72,7 +78,7 @@ spec:
         - -controller-namespace={{.Values.global.namespace}}
         - -log-level={{.Values.controllerLogLevel}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
-        image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+        image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
         imagePullPolicy: {{.Values.global.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -113,6 +119,9 @@ spec:
       - configMap:
           name: linkerd-config
         name: config
+      {{ if .Values.global.controlPlaneTracing -}}
+      - {{- include "partials.proxy.volumes.labels" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}
       - name: tls
         secret:

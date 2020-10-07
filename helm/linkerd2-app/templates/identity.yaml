@@ -53,7 +53,7 @@ metadata:
   labels:
     app.kubernetes.io/name: identity
     app.kubernetes.io/part-of: Linkerd
-    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: identity
     {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
   name: linkerd-identity
@@ -65,6 +65,11 @@ spec:
       {{.Values.global.controllerComponentLabel}}: identity
       {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
+  {{- if .Values.enablePodAntiAffinity }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  {{- end }}
   template:
     metadata:
       annotations:
@@ -73,6 +78,7 @@ spec:
       labels:
         {{.Values.global.controllerComponentLabel}}: identity
         {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Values.global.namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}
@@ -85,7 +91,7 @@ spec:
         - identity
         - -log-level={{.Values.controllerLogLevel}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
-        image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+        image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
         imagePullPolicy: {{.Values.global.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -126,5 +132,8 @@ spec:
       - name: identity-issuer
         secret:
           secretName: linkerd-identity-issuer
+      {{ if .Values.global.controlPlaneTracing -}}
+      - {{- include "partials.proxy.volumes.labels" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}
 {{end -}}
