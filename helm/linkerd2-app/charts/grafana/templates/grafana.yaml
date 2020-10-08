@@ -25,7 +25,7 @@ data:
 
     [auth.anonymous]
     enabled = true
-    org_role = Editor
+    org_role = {{ .Values.grafana.auth.anonymous.role | default "Editor" }}
 
     [auth.basic]
     enabled = false
