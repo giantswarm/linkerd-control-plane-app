@@ -3,12 +3,12 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: linkerd-config
-  namespace: {{.Release.Namespace}}
+  namespace: {{.Values.global.namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: controller
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
   annotations:
-    {{.Values.global.createdByAnnotation}}: {{printf "linkerd/helm %s" .Values.global.linkerdVersion}}
+    {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
     "helm.sh/hook": "pre-install,pre-upgrade"
     "helm.sh/hook-weight": "-4"
 data:
