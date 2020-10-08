@@ -24,8 +24,8 @@ data:
     disable_login_form = true
 
     [auth.anonymous]
-    enabled = true
-    org_role = {{ .Values.grafana.auth.anonymous.role | default "Editor" }}
+    enabled = {{ .Values.auth.anonymous.enabled | default true }}
+    org_role = {{ .Values.auth.anonymous.role | default "Editor" }}
 
     [auth.basic]
     enabled = false

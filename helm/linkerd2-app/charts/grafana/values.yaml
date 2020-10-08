@@ -1,4 +1,3 @@
-grafana:
-  auth:
-    anonymous:
-      role:
+auth:
+  anonymous:
+    role:

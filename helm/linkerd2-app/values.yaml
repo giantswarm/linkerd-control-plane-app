@@ -219,6 +219,10 @@ grafana:
   image:
     name: gcr.io/linkerd-io/grafana
   # resources:
+  auth:
+    anonymous:
+      enabled: true
+      role:
 
 tracing:
   enabled: false
