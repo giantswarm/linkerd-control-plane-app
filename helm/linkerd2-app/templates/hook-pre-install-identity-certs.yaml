@@ -5,10 +5,10 @@ apiVersion: certmanager.k8s.io/v1alpha1
 kind: Issuer
 metadata:
   name: linkerd-selfsigning-issuer
-  namespace: {{.Release.Namespace}}
+  namespace: {{.Values.global.namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: identity
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{ printf "linkerd/helm %s" .Values.global.linkerdVersion }}
     "helm.sh/hook": pre-install
@@ -20,17 +20,17 @@ apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
   name: linkerd-identity-issuer
-  namespace: {{.Release.Namespace}}
+  namespace: {{.Values.global.namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: identity
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{ printf "linkerd/helm %s" .Values.global.linkerdVersion }}
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-5"
 spec:
   secretName: linkerd-identity-issuer
-  commonName: identity.{{.Release.Namespace}}.{{.Values.global.clusterDomain}}
+  commonName: identity.{{.Values.global.namespace}}.{{.Values.global.clusterDomain}}
   isCA: true
   keyAlgorithm: ecdsa
   issuerRef:
