@@ -54,8 +54,16 @@ env:
 - name: LINKERD2_PROXY_IDENTITY_DIR
   value: /var/run/linkerd/identity/end-entity
 - name: LINKERD2_PROXY_IDENTITY_TRUST_ANCHORS
+{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") }}
+  valueFrom:
+    secretKeyRef:
+      name: linkerd-identity-issuer
+      key: ca.crt
+{{- end }}
+{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/tls") }}
   value: |
   {{- required "Please provide the identity trust anchors" .Values.global.identityTrustAnchorsPEM | trim | nindent 4 }}
+{{- end }}
 - name: LINKERD2_PROXY_IDENTITY_TOKEN_FILE
   value: /var/run/secrets/kubernetes.io/serviceaccount/token
 - name: LINKERD2_PROXY_IDENTITY_SVC_ADDR
