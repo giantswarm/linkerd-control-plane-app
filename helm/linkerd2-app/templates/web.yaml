@@ -7,10 +7,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-web
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: web
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -36,17 +36,17 @@ metadata:
   labels:
     app.kubernetes.io/name: web
     app.kubernetes.io/part-of: Linkerd
-    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: web
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   name: linkerd-web
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: {{.Values.dashboard.replicas}}
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: web
-      {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+      {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
   template:
     metadata:
@@ -55,21 +55,33 @@ spec:
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
       labels:
         {{.Values.global.controllerComponentLabel}}: web
-        {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}
       containers:
       - args:
-        - -api-addr=linkerd-controller-api.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:8085
-        - -grafana-addr=linkerd-grafana.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:3000
-        - -controller-namespace={{.Values.global.namespace}}
+        - -api-addr=linkerd-controller-api.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:8085
+        {{- if .Values.global.grafanaUrl }}
+        - -grafana-addr={{.Values.global.grafanaUrl}}
+        {{- else if .Values.grafana.enabled }}
+        - -grafana-addr={{.Values.grafana.name}}.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:3000
+        {{- end}}
+        {{- if .Values.tracing.enabled }}
+        - -jaeger-addr={{.Values.tracing.jaeger.name}}.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:16686
+        {{- end}}
+        - -controller-namespace={{.Release.Namespace}}
         - -log-level={{.Values.controllerLogLevel}}
-        {{- $hostFull := replace "." "\\." (printf "linkerd-web.%s.svc.%s" .Values.global.namespace .Values.global.clusterDomain) }}
-        {{- $hostAbbrev := replace "." "\\." (printf "linkerd-web.%s.svc" .Values.global.namespace) }}
+        {{- if .Values.enforcedHostRegexp }}
+        - -enforced-host={{.Values.enforcedHostRegexp}}
+        {{- else -}}
+        {{- $hostFull := replace "." "\\." (printf "linkerd-web.%s.svc.%s" .Release.Namespace .Values.global.clusterDomain) }}
+        {{- $hostAbbrev := replace "." "\\." (printf "linkerd-web.%s.svc" .Release.Namespace) }}
         - -enforced-host=^(localhost|127\.0\.0\.1|{{ $hostFull }}|{{ $hostAbbrev }}|\[::1\])(:\d+)?$
+        {{- end}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
-        image: {{.Values.webImage}}:{{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+        image: {{.Values.webImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
         imagePullPolicy: {{.Values.global.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -105,4 +117,7 @@ spec:
       - configMap:
           name: linkerd-config
         name: config
+      {{ if .Values.global.controlPlaneTracing -}}
+      - {{- include "partials.proxy.volumes.labels" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}

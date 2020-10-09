@@ -14,16 +14,21 @@ metadata:
   labels:
     app.kubernetes.io/name: proxy-injector
     app.kubernetes.io/part-of: Linkerd
-    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   name: linkerd-proxy-injector
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: {{.Values.controllerReplicas}}
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: proxy-injector
+  {{- if .Values.enablePodAntiAffinity }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  {{- end }}
   template:
     metadata:
       annotations:
@@ -34,7 +39,8 @@ spec:
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
       labels:
         {{.Values.global.controllerComponentLabel}}: proxy-injector
-        {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}
@@ -46,7 +52,7 @@ spec:
       - args:
         - proxy-injector
         - -log-level={{.Values.controllerLogLevel}}
-        image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+        image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
         imagePullPolicy: {{.Values.global.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -88,16 +94,19 @@ spec:
       - name: tls
         secret:
           secretName: linkerd-proxy-injector-tls
+      {{ if .Values.global.controlPlaneTracing -}}
+      - {{- include "partials.proxy.volumes.labels" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-proxy-injector
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:

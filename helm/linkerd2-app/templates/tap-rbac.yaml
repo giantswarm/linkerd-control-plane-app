@@ -6,10 +6,10 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-tap
+  name: linkerd-{{.Release.Namespace}}-tap
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 rules:
 - apiGroups: [""]
   resources: ["pods", "services", "replicationcontrollers", "namespaces", "nodes"]
@@ -24,10 +24,10 @@ rules:
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-tap-admin
+  name: linkerd-{{.Release.Namespace}}-tap-admin
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 rules:
 - apiGroups: ["tap.linkerd.io"]
   resources: ["*"]
@@ -36,26 +36,26 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-tap
+  name: linkerd-{{.Release.Namespace}}-tap
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: linkerd-{{.Values.global.namespace}}-tap
+  name: linkerd-{{.Release.Namespace}}-tap
 subjects:
 - kind: ServiceAccount
   name: linkerd-tap
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-tap-auth-delegator
+  name: linkerd-{{.Release.Namespace}}-tap-auth-delegator
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -63,25 +63,25 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: linkerd-tap
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: linkerd-tap
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-tap-auth-reader
+  name: linkerd-{{.Release.Namespace}}-tap-auth-reader
   namespace: kube-system
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -89,31 +89,33 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: linkerd-tap
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
 ---
+{{-  $ca := genCA (printf "linkerd-tap.%s.svc" .Release.Namespace) 365 }}
+{{- if (not .Values.tap.externalSecret) }}
 kind: Secret
 apiVersion: v1
 metadata:
   name: linkerd-tap-tls
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 type: Opaque
 data:
-  {{ $ca := genCA (printf "linkerd-tap.%s.svc" .Values.global.namespace) 365 -}}
   crt.pem: {{ ternary (b64enc $ca.Cert) (b64enc (trim .Values.tap.crtPEM)) (empty .Values.tap.crtPEM) }}
   key.pem: {{ ternary (b64enc $ca.Key) (b64enc (trim .Values.tap.keyPEM)) (empty .Values.tap.keyPEM) }}
 ---
+{{- end }}
 apiVersion: apiregistration.k8s.io/v1
 kind: APIService
 metadata:
   name: v1alpha1.tap.linkerd.io
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 spec:
   group: tap.linkerd.io
   version: v1alpha1
@@ -121,5 +123,8 @@ spec:
   versionPriority: 100
   service:
     name: linkerd-tap
-    namespace: {{.Values.global.namespace}}
-  caBundle: {{ ternary (b64enc $ca.Cert) (b64enc (trim .Values.tap.crtPEM)) (empty .Values.tap.crtPEM) }}
+    namespace: {{.Release.Namespace}}
+{{- if and (.Values.tap.externalSecret) (empty .Values.tap.caBundle) }}
+  {{- fail "If tap.externalSecret is true then you need to provide tap.caBundle" }}
+{{- end }}
+  caBundle: {{ ternary (b64enc $ca.Cert) (b64enc (trim .Values.tap.caBundle)) (empty .Values.tap.caBundle) }}

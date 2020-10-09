@@ -1,0 +1,15 @@
+{{- if .Values.global.grafana.enabled }}
+---
+###
+### Grafana RBAC
+###
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: {{.Values.name}}
+  namespace: {{.Release.Namespace}}
+  labels:
+    {{.Values.global.controllerComponentLabel}}: grafana
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+{{- end }}

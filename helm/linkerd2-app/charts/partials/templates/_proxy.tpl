@@ -1,9 +1,17 @@
 {{ define "partials.proxy" -}}
 env:
+{{ if .Values.global.proxy.requireIdentityOnInboundPorts -}}
+- name: LINKERD2_PROXY_INBOUND_PORTS_REQUIRE_IDENTITY
+  value: "{{.Values.global.proxy.requireIdentityOnInboundPorts}}"
+{{ end -}}  
 - name: LINKERD2_PROXY_LOG
   value: {{.Values.global.proxy.logLevel}}
 - name: LINKERD2_PROXY_DESTINATION_SVC_ADDR
-  value: {{ternary "localhost.:8086" (printf "linkerd-dst.%s.svc.%s:8086" .Values.global.namespace .Values.global.clusterDomain) (eq .Values.global.proxy.component "linkerd-destination")}}
+  value: {{ternary "localhost.:8086" (printf "linkerd-dst.%s.svc.%s:8086" .Release.Namespace .Values.global.clusterDomain) (eq .Values.global.proxy.component "linkerd-destination")}}
+{{ if .Values.global.proxy.destinationGetNetworks -}}
+- name: LINKERD2_PROXY_DESTINATION_GET_NETWORKS
+  value: "{{.Values.global.proxy.destinationGetNetworks}}"
+{{ end -}}  
 - name: LINKERD2_PROXY_CONTROL_LISTEN_ADDR
   value: 0.0.0.0:{{.Values.global.proxy.ports.control}}
 - name: LINKERD2_PROXY_ADMIN_LISTEN_ADDR
@@ -12,16 +20,23 @@ env:
   value: 127.0.0.1:{{.Values.global.proxy.ports.outbound}}
 - name: LINKERD2_PROXY_INBOUND_LISTEN_ADDR
   value: 0.0.0.0:{{.Values.global.proxy.ports.inbound}}
+{{ if .Values.global.proxy.isGateway -}}
+- name: LINKERD2_PROXY_INBOUND_GATEWAY_SUFFIXES
+  value: {{printf "svc.%s." .Values.global.clusterDomain}}
+{{ end -}}  
 - name: LINKERD2_PROXY_DESTINATION_GET_SUFFIXES
-  {{- $internalProfileSuffix := printf "svc.%s." .Values.global.clusterDomain }}
-  value: {{ternary "." $internalProfileSuffix .Values.global.proxy.enableExternalProfiles}}
+  value: {{printf "svc.%s." .Values.global.clusterDomain}}
 - name: LINKERD2_PROXY_DESTINATION_PROFILE_SUFFIXES
-  {{- $internalProfileSuffix := printf "svc.%s." .Values.global.clusterDomain }}
-  value: {{ternary "." $internalProfileSuffix .Values.global.proxy.enableExternalProfiles}}
+  {{- $internalDomain := printf "svc.%s." .Values.global.clusterDomain }}
+  value: {{ternary "." $internalDomain .Values.global.proxy.enableExternalProfiles}}
 - name: LINKERD2_PROXY_INBOUND_ACCEPT_KEEPALIVE
   value: 10000ms
 - name: LINKERD2_PROXY_OUTBOUND_CONNECT_KEEPALIVE
   value: 10000ms
+{{ if or (.Values.global.proxy.trace.collectorSvcAddr) (.Values.global.controlPlaneTracing) -}}
+- name: LINKERD2_PROXY_TRACE_ATTRIBUTES_PATH
+  value: /var/run/linkerd/podinfo/labels
+{{ end -}}
 - name: _pod_ns
   valueFrom:
     fieldRef:
@@ -39,27 +54,27 @@ env:
 - name: LINKERD2_PROXY_IDENTITY_DIR
   value: /var/run/linkerd/identity/end-entity
 - name: LINKERD2_PROXY_IDENTITY_TRUST_ANCHORS
-{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") }}
+{{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "linkerd.io/cert-manager") }}
   valueFrom:
     secretKeyRef:
       name: linkerd-identity-issuer
       key: ca.crt
 {{- end }}
-{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/tls") }}
+{{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "linkerd.io/tls") }}
   value: |
   {{- required "Please provide the identity trust anchors" .Values.global.identityTrustAnchorsPEM | trim | nindent 4 }}
 {{- end }}
 - name: LINKERD2_PROXY_IDENTITY_TOKEN_FILE
   value: /var/run/secrets/kubernetes.io/serviceaccount/token
 - name: LINKERD2_PROXY_IDENTITY_SVC_ADDR
-  {{- $identitySvcAddr := printf "linkerd-identity.%s.svc.%s:8080" .Values.global.namespace .Values.global.clusterDomain }}
+  {{- $identitySvcAddr := printf "linkerd-identity.%s.svc.%s:8080" .Release.Namespace .Values.global.clusterDomain }}
   value: {{ternary "localhost.:8080" $identitySvcAddr (eq .Values.global.proxy.component "linkerd-identity")}}
 - name: _pod_sa
   valueFrom:
     fieldRef:
       fieldPath: spec.serviceAccountName
 - name: _l5d_ns
-  value: {{.Values.global.namespace}}
+  value: {{.Release.Namespace}}
 - name: _l5d_trustdomain
   value: {{.Values.global.identityTrustDomain}}
 - name: LINKERD2_PROXY_IDENTITY_LOCAL_NAME
@@ -78,22 +93,20 @@ env:
 {{ end -}}
 {{ if .Values.global.controlPlaneTracing -}}
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_ADDR
-  value: linkerd-collector.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:55678
+  value: linkerd-collector.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:55678
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_NAME
-  value: linkerd-collector.{{.Values.global.namespace}}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
-{{ else if .Values.global.proxy.trace -}}
-{{ if .Values.global.proxy.trace.collectorSvcAddr -}}
+  value: linkerd-collector.{{.Release.Namespace}}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
+{{ else if .Values.global.proxy.trace.collectorSvcAddr -}}
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_ADDR
   value: {{ .Values.global.proxy.trace.collectorSvcAddr }}
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_NAME
   value: {{ .Values.global.proxy.trace.collectorSvcAccount }}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
 {{ end -}}
-{{ end -}}
 image: {{.Values.global.proxy.image.name}}:{{.Values.global.proxy.image.version}}
 imagePullPolicy: {{.Values.global.proxy.image.pullPolicy}}
 livenessProbe:
   httpGet:
-    path: /metrics
+    path: /live
     port: {{.Values.global.proxy.ports.admin}}
   initialDelaySeconds: 10
 name: linkerd-proxy
@@ -127,8 +140,12 @@ lifecycle:
         - -c
         - sleep {{.Values.global.proxy.waitBeforeExitSeconds}}
 {{- end }}
-{{- if or (not .Values.global.proxy.disableIdentity) (.Values.global.proxy.saMountPath) }}
+{{- if or (.Values.global.proxy.trace.collectorSvcAddr) (.Values.global.controlPlaneTracing)  (not .Values.global.proxy.disableIdentity) (.Values.global.proxy.saMountPath) }}
 volumeMounts:
+{{- if or (.Values.global.proxy.trace.collectorSvcAddr) (.Values.global.controlPlaneTracing) }}
+- mountPath: var/run/linkerd/podinfo
+  name: podinfo
+{{- end -}}
 {{- if not .Values.global.proxy.disableIdentity }}
 - mountPath: /var/run/linkerd/identity/end-entity
   name: linkerd-identity-end-entity

@@ -6,18 +6,35 @@
 global:
   clusterDomain: &cluster_domain cluster.local
   imagePullPolicy: &image_pull_policy IfNotPresent
-  
-  # Control Plane Trace Configuration
+
+  # control plane trace configuration
   controlPlaneTracing: false
 
   # control plane version. See Proxy section for proxy version
-  linkerdVersion: &linkerd_version stable-2.7.1
-
-  namespace: linkerd
+  linkerdVersion: &linkerd_version stable-2.8.1
 
   identityTrustAnchorsPEM: |
 
   identityTrustDomain: *cluster_domain
+
+  # GS changes: needed now as global value to be available in subcharts including _proxy.tpl
+  identity:
+    issuer:
+      scheme: &identity_issuer_scheme linkerd.io/cert-manager
+
+  # GS changes: support older version of cert-manager's API. Setting this to anything later
+  # than 0.11.0 will use the new API version and API group.
+  certManager:
+    version: 1.0.2
+
+  # GS changes: expose subchart toggles as global vars
+  grafana:
+    enabled: &grafana_enabled true
+  tracing:
+    enabled: &tracing_enabled false
+
+  # url of external grafana instance.
+  grafanaUrl: ""
 
   # proxy configuration
   proxy:
@@ -48,6 +65,8 @@ global:
     # See https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks
     # for more info on container lifecycle hooks.
     waitBeforeExitSeconds: 0
+    requireIdentityOnInboundPorts: ""
+    destinationGetNetworks: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
   # proxy-init configuration
   proxyInit:
@@ -56,7 +75,7 @@ global:
     image:
       name: gcr.io/linkerd-io/proxy-init
       pullPolicy: *image_pull_policy
-      version: v1.3.2
+      version: v1.3.3
     resources:
       cpu:
         limit: 100m
@@ -64,6 +83,7 @@ global:
       memory:
         limit: 50Mi
         request: 10Mi
+    closeWaitTimeoutSecs: 0
 
   # control plane annotations - do not edit
   createdByAnnotation: linkerd.io/created-by
@@ -74,7 +94,10 @@ global:
   controllerComponentLabel: linkerd.io/control-plane-component
   controllerNamespaceLabel: linkerd.io/control-plane-ns
   linkerdNamespaceLabel: linkerd.io/is-control-plane
+  workloadNamespaceLabel: linkerd.io/workload-ns
 
+# enforced host validation regular expression
+enforcedHostRegexp: ""
 
 enableH2Upgrade: true
 
@@ -101,7 +124,7 @@ debugContainer:
 # identity configuration
 identity:
   issuer:
-    scheme: linkerd.io/tls
+    scheme: *identity_issuer_scheme
 
     clockSkewAllowance: 20s
 
@@ -120,10 +143,6 @@ identity:
       # PEM-encoded ECDSA private key
       keyPEM: |
 
-# grafana configuration
-grafanaImage: gcr.io/linkerd-io/grafana
-grafanaUserRole: Editor
-
 # heartbeat configuration
 disableHeartBeat: false
 heartbeatSchedule: "0 0 * * *"
@@ -131,27 +150,53 @@ heartbeatSchedule: "0 0 * * *"
 # prometheus configuration
 prometheusImage: prom/prometheus:v2.15.2
 prometheusLogLevel: *controller_log_level
+prometheusExtraArgs: {}
+  # log.format: json
+prometheusAlertmanagers: []
+  # - scheme: http
+  #   static_configs:
+  #   - targets:
+  #     - "alertmanager.linkerd.svc:9093"
+prometheusRuleConfigMapMounts: []
+  # - name: alerting-rules
+  #   subPath: alerting_rules.yml
+  #   configMap: linkerd-prometheus-rules
+  # - name: recording-rules
+  #   subPath: recording_rules.yml
+  #   configMap: linkerd-prometheus-rules
 
 # proxy injector configuration
 proxyInjector:
+  externalSecret: false
   # if empty, Helm will auto-generate these fields
   crtPEM: |
 
   keyPEM: |
+
+  # if empty, Helm will auto-generate this field, unless externalSecret is set to true.
+  caBundle: |
 
 # service profile validator configuration
 profileValidator:
+  externalSecret: false
   # if empty, Helm will auto-generate these fields
   crtPEM: |
 
   keyPEM: |
+
+  # if empty, Helm will auto-generate this field, unless externalSecret is set to true.
+  caBundle: |
 
 # tap configuration
 tap:
+  externalSecret: false
   # if empty, Helm will auto-generate these fields
   crtPEM: |
 
   keyPEM: |
+
+  # if empty, Helm will auto-generate this field, unless externalSecret is set to true.
+  caBundle: |
 
 # web configuration
 webImage: gcr.io/linkerd-io/web
@@ -160,6 +205,42 @@ webImage: gcr.io/linkerd-io/web
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector.
 nodeSelector:
   beta.kubernetes.io/os: linux
+
+smiMetrics:
+  enabled: false
+  externalSecret: false
+  image: deislabs/smi-metrics:v0.2.1
+  # if empty, Helm will auto-generate these fields
+  crtPEM: |
+
+  keyPEM: |
+
+  # if empty, Helm will auto-generate this field, unless externalSecret is set to true.
+  caBundle: |
+
+# Configuration for Add-ons
+
+grafana:
+  enabled: &grafana_enabled
+  name: linkerd-grafana
+  image:
+    name: gcr.io/linkerd-io/grafana
+  # resources:
+  auth:
+    anonymous:
+      enabled: true
+      role:
+
+tracing:
+  enabled: &tracing_enabled
+  collector:
+    name: linkerd-collector
+    image: omnition/opencensus-collector:0.1.11
+    # resources:
+  jaeger:
+    name: linkerd-jaeger
+    image: jaegertracing/all-in-one:1.17.1
+    # resources:
 
 kubectlImage:
   registry: quay.io

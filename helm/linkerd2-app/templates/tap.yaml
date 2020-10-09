@@ -7,10 +7,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-tap
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -36,18 +36,23 @@ metadata:
   labels:
     app.kubernetes.io/name: tap
     app.kubernetes.io/part-of: Linkerd
-    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: tap
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   name: linkerd-tap
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: {{.Values.controllerReplicas}}
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: tap
-      {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+      {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
+  {{- if .Values.enablePodAntiAffinity }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  {{- end }}
   template:
     metadata:
       annotations:
@@ -58,7 +63,8 @@ spec:
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
       labels:
         {{.Values.global.controllerComponentLabel}}: tap
-        {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}
@@ -69,10 +75,10 @@ spec:
       containers:
       - args:
         - tap
-        - -controller-namespace={{.Values.global.namespace}}
+        - -controller-namespace={{.Release.Namespace}}
         - -log-level={{.Values.controllerLogLevel}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
-        image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+        image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
         imagePullPolicy: {{.Values.global.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -113,6 +119,9 @@ spec:
       - configMap:
           name: linkerd-config
         name: config
+      {{ if .Values.global.controlPlaneTracing -}}
+      - {{- include "partials.proxy.volumes.labels" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}
       - name: tls
         secret:

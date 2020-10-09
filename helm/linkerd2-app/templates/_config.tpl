@@ -1,6 +1,6 @@
 {{- define "linkerd.configs.global" -}}
 {
-  "linkerdNamespace": "{{.Values.global.namespace}}",
+  "linkerdNamespace": "{{.Release.Namespace}}",
   "cniEnabled": {{ default false .Values.global.cniEnabled }},
   "version": "{{.Values.global.linkerdVersion}}",
   "identityContext":{
@@ -66,7 +66,8 @@
     "imageName":"{{.Values.debugContainer.image.name}}",
     "pullPolicy":"{{.Values.debugContainer.image.pullPolicy}}"
   },
-  "debugImageVersion": "{{.Values.debugContainer.image.version}}"
+  "debugImageVersion": "{{.Values.debugContainer.image.version}}",
+  "destinationGetNetworks": "{{.Values.global.proxy.destinationGetNetworks}}"
 }
 {{- end -}}
 

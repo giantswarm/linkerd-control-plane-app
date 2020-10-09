@@ -58,7 +58,6 @@ subjects:
 roleRef:
   kind: Role
   name: namespace-tagger
-  namespace: {{ .Release.Namespace }}
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1

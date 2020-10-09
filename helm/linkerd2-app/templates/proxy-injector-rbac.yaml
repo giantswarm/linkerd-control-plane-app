@@ -6,10 +6,10 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-proxy-injector
+  name: linkerd-{{.Release.Namespace}}-proxy-injector
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 rules:
 - apiGroups: [""]
   resources: ["events"]
@@ -30,52 +30,54 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-proxy-injector
+  name: linkerd-{{.Release.Namespace}}-proxy-injector
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 subjects:
 - kind: ServiceAccount
   name: linkerd-proxy-injector
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
   apiGroup: ""
 roleRef:
   kind: ClusterRole
-  name: linkerd-{{.Values.global.namespace}}-proxy-injector
+  name: linkerd-{{.Release.Namespace}}-proxy-injector
   apiGroup: rbac.authorization.k8s.io
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: linkerd-proxy-injector
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 ---
+{{- $ca := genCA (printf "linkerd-proxy-injector.%s.svc" .Release.Namespace) 365 }}
+{{- if (not .Values.proxyInjector.externalSecret) }}
 kind: Secret
 apiVersion: v1
 metadata:
   name: linkerd-proxy-injector-tls
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 type: Opaque
 data:
-  {{ $ca := genCA (printf "linkerd-proxy-injector.%s.svc" .Values.global.namespace) 365 -}}
   crt.pem: {{ ternary (b64enc $ca.Cert) (b64enc (trim .Values.proxyInjector.crtPEM)) (empty .Values.proxyInjector.crtPEM) }}
   key.pem: {{ ternary (b64enc $ca.Key) (b64enc (trim .Values.proxyInjector.keyPEM)) (empty .Values.proxyInjector.keyPEM) }}
 ---
+{{- end }}
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
   name: linkerd-proxy-injector-webhook-config
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 webhooks:
 - name: linkerd-proxy-injector.linkerd.io
   namespaceSelector:
@@ -87,9 +89,12 @@ webhooks:
   clientConfig:
     service:
       name: linkerd-proxy-injector
-      namespace: {{ .Values.global.namespace }}
+      namespace: {{ .Release.Namespace }}
       path: "/"
-    caBundle: {{ ternary (b64enc $ca.Cert) (b64enc (trim .Values.proxyInjector.crtPEM)) (empty .Values.proxyInjector.crtPEM) }}
+{{- if and (.Values.proxyInjector.externalSecret) (empty .Values.proxyInjector.caBundle) }}
+  {{- fail "If proxyInjector.externalSecret is true then you need to provide proxyInjector.caBundle" }}
+{{- end }}
+    caBundle: {{ ternary (b64enc $ca.Cert) (b64enc (trim .Values.proxyInjector.caBundle)) (empty .Values.proxyInjector.caBundle) }}
   failurePolicy: {{.Values.webhookFailurePolicy}}
   rules:
   - operations: [ "CREATE" ]

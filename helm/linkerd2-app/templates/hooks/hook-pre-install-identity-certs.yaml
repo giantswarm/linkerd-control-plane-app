@@ -1,7 +1,7 @@
 {{if .Values.identity -}}
 {{if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") -}}
 ---
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: {{ template "cert-manager.apiversion" . }}
 kind: Issuer
 metadata:
   name: linkerd-selfsigning-issuer
@@ -16,7 +16,7 @@ metadata:
 spec:
   selfSigned: {}
 ---
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: {{ template "cert-manager.apiversion" . }}
 kind: Certificate
 metadata:
   name: linkerd-identity-issuer

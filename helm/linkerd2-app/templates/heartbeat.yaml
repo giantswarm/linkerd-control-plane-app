@@ -8,13 +8,13 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: linkerd-heartbeat
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     app.kubernetes.io/name: heartbeat
     app.kubernetes.io/part-of: Linkerd
-    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: heartbeat
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -26,6 +26,7 @@ spec:
         metadata:
           labels:
             {{.Values.global.controllerComponentLabel}}: heartbeat
+            {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
           annotations:
             {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
         spec:
@@ -34,12 +35,12 @@ spec:
           restartPolicy: Never
           containers:
           - name: heartbeat
-            image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+            image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
             imagePullPolicy: {{.Values.global.imagePullPolicy}}
             args:
             - "heartbeat"
-            - "-prometheus-url=http://linkerd-prometheus.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:9090"
-            - "-controller-namespace={{.Values.global.namespace}}"
+            - "-prometheus-url=http://linkerd-prometheus.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:9090"
+            - "-controller-namespace={{.Release.Namespace}}"
             - "-log-level={{.Values.controllerLogLevel}}"
             {{- if .Values.heartbeatResources -}}
             {{- include "partials.resources" .Values.heartbeatResources | nindent 12 }}

@@ -1,3 +1,4 @@
+{{- if .Values.global.grafana.enabled }}
 ---
 ###
 ### Grafana
@@ -6,16 +7,16 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: linkerd-grafana-config
-  namespace: {{.Values.global.namespace}}
+  name: {{.Values.name}}-config
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: grafana
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 data:
   grafana.ini: |-
-    instance_name = linkerd-grafana
+    instance_name = {{.Values.name}}
 
     [server]
     root_url = %(protocol)s://%(domain)s:/grafana/
@@ -24,8 +25,8 @@ data:
     disable_login_form = true
 
     [auth.anonymous]
-    enabled = true
-    org_role = {{ .Values.grafanaUserRole | default "Editor" }}
+    enabled = {{ .Values.auth.anonymous.enabled | default true }}
+    org_role = {{ .Values.auth.anonymous.role | default "Editor" }}
 
     [auth.basic]
     enabled = false
@@ -43,7 +44,7 @@ data:
       type: prometheus
       access: proxy
       orgId: 1
-      url: http://linkerd-prometheus.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:9090
+      url: http://linkerd-prometheus.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:9090
       isDefault: true
       jsonData:
         timeInterval: "5s"
@@ -66,11 +67,11 @@ data:
 kind: Service
 apiVersion: v1
 metadata:
-  name: linkerd-grafana
-  namespace: {{.Values.global.namespace}}
+  name: {{.Values.name}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: grafana
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -83,7 +84,7 @@ spec:
     targetPort: 3000
 ---
 {{ $_ := set .Values.global.proxy "workloadKind" "deployment" -}}
-{{ $_ := set .Values.global.proxy "component" "linkerd-grafana" -}}
+{{ $_ := set .Values.global.proxy "component" .Values.name -}}
 {{ include "linkerd.proxy.validation" .Values.global.proxy -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -93,17 +94,17 @@ metadata:
   labels:
     app.kubernetes.io/name: grafana
     app.kubernetes.io/part-of: Linkerd
-    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+    app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: grafana
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
-  name: linkerd-grafana
-  namespace: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+  name: {{.Values.name}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: 1
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: grafana
-      {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+      {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
   template:
     metadata:
@@ -112,7 +113,8 @@ spec:
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
       labels:
         {{.Values.global.controllerComponentLabel}}: grafana
-        {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}
@@ -120,7 +122,11 @@ spec:
       - env:
         - name: GF_PATHS_DATA
           value: /data
-        image: {{.Values.grafanaImage}}:{{default .Values.global.linkerdVersion .Values.controllerImageVersion}}
+        # Force using the go-based DNS resolver instead of the OS' to avoid failures in some environments
+        # see https://github.com/grafana/grafana/issues/20096
+        - name: GODEBUG
+          value: netdns=go
+        image: {{.Values.image.name}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
         imagePullPolicy: {{.Values.global.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -135,8 +141,8 @@ spec:
           httpGet:
             path: /api/health
             port: 3000
-        {{- if .Values.grafanaResources -}}
-        {{- include "partials.resources" .Values.grafanaResources | nindent 8 }}
+        {{- if .Values.resources -}}
+        {{- include "partials.resources" .Values.resources | nindent 8 }}
         {{- end }}
         securityContext:
           runAsUser: 472
@@ -151,7 +157,7 @@ spec:
       initContainers:
       - {{- include "partials.proxy-init" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{ end -}}
-      serviceAccountName: linkerd-grafana
+      serviceAccountName: {{.Values.name}}
       volumes:
       - emptyDir: {}
         name: data
@@ -163,6 +169,10 @@ spec:
             path: provisioning/datasources/datasources.yaml
           - key: dashboards.yaml
             path: provisioning/dashboards/dashboards.yaml
-          name: linkerd-grafana-config
+          name: {{.Values.name}}-config
         name: grafana-config
+      {{ if .Values.global.controlPlaneTracing -}}
+      - {{- include "partials.proxy.volumes.labels" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}
+{{- end }}
