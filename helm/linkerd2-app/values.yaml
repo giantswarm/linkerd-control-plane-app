@@ -22,7 +22,7 @@ global:
   # GS changes: needed now as global value to be available in subcharts including _proxy.tpl
   identity:
     issuer:
-      scheme: &identity_issuer_scheme linkerd.io/tls
+      scheme: &identity_issuer_scheme linkerd.io/cert-manager
 
   # url of external grafana instance.
   grafanaUrl: ""
