@@ -17,5 +17,4 @@ name: linkerd2-app
 sources:
 - https://github.com/linkerd/linkerd2/
 - https://github.com/giantswarm/linkerd2-app
-version: 0.3.2-9db9819ae04bb5d01896ade00a9bca4466ba1196
-  #version: 2.7.1
+version: [[ .Version ]]
