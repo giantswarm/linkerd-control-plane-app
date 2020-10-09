@@ -1,3 +1,4 @@
+{{- if .Values.global.tracing.enabled }}
 ---
 ###
 ### linkerd-collector RBAC
@@ -24,3 +25,4 @@ metadata:
   labels:
     {{.Values.global.controllerComponentLabel}}: {{.Values.jaeger.name}}
     {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+{{- end }}

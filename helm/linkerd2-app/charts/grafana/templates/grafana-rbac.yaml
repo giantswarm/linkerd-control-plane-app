@@ -1,3 +1,4 @@
+{{- if .Values.global.grafana.enabled }}
 ---
 ###
 ### Grafana RBAC
@@ -11,3 +12,4 @@ metadata:
   labels:
     {{.Values.global.controllerComponentLabel}}: grafana
     {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+{{- end }}
