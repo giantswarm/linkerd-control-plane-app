@@ -13,8 +13,6 @@ global:
   # control plane version. See Proxy section for proxy version
   linkerdVersion: &linkerd_version stable-2.8.1
 
-  namespace: linkerd
-
   identityTrustAnchorsPEM: |
 
   identityTrustDomain: *cluster_domain
@@ -191,13 +189,6 @@ tap:
 
 # web configuration
 webImage: gcr.io/linkerd-io/web
-
-# If the namespace is controlled by an external tool or can't be installed with Helm
-# you can disable its installation. In this case:
-# - The namespace created by the external tool must match the namespace value above
-# - The external tool needs to create the namespace with the label:
-#     config.linkerd.io/admission-webhooks: disabled
-installNamespace: true
 
 # Node selection constraints for control-plane components
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector.
