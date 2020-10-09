@@ -54,13 +54,13 @@ env:
 - name: LINKERD2_PROXY_IDENTITY_DIR
   value: /var/run/linkerd/identity/end-entity
 - name: LINKERD2_PROXY_IDENTITY_TRUST_ANCHORS
-{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") }}
+{{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "linkerd.io/cert-manager") }}
   valueFrom:
     secretKeyRef:
       name: linkerd-identity-issuer
       key: ca.crt
 {{- end }}
-{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/tls") }}
+{{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "linkerd.io/tls") }}
   value: |
   {{- required "Please provide the identity trust anchors" .Values.global.identityTrustAnchorsPEM | trim | nindent 4 }}
 {{- end }}

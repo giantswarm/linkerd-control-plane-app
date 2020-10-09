@@ -19,6 +19,11 @@ global:
 
   identityTrustDomain: *cluster_domain
 
+  # GS changes: needed now as global value to be available in subcharts including _proxy.tpl
+  identity:
+    issuer:
+      scheme: &identity_issuer_scheme linkerd.io/tls
+
   # url of external grafana instance.
   grafanaUrl: ""
 
@@ -110,7 +115,7 @@ debugContainer:
 # identity configuration
 identity:
   issuer:
-    scheme: linkerd.io/tls
+    scheme: *identity_issuer_scheme
 
     clockSkewAllowance: 20s
 
