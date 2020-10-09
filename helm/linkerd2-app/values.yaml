@@ -22,6 +22,11 @@ global:
     issuer:
       scheme: &identity_issuer_scheme linkerd.io/cert-manager
 
+  # GS changes: support older version of cert-manager's API. Setting this to anything later
+  # than 0.11.0 will use the new API version and API group.
+  certManager:
+    version: 1.0.2
+
   # GS changes: expose subchart toggles as global vars
   grafana:
     enabled: &grafana_enabled true
