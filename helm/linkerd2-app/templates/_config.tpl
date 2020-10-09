@@ -1,6 +1,6 @@
 {{- define "linkerd.configs.global" -}}
 {
-  "linkerdNamespace": "{{.Values.global.namespace}}",
+  "linkerdNamespace": "{{.Release.namespace}}",
   "cniEnabled": {{ default false .Values.global.cniEnabled }},
   "version": "{{.Values.global.linkerdVersion}}",
   "identityContext":{

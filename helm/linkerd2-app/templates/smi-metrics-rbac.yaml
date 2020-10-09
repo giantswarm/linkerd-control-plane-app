@@ -9,9 +9,9 @@ kind: ServiceAccount
 metadata:
   labels:
     {{.Values.global.controllerComponentLabel}}: smi-metrics
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
   name: linkerd-smi-metrics
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.namespace}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -19,7 +19,7 @@ metadata:
   name: linkerd-smi-metrics
   labels:
     {{.Values.global.controllerComponentLabel}}: smi-metrics
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
   namespace: kube-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -28,19 +28,19 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: linkerd-smi-metrics
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.namespace}}
 ---
-{{- $cn := printf "linkerd-smi-metrics.%s.svc" .Values.global.namespace }}
+{{- $cn := printf "linkerd-smi-metrics.%s.svc" .Release.namespace }}
 {{- $cert := genCA $cn 365 }}
 {{- if (not .Values.smiMetrics.externalSecret) }}
 kind: Secret
 apiVersion: v1
 metadata:
   name: linkerd-smi-metrics-tls
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.namespace }}
   labels:
     {{.Values.global.controllerComponentLabel}}: smi-metrics
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 type: kubernetes.io/tls
@@ -55,7 +55,7 @@ metadata:
   name: v1alpha1.metrics.smi-spec.io
   labels:
     {{.Values.global.controllerComponentLabel}}: smi-metrics
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
 spec:
   group: metrics.smi-spec.io
   version: v1alpha1
@@ -64,7 +64,7 @@ spec:
   versionPriority: 100
   service:
     name: linkerd-smi-metrics
-    namespace: {{.Values.global.namespace}}
+    namespace: {{.Release.namespace}}
 {{- if and (.Values.smiMetrics.externalSecret) (empty .Values.smiMetrics.caBundle) }}
   {{- fail "If smiMetrics.externalSecret is true then you need to provide smiMetrics.caBundle" }}
 {{- end }}

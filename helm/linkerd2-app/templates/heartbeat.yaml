@@ -8,13 +8,13 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: linkerd-heartbeat
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.namespace}}
   labels:
     app.kubernetes.io/name: heartbeat
     app.kubernetes.io/part-of: Linkerd
     app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: heartbeat
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -26,7 +26,7 @@ spec:
         metadata:
           labels:
             {{.Values.global.controllerComponentLabel}}: heartbeat
-            {{.Values.global.workloadNamespaceLabel}}: {{.Values.global.namespace}}
+            {{.Values.global.workloadNamespaceLabel}}: {{.Release.namespace}}
           annotations:
             {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
         spec:
@@ -39,8 +39,8 @@ spec:
             imagePullPolicy: {{.Values.global.imagePullPolicy}}
             args:
             - "heartbeat"
-            - "-prometheus-url=http://linkerd-prometheus.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:9090"
-            - "-controller-namespace={{.Values.global.namespace}}"
+            - "-prometheus-url=http://linkerd-prometheus.{{.Release.namespace}}.svc.{{.Values.global.clusterDomain}}:9090"
+            - "-controller-namespace={{.Release.namespace}}"
             - "-log-level={{.Values.controllerLogLevel}}"
             {{- if .Values.heartbeatResources -}}
             {{- include "partials.resources" .Values.heartbeatResources | nindent 12 }}

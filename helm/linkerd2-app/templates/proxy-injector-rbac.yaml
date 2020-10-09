@@ -6,10 +6,10 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-proxy-injector
+  name: linkerd-{{.Release.namespace}}-proxy-injector
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
 rules:
 - apiGroups: [""]
   resources: ["events"]
@@ -30,39 +30,39 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.global.namespace}}-proxy-injector
+  name: linkerd-{{.Release.namespace}}-proxy-injector
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
 subjects:
 - kind: ServiceAccount
   name: linkerd-proxy-injector
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.namespace}}
   apiGroup: ""
 roleRef:
   kind: ClusterRole
-  name: linkerd-{{.Values.global.namespace}}-proxy-injector
+  name: linkerd-{{.Release.namespace}}-proxy-injector
   apiGroup: rbac.authorization.k8s.io
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: linkerd-proxy-injector
-  namespace: {{.Values.global.namespace}}
+  namespace: {{.Release.namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
 ---
-{{- $ca := genCA (printf "linkerd-proxy-injector.%s.svc" .Values.global.namespace) 365 }}
+{{- $ca := genCA (printf "linkerd-proxy-injector.%s.svc" .Release.namespace) 365 }}
 {{- if (not .Values.proxyInjector.externalSecret) }}
 kind: Secret
 apiVersion: v1
 metadata:
   name: linkerd-proxy-injector-tls
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.namespace }}
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 type: Opaque
@@ -77,7 +77,7 @@ metadata:
   name: linkerd-proxy-injector-webhook-config
   labels:
     {{.Values.global.controllerComponentLabel}}: proxy-injector
-    {{.Values.global.controllerNamespaceLabel}}: {{.Values.global.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
 webhooks:
 - name: linkerd-proxy-injector.linkerd.io
   namespaceSelector:
@@ -89,7 +89,7 @@ webhooks:
   clientConfig:
     service:
       name: linkerd-proxy-injector
-      namespace: {{ .Values.global.namespace }}
+      namespace: {{ .Release.namespace }}
       path: "/"
 {{- if and (.Values.proxyInjector.externalSecret) (empty .Values.proxyInjector.caBundle) }}
   {{- fail "If proxyInjector.externalSecret is true then you need to provide proxyInjector.caBundle" }}

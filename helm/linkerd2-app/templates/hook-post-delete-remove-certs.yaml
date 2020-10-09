@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: linkerd-janitor
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-5"
@@ -32,7 +32,7 @@ rules:
   resources:
   - namespaces
   resourceNames:
-  - {{ .Values.global.namespace }}
+  - {{ .Release.namespace }}
   verbs:
   - delete
 - apiGroups:
@@ -56,7 +56,7 @@ rules:
   resources:
   - podsecuritypolicies
   resourceNames:
-  - linkerd-{{ .Values.global.namespace }}-control-plane
+  - linkerd-{{ .Release.namespace }}-control-plane
   verbs:
   - use
 ---
@@ -64,7 +64,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: linkerd-janitor
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-5"
@@ -76,7 +76,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: linkerd-janitor
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-4"
@@ -86,7 +86,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: linkerd-janitor
-    namespace: {{ .Values.global.namespace }}
+    namespace: {{ .Release.namespace }}
 roleRef:
   kind: Role
   name: linkerd-janitor
@@ -96,7 +96,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: linkerd-janitor
-  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Release.namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-3"
@@ -116,12 +116,12 @@ spec:
         - -e
         - -c
         - >-
-          kubectl -n {{ .Values.global.namespace }} delete configmap linkerd-config;
+          kubectl -n {{ .Release.namespace }} delete configmap linkerd-config;
 {{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") }}
-          kubectl -n {{ .Values.global.namespace }} delete issuer linkerd-selfsigning-issuer;
-          kubectl -n {{ .Values.global.namespace }} delete certificate linkerd-identity-issuer;
-          kubectl -n {{ .Values.global.namespace }} delete secret linkerd-identity-issuer;
+          kubectl -n {{ .Release.namespace }} delete issuer linkerd-selfsigning-issuer;
+          kubectl -n {{ .Release.namespace }} delete certificate linkerd-identity-issuer;
+          kubectl -n {{ .Release.namespace }} delete secret linkerd-identity-issuer;
 {{- end }}
-          kubectl delete ns {{ .Values.global.namespace }};
+          kubectl delete ns {{ .Release.namespace }};
       restartPolicy: Never
   backoffLimit: 6
