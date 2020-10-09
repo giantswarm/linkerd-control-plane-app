@@ -90,7 +90,7 @@ subjects:
 - kind: ServiceAccount
   name: linkerd-destination
   namespace: {{.Release.Namespace}}
-{{ if .Values.grafana.enabled -}}
+{{ if .Values.global.grafana.enabled -}}
 - kind: ServiceAccount
   name: {{.Values.grafana.name}}
   namespace: {{.Release.Namespace}}
