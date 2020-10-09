@@ -7,7 +7,7 @@ env:
 - name: LINKERD2_PROXY_LOG
   value: {{.Values.global.proxy.logLevel}}
 - name: LINKERD2_PROXY_DESTINATION_SVC_ADDR
-  value: {{ternary "localhost.:8086" (printf "linkerd-dst.%s.svc.%s:8086" .Values.global.namespace .Values.global.clusterDomain) (eq .Values.global.proxy.component "linkerd-destination")}}
+  value: {{ternary "localhost.:8086" (printf "linkerd-dst.%s.svc.%s:8086" .Release.namespace .Values.global.clusterDomain) (eq .Values.global.proxy.component "linkerd-destination")}}
 {{ if .Values.global.proxy.destinationGetNetworks -}}
 - name: LINKERD2_PROXY_DESTINATION_GET_NETWORKS
   value: "{{.Values.global.proxy.destinationGetNetworks}}"
@@ -67,14 +67,14 @@ env:
 - name: LINKERD2_PROXY_IDENTITY_TOKEN_FILE
   value: /var/run/secrets/kubernetes.io/serviceaccount/token
 - name: LINKERD2_PROXY_IDENTITY_SVC_ADDR
-  {{- $identitySvcAddr := printf "linkerd-identity.%s.svc.%s:8080" .Values.global.namespace .Values.global.clusterDomain }}
+  {{- $identitySvcAddr := printf "linkerd-identity.%s.svc.%s:8080" .Release.namespace .Values.global.clusterDomain }}
   value: {{ternary "localhost.:8080" $identitySvcAddr (eq .Values.global.proxy.component "linkerd-identity")}}
 - name: _pod_sa
   valueFrom:
     fieldRef:
       fieldPath: spec.serviceAccountName
 - name: _l5d_ns
-  value: {{.Values.global.namespace}}
+  value: {{.Release.namespace}}
 - name: _l5d_trustdomain
   value: {{.Values.global.identityTrustDomain}}
 - name: LINKERD2_PROXY_IDENTITY_LOCAL_NAME
@@ -93,9 +93,9 @@ env:
 {{ end -}}
 {{ if .Values.global.controlPlaneTracing -}}
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_ADDR
-  value: linkerd-collector.{{.Values.global.namespace}}.svc.{{.Values.global.clusterDomain}}:55678
+  value: linkerd-collector.{{.Release.namespace}}.svc.{{.Values.global.clusterDomain}}:55678
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_NAME
-  value: linkerd-collector.{{.Values.global.namespace}}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
+  value: linkerd-collector.{{.Release.namespace}}.serviceaccount.identity.$(_l5d_ns).$(_l5d_trustdomain)
 {{ else if .Values.global.proxy.trace.collectorSvcAddr -}}
 - name: LINKERD2_PROXY_TRACE_COLLECTOR_SVC_ADDR
   value: {{ .Values.global.proxy.trace.collectorSvcAddr }}
