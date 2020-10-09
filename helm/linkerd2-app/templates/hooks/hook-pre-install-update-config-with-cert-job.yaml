@@ -70,7 +70,6 @@ subjects:
 roleRef:
   kind: Role
   name: global-config-creator
-  namespace: {{ .Release.Namespace }}
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1
