@@ -7,10 +7,10 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: {{.Values.collector.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
 ---
 ###
 ### linkerd-jaeger RBAC
@@ -20,7 +20,7 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: {{.Values.jaeger.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: {{.Values.jaeger.name}}
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}

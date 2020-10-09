@@ -7,10 +7,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-web
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: web
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -38,15 +38,15 @@ metadata:
     app.kubernetes.io/part-of: Linkerd
     app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: web
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   name: linkerd-web
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: {{.Values.dashboard.replicas}}
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: web
-      {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+      {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
   template:
     metadata:
@@ -55,29 +55,29 @@ spec:
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
       labels:
         {{.Values.global.controllerComponentLabel}}: web
-        {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
-        {{.Values.global.workloadNamespaceLabel}}: {{.Release.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}
       containers:
       - args:
-        - -api-addr=linkerd-controller-api.{{.Release.namespace}}.svc.{{.Values.global.clusterDomain}}:8085
+        - -api-addr=linkerd-controller-api.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:8085
         {{- if .Values.global.grafanaUrl }}
         - -grafana-addr={{.Values.global.grafanaUrl}}
         {{- else if .Values.grafana.enabled }}
-        - -grafana-addr={{.Values.grafana.name}}.{{.Release.namespace}}.svc.{{.Values.global.clusterDomain}}:3000
+        - -grafana-addr={{.Values.grafana.name}}.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:3000
         {{- end}}
         {{- if .Values.tracing.enabled }}
-        - -jaeger-addr={{.Values.tracing.jaeger.name}}.{{.Release.namespace}}.svc.{{.Values.global.clusterDomain}}:16686
+        - -jaeger-addr={{.Values.tracing.jaeger.name}}.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:16686
         {{- end}}
-        - -controller-namespace={{.Release.namespace}}
+        - -controller-namespace={{.Release.Namespace}}
         - -log-level={{.Values.controllerLogLevel}}
         {{- if .Values.enforcedHostRegexp }}
         - -enforced-host={{.Values.enforcedHostRegexp}}
         {{- else -}}
-        {{- $hostFull := replace "." "\\." (printf "linkerd-web.%s.svc.%s" .Release.namespace .Values.global.clusterDomain) }}
-        {{- $hostAbbrev := replace "." "\\." (printf "linkerd-web.%s.svc" .Release.namespace) }}
+        {{- $hostFull := replace "." "\\." (printf "linkerd-web.%s.svc.%s" .Release.Namespace .Values.global.clusterDomain) }}
+        {{- $hostAbbrev := replace "." "\\." (printf "linkerd-web.%s.svc" .Release.Namespace) }}
         - -enforced-host=^(localhost|127\.0\.0\.1|{{ $hostFull }}|{{ $hostAbbrev }}|\[::1\])(:\d+)?$
         {{- end}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}

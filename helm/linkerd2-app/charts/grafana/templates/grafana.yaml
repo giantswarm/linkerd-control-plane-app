@@ -7,10 +7,10 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{.Values.name}}-config
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: grafana
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 data:
@@ -43,7 +43,7 @@ data:
       type: prometheus
       access: proxy
       orgId: 1
-      url: http://linkerd-prometheus.{{.Release.namespace}}.svc.{{.Values.global.clusterDomain}}:9090
+      url: http://linkerd-prometheus.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:9090
       isDefault: true
       jsonData:
         timeInterval: "5s"
@@ -67,10 +67,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: {{.Values.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: grafana
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -95,15 +95,15 @@ metadata:
     app.kubernetes.io/part-of: Linkerd
     app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: grafana
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   name: {{.Values.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: 1
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: grafana
-      {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+      {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
   template:
     metadata:
@@ -112,8 +112,8 @@ spec:
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
       labels:
         {{.Values.global.controllerComponentLabel}}: grafana
-        {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
-        {{.Values.global.workloadNamespaceLabel}}: {{.Release.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}

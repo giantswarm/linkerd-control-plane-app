@@ -7,10 +7,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-controller-api
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: controller
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -35,15 +35,15 @@ metadata:
     app.kubernetes.io/part-of: Linkerd
     app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: controller
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   name: linkerd-controller
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: {{.Values.controllerReplicas}}
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: controller
-      {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+      {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
   {{- if .Values.enablePodAntiAffinity }}
   strategy:
@@ -57,8 +57,8 @@ spec:
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
       labels:
         {{.Values.global.controllerComponentLabel}}: controller
-        {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
-        {{.Values.global.workloadNamespaceLabel}}: {{.Release.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       {{- include "linkerd.node-selector" . | nindent 6 }}
@@ -69,9 +69,9 @@ spec:
       containers:
       - args:
         - public-api
-        - -prometheus-url=http://linkerd-prometheus.{{.Release.namespace}}.svc.{{.Values.global.clusterDomain}}:9090
-        - -destination-addr=linkerd-dst.{{.Release.namespace}}.svc.{{.Values.global.clusterDomain}}:8086
-        - -controller-namespace={{.Release.namespace}}
+        - -prometheus-url=http://linkerd-prometheus.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:9090
+        - -destination-addr=linkerd-dst.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:8086
+        - -controller-namespace={{.Release.Namespace}}
         - -log-level={{.Values.controllerLogLevel}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
         image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}

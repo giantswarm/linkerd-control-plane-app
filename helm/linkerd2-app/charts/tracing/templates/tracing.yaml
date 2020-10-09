@@ -7,10 +7,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{printf "%s-config" .Values.collector.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 data:
@@ -27,17 +27,17 @@ data:
         retry-on-failure: true
         sender-type: jaeger-thrift-http
         jaeger-thrift-http:
-          collector-endpoint: {{printf "http://%s.%s:14268/api/traces" .Values.jaeger.name .Release.namespace }}
+          collector-endpoint: {{printf "http://%s.%s:14268/api/traces" .Values.jaeger.name .Release.Namespace }}
           timeout: 5s
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: {{.Values.collector.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -67,15 +67,15 @@ metadata:
     app.kubernetes.io/part-of: Linkerd
     app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   name: {{.Values.collector.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: 1
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
-      {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+      {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
   minReadySeconds: 5
   progressDeadlineSeconds: 120
@@ -89,8 +89,8 @@ spec:
         prometheus.io/scrape: "true"
       labels:
         {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
-        {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
-        {{.Values.global.workloadNamespaceLabel}}: {{.Release.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       containers:
@@ -146,10 +146,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{.Values.jaeger.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
   labels:
     {{.Values.global.controllerComponentLabel}}: {{.Values.jaeger.name}}
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   annotations:
     {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
 spec:
@@ -175,15 +175,15 @@ metadata:
     app.kubernetes.io/part-of: Linkerd
     app.kubernetes.io/version: {{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
     {{.Values.global.controllerComponentLabel}}: {{.Values.jaeger.name}}
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
   name: {{.Values.jaeger.name}}
-  namespace: {{.Release.namespace}}
+  namespace: {{.Release.Namespace}}
 spec:
   replicas: 1
   selector:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: {{.Values.jaeger.name}}
-      {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
+      {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
   template:
     metadata:
@@ -195,8 +195,8 @@ spec:
         prometheus.io/scrape: "true"
       labels:
         {{.Values.global.controllerComponentLabel}}: {{.Values.jaeger.name}}
-        {{.Values.global.controllerNamespaceLabel}}: {{.Release.namespace}}
-        {{.Values.global.workloadNamespaceLabel}}: {{.Release.namespace}}
+        {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+        {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
         {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
     spec:
       containers:
