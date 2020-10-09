@@ -7,6 +7,8 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+## [0.4.0] - 2020-10-09
+
 ### Changed
 
 - Updated to upstream v2.8.1. ([#4](https://github.com/giantswarm/linkerd2-app/pull/4))
@@ -18,5 +20,6 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 - Update chart to v2.7.1.
 
-[Unreleased]: https://github.com/giantswarm/linkerd2-app/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/giantswarm/linkerd2-app/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/giantswarm/linkerd2-app/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/giantswarm/linkerd2-app/releases/tag/v0.3.2
