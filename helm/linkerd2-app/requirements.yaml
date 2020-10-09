@@ -1,8 +1,0 @@
-dependencies:
-- name: partials
-  version: 0.1.0
-  repository: file://charts/partials
-- name: grafana
-  version: 0.1.0
-  repository: file://charts/grafana
-  condition: grafana.enabled
