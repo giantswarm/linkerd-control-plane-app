@@ -21,6 +21,11 @@ global:
   identity:
     issuer:
       scheme: &identity_issuer_scheme linkerd.io/cert-manager
+      # allows certificate issuance from pre-created cert-manager issuer using Vault
+      # as a PKI backend
+      vault:
+        enabled: false
+        issuerName: null
 
   # GS changes: support older version of cert-manager's API. Setting this to anything later
   # than 0.11.0 will use the new API version and API group.
