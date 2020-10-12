@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Fixed
+
+- Allowed tracing subchart's serviceaccounts to use the PSP. ([#7](https://github.com/giantswarm/linkerd2-app/pull/7))
+
 ## [0.4.0] - 2020-10-09
 
 ### Changed
