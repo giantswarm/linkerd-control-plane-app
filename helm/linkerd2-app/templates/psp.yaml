@@ -123,3 +123,11 @@ subjects:
   name: linkerd-smi-metrics
   namespace: {{.Release.Namespace}}
 {{- end }}
+{{- if .Values.global.tracing.enabled }}
+- kind: ServiceAccount
+  name: {{.Values.tracing.collector.name}}
+  namespace: {{.Release.Namespace}}
+- kind: ServiceAccount
+  name: {{.Values.tracing.jaeger.name}}
+  namespace: {{.Release.Namespace}}
+{{- end }}
