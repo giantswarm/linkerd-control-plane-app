@@ -47,6 +47,13 @@ Two installation options, `Identity.Issuer.Scheme` and `Namespace` are required 
 as shown above. You shouldn't need to change other defaults. Still, you can check available chart
 options [here](helm/linkerd2-app/values.yaml).
 
+### Note:
+
+`values.yaml` uses [YAML anchors](https://helm.sh/docs/chart_template_guide/yaml_techniques/#yaml-anchors) to
+be DRY where possible, however this can cause problems when these values are overridden by a custom
+values file. If you wish to enabled or disable deployment of the `grafana` and `tracing` subcharts
+then you should override the values at `.$subchart.enabled`, **not** `.global.$subchart.enabled`.
+
 ## Compatibility
 
 Tested on Giant Swarm release 10.1.0 on AWS with Kubernetes 1.15.5.
