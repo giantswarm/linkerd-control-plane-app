@@ -221,7 +221,7 @@ smiMetrics:
 # Configuration for Add-ons
 
 grafana:
-  enabled: &grafana_enabled
+  enabled: *grafana_enabled
   name: linkerd-grafana
   image:
     name: gcr.io/linkerd-io/grafana
@@ -232,7 +232,7 @@ grafana:
       role:
 
 tracing:
-  enabled: &tracing_enabled
+  enabled: *tracing_enabled
   collector:
     name: linkerd-collector
     image: omnition/opencensus-collector:0.1.11
