@@ -22,6 +22,17 @@ global:
     issuer:
       scheme: &identity_issuer_scheme linkerd.io/cert-manager
 
+      # if global.identity.issuer.scheme is `linkerd.io/cert-manager` then the following
+      # variables will be used.
+      vault:
+        enabled: false
+        serverAddr:
+        caPath: ""
+        auth:
+          role: ""
+          mountPath: ""
+          secretName: ""
+
   # GS changes: support older version of cert-manager's API. Setting this to anything later
   # than 0.11.0 will use the new API version and API group.
   certManager:
