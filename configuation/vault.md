@@ -30,7 +30,9 @@ path "pki/sign/rolename"  { capabilities = ["create", "update"] }
 path "pki/issue/rolename" { capabilities = ["create"] }
 ```
 
-## Cluster configuration
+## Cluster steup
+
+### Configuration
 
 - first declare some variables:
 ```
@@ -69,6 +71,11 @@ subjects:
   namespace: ${LINKERD_NAMESPACE}
 EOF
 ```
+
+### Auth details
+
+Now we need to extract the details required to configure Vault.
+
 - get the name of the ServiceAccount's associated secret:
 ```
 SA_SECRET_NAME=$(kubectl get sa ${SA_NAME} -n ${LINKERD_NAMESPACE} \
@@ -85,3 +92,22 @@ kubectl get secret ${SA_SECRET_NAME} -n ${LINKERD_NAMESPACE} \
   | base64 -d > /tmp/k8s-ca.crt
 ```
 
+## Vault configuration
+
+This next stage assumes you have enabled Kubernetes auth at the `kubernetes_linkerd` path.
+
+- set the address for the cluster's API server:
+```
+export K8S_API_URL="https://kubernetes.default.svc.cluster.local:443"
+```
+- configure the auth backend with the extracted details:
+```
+vault write auth/kubernetes_linkerd/config token_reviewer_jwt="${SA_TOKEN}" \
+  kubernetes_host=${K8S_API_URL} kubernetes_ca_cert=@/tmp/k8s-ca.crt
+```
+- create a role and link it to the policy mentioned in the Vault requirements section of this document:
+```
+vault write auth/kubernetes_linkerd/role/linkerd \
+  bound_service_account_names=${SA_NAME} bound_service_account_namespaces=${LINKERD_NAMESPACE} \
+  policies=$POLICY_NAME ttl=24h
+```
