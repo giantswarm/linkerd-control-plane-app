@@ -25,12 +25,34 @@ global:
       # if global.identity.issuer.scheme is `linkerd.io/cert-manager` then the following
       # variables will be used.
       vault:
+
+        # if enabled, the issuer scheme _must_ also be "linkerd.io/cert-manager"
         enabled: false
-        serverAddr:
-        caPath: ""
+
+        # Vault server configuration
+        server:
+
+          # Vault server address. Must include the port if it isn't 80 or 443.
+          address:
+
+          # Vault server's CA cert bundle. Required if the Vault server scheme is HTTPS and
+          # its certificate is self-signed. Not required if its certificate is signed by a
+          # public CA.
+          caPEM: |
+
+          # Vault API path to the PKI's `sign` endpoint. e.g. `pki_mountpoint/sign/rolename`.
+          signingPath: ""
+
+        # Vault+ServiceAccount authentication configuration.
         auth:
+
+          # Vault Kubernetes auth role name to assume.
           role: ""
+
+          # Mountpath to the Kubernetes authentication backend. e.g. `/v1/auth/kubernetes/
           mountPath: ""
+
+          # The name of the Secret resource linked to the dedicated ServiceAccount.
           secretName: ""
 
   # GS changes: support older version of cert-manager's API. Setting this to anything later
