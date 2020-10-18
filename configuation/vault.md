@@ -111,3 +111,26 @@ vault write auth/kubernetes_linkerd/role/linkerd \
   bound_service_account_names=${SA_NAME} bound_service_account_namespaces=${LINKERD_NAMESPACE} \
   policies=$POLICY_NAME ttl=24h
 ```
+
+# Validation
+
+- request certificate issuance for a CA cert with a Common Name of `identity.linkerd.cluster.local`:
+```
+k create -f - <<EOF
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: linkerd-identity-issuer
+  namespace: ${LINKERD_NAMESPACE}
+spec:
+  secretName: linkerd-identity-ca
+  commonName: identity.linkerd.cluster.local
+  isCA: true
+  issuerRef:
+    name: vault-issuer
+EOF
+```
+
+Provided everything has been configured correctly, you should now have a certificate stored in the Secret `linkerd-identity-ca` in the `linkerd` namespace.
+
+**NOTE**: this Certificate and Secret must be deleted prior to installing the Chart. This is because the Chart will manage the Certificate resource itself.
