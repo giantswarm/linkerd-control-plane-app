@@ -21,11 +21,6 @@ global:
   identity:
     issuer:
       scheme: &identity_issuer_scheme linkerd.io/cert-manager
-      # allows certificate issuance from pre-created cert-manager issuer using Vault
-      # as a PKI backend
-      vault:
-        enabled: false
-        issuerName: null
 
       # if global.identity.issuer.scheme is `linkerd.io/cert-manager` then the following
       # variables will be used.
