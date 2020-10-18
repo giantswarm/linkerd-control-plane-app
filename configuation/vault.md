@@ -51,6 +51,24 @@ metadata:
   namespace: ${LINKERD_NAMESPACE}
 EOF
 ```
+- give the ServiceAccount the permissions required for Vault to verify its authentication:
+```
+kubectl create -f - <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ${SA_NAME}-tokenreviewer
+  namespace: ${LINKERD_NAMESPACE}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: ${SA_NAME}
+  namespace: ${LINKERD_NAMESPACE}
+EOF
+```
 - get the name of the ServiceAccount's associated secret:
 ```
 SA_SECRET_NAME=$(kubectl get sa ${SA_NAME} -n ${LINKERD_NAMESPACE} \
