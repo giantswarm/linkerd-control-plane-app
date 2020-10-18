@@ -89,7 +89,7 @@ SA_TOKEN=$(kubectl get secret ${SA_SECRET_NAME} -n ${LINKERD_NAMESPACE} \
 - get the cluster's CA certificate:
 ```
 kubectl get secret ${SA_SECRET_NAME} -n ${LINKERD_NAMESPACE} \
-  | base64 -d > /tmp/k8s-ca.crt
+  -o "jsonpath={.data['ca\.crt']}" | base64 -d > /tmp/k8s-ca.crt
 ```
 
 ## Vault configuration
