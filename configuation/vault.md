@@ -2,12 +2,16 @@
 
 ## Overview
 
-cert-manager will authenticate to Vault by using a dedicated Kubernetes ServiceAccount which is created specifically for this purpose. This must exist in the `linkerd` namespace _before_ the Chart is installed. The ServiceAccount's details will then be used to configure the `kubernetes` authentication method for Vault. Both of these steps must be carried out before the Chart can be installed in order to permit creation of the necessary TLS certificates required for Linkerd to function.
+Cert Manager will authenticate to Vault by way of a dedicated Kubernetes `ServiceAccount` which is created specifically for this purpose. This must exist in the `linkerd` namespace _before_ the Chart is installed. The ServiceAccount's details will then be used to configure the `kubernetes` authentication method for Vault. Both of these steps must be carried out before the Chart can be installed in order to permit creation of the necessary TLS certificates required for Linkerd to function.
 ## Pre-requisites
+
+**Kubernetes cluster**
+
+In order to verify the ServiceAccount's credentials, Vault must be able to access the cluster's API.
 
 **cert-manager**
 
-- cert-manager must already be running in the cluster.
+Cert Manager must already be running in the cluster.
 
 **Vault**
 
