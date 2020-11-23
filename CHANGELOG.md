@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Added
+
+- Added a values.schema.json file to help with validating user values.
+
 ## [0.4.1] - 2020-10-13
 
 ### Fixed
