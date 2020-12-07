@@ -21,6 +21,8 @@ data:
         port: 55678
       zipkin:
         port: 9411
+      jaeger:
+        jaeger-thrift-http-port: 14268
     queued-exporters:
       jaeger-all-in-one:
         num-workers: 4
@@ -52,12 +54,17 @@ spec:
     port: 9411
     protocol: TCP
     targetPort: 9411
+  - name: jaeger
+    port: 14268
+    protocol: TCP
+    targetPort: 14268
   selector:
     {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
 ---
-{{ $_ := set .Values.global.proxy "workloadKind" "deployment" -}}
-{{ $_ := set .Values.global.proxy "component" .Values.collector.name -}}
-{{ include "linkerd.proxy.validation" .Values.global.proxy -}}
+{{- $tree := deepCopy . }}
+{{ $_ := set $tree.Values.global.proxy "workloadKind" "deployment" -}}
+{{ $_ := set $tree.Values.global.proxy "component" .Values.collector.name -}}
+{{ include "linkerd.proxy.validation" $tree.Values.global.proxy -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -77,7 +84,7 @@ spec:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
       {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
-      {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
+      {{- include "partials.proxy.labels" $tree.Values.global.proxy | nindent 6}}
   minReadySeconds: 5
   progressDeadlineSeconds: 120
   template:
@@ -85,6 +92,7 @@ spec:
       annotations:
         {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
+        {{- with .Values.global.podAnnotations }}{{ toYaml . | trim | nindent 8 }}{{- end }}
         prometheus.io/path: /metrics
         prometheus.io/port: "8888"
         prometheus.io/scrape: "true"
@@ -92,7 +100,8 @@ spec:
         {{.Values.global.controllerComponentLabel}}: {{.Values.collector.name}}
         {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
         {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
-        {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
+        {{- include "partials.proxy.labels" $tree.Values.global.proxy | nindent 8}}
+        {{- with .Values.global.podLabels }}{{ toYaml . | trim | nindent 8 }}{{- end }}
     spec:
       containers:
       - command:
@@ -111,6 +120,7 @@ spec:
         ports:
         - containerPort: 55678
         - containerPort: 9411
+        - containerPort: 14268
         readinessProbe:
           httpGet:
             path: /
@@ -121,8 +131,8 @@ spec:
         volumeMounts:
         - mountPath: /conf
           name: {{ printf "%s-config-val" .Values.collector.name}}
-      - {{- include "partials.proxy" . | indent 8 | trimPrefix (repeat 7 " ") }}
-      {{ if not .Values.global.noInitContainer -}}
+      - {{- include "partials.proxy" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ if not .Values.global.cniEnabled -}}
       initContainers:
       - {{- include "partials.proxy-init" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{ end -}}
@@ -136,6 +146,9 @@ spec:
         name: {{ printf "%s-config-val" .Values.collector.name}}
       {{ if .Values.global.controlPlaneTracing -}}
       - {{- include "partials.proxy.volumes.labels" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
+      {{ if not .Values.global.cniEnabled -}}
+      - {{- include "partials.proxyInit.volumes.xtables" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}
 ---
@@ -163,9 +176,10 @@ spec:
     - name: ui
       port: 16686
 ---
-{{ $_ := set .Values.global.proxy "workloadKind" "deployment" -}}
-{{ $_ := set .Values.global.proxy "component" .Values.jaeger.name -}}
-{{ include "linkerd.proxy.validation" .Values.global.proxy -}}
+{{- $tree := deepCopy . }}
+{{ $_ := set $tree.Values.global.proxy "workloadKind" "deployment" -}}
+{{ $_ := set $tree.Values.global.proxy "component" .Values.jaeger.name -}}
+{{ include "linkerd.proxy.validation" $tree.Values.global.proxy -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -185,12 +199,13 @@ spec:
     matchLabels:
       {{.Values.global.controllerComponentLabel}}: {{.Values.jaeger.name}}
       {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
-      {{- include "partials.proxy.labels" .Values.global.proxy | nindent 6}}
+      {{- include "partials.proxy.labels" $tree.Values.global.proxy | nindent 6}}
   template:
     metadata:
       annotations:
         {{.Values.global.createdByAnnotation}}: {{default (printf "linkerd/helm %s" .Values.global.linkerdVersion) .Values.global.cliVersion}}
         {{- include "partials.proxy.annotations" .Values.global.proxy| nindent 8}}
+        {{- with .Values.global.podAnnotations }}{{ toYaml . | trim | nindent 8 }}{{- end }}
         prometheus.io/path: /metrics
         prometheus.io/port: "8888"
         prometheus.io/scrape: "true"
@@ -198,7 +213,8 @@ spec:
         {{.Values.global.controllerComponentLabel}}: {{.Values.jaeger.name}}
         {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
         {{.Values.global.workloadNamespaceLabel}}: {{.Release.Namespace}}
-        {{- include "partials.proxy.labels" .Values.global.proxy | nindent 8}}
+        {{- include "partials.proxy.labels" $tree.Values.global.proxy | nindent 8}}
+        {{- with .Values.global.podLabels }}{{ toYaml . | trim | nindent 8 }}{{- end }}
     spec:
       containers:
       - args:
@@ -214,8 +230,8 @@ spec:
         {{- if .Values.jaeger.resources -}}
         {{- include "partials.resources" .Values.jaeger.resources | nindent 8 }}
         {{- end }}
-      - {{- include "partials.proxy" . | indent 8 | trimPrefix (repeat 7 " ") }}
-      {{ if not .Values.global.noInitContainer -}}
+      - {{- include "partials.proxy" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ if not .Values.global.cniEnabled -}}
       initContainers:
       - {{- include "partials.proxy-init" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{ end -}}
@@ -224,6 +240,9 @@ spec:
       volumes:
       {{ if .Values.global.controlPlaneTracing -}}
       - {{- include "partials.proxy.volumes.labels" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
+      {{ if not .Values.global.cniEnabled -}}
+      - {{- include "partials.proxyInit.volumes.xtables" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}
 {{- end }}
