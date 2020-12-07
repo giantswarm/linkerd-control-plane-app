@@ -166,8 +166,8 @@ controllerUID: 2103
 # destination configuration
 # set resources for the sp-validator and its linkerd proxy respectively
 # see global.proxy.resources for details.
-#destinationResources:
-#destinationProxyResources:
+# destinationResources:
+# destinationProxyResources:
 
 
 # web dashboard configuration
@@ -205,8 +205,8 @@ identity:
 
 # set resources for identity and its linkerd proxy respectively
 # see global.proxy.resources for details.
-#identityResources:
-#identityProxyResources:
+# identityResources:
+# identityProxyResources:
 
 # heartbeat configuration
 disableHeartBeat: false
@@ -234,8 +234,8 @@ proxyInjector:
 
 # set resources for proxy injector and its linkerd proxy respectively
 # see global.proxy.resources for details.
-#proxyInjectorResources:
-#proxyInjectorProxyResources:
+# proxyInjectorResources:
+# proxyInjectorProxyResources:
 
 # service profile validator configuration
 profileValidator:
@@ -259,13 +259,13 @@ profileValidator:
 
 # set resources for the sp-validator and its linkerd proxy respectively
 # see global.proxy.resources for details.
-#spValidatorResources:
-#spValidatorProxyResources:
+# spValidatorResources:
+# spValidatorProxyResources:
 
 # set resources for controllers public API and its linkerd proxy respectively
 # see global.proxy.resources for details.
-#publicAPIResources:
-#publicAPIProxyResources:
+# publicAPIResources:
+# publicAPIProxyResources:
 
 # tap configuration
 tap:
@@ -280,15 +280,15 @@ tap:
 
 # set resources for tap and its linkerd proxy respectively
 # see global.proxy.resources for details.
-#tapResources:
-#tapProxyResources:
+# tapResources:
+# tapProxyResources:
 
 # web configuration
 webImage: ghcr.io/linkerd/web
 # set resources for web UI and its linkerd proxy respectively
 # see global.proxy.resources for details.
-#webResources:
-#webProxyResources:
+# webResources:
+# webProxyResources:
 
 
 # If the namespace is controlled by an external tool or can't be installed with Helm
@@ -305,7 +305,7 @@ nodeSelector:
 
 # Tolerations constraints for control-plane components
 # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-#tolerations:
+# tolerations:
 
 # Configuration for Add-ons
 # Full configuration fields https://github.com/linkerd/linkerd2/tree/master/charts/linkerd2#add-ons-configuration
