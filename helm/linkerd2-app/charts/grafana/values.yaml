@@ -1,3 +1,6 @@
 auth:
   anonymous:
     role:
+
+image:
+  name: ghcr.io/linkerd/grafana
