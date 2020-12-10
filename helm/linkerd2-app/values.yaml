@@ -40,7 +40,7 @@ global:
   # GS changes: needed now as global value to be available in subcharts including _proxy.tpl
   identity:
     issuer:
-      scheme: &identity_issuer_scheme linkerd.io/cert-manager
+      scheme: &identity_issuer_scheme linkerd.io/tls
 
   identityTrustAnchorsPEM: |
 
