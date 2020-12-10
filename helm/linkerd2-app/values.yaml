@@ -105,7 +105,6 @@ global:
     # for more info on container lifecycle hooks.
     waitBeforeExitSeconds: 0
     requireIdentityOnInboundPorts: ""
-    destinationGetNetworks: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
   # proxy-init configuration
   proxyInit:
@@ -158,7 +157,6 @@ webhookFailurePolicy: Ignore
 
 # controller configuration
 controllerImage: ghcr.io/linkerd/controller
-controllerLogLevel: &controller_log_level info
 controllerReplicas: 1
 controllerUID: 2103
 
