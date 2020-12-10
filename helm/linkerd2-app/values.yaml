@@ -51,9 +51,10 @@ global:
 
   identityTrustDomain: *cluster_domain
 
-  # GS changes: expose subchart toggles as global vars
+  # GS changes: subcharts aren't included in this chart, but the variables are retained
+  # for ease of upstream compatibility.
   grafana:
-    enabled: &grafana_enabled true
+    enabled: &grafana_enabled false
   tracing:
     enabled: &tracing_enabled false
 
@@ -308,21 +309,11 @@ nodeSelector:
 # Configuration for Add-ons
 # Full configuration fields https://github.com/linkerd/linkerd2/tree/master/charts/linkerd2#add-ons-configuration
 
+# GS changes: Grafana subchart is removed, but this value is retained for
+# ease of upstream compatibility.
 grafana:
   enabled: *grafana_enabled
-  name: linkerd-grafana
-  image:
-    name: ghcr.io/linkerd/grafana
-    tag: latest
-  # set resource requests and limits for grafana and its linkerd proxy respectively
-  # see global.proxy.resources in the linkerd2 chart for details.
-  # resources:
-  # proxy:
-  #   resources:
-  auth:
-    anonymous:
-      enabled: true
-      role:
+
 
 prometheus:
   enabled: true
@@ -395,16 +386,11 @@ prometheus:
   # proxy:
   #   resources:
 
+# GS changes: tracing subchart is removed, but this value is retained for
+# ease of upstream compatibility.
 tracing:
   enabled: *tracing_enabled
-  collector:
-    name: linkerd-collector
-    image: omnition/opencensus-collector:0.1.11
-    # resources:
-  jaeger:
-    name: linkerd-jaeger
-    image: jaegertracing/all-in-one:1.19.2
-    # resources:
+
 
 kubectlImage:
   registry: quay.io
