@@ -146,8 +146,6 @@ spec:
         securityContext:
           runAsUser: {{.Values.controllerUID}}
         volumeMounts:
-        - mountPath: /var/run/linkerd/config
-          name: config
         - mountPath: /var/run/linkerd/identity/issuer
           name: identity-issuer
       {{- if not (empty .Values.identityProxyResources) }}
@@ -162,9 +160,6 @@ spec:
       {{ end -}}
       serviceAccountName: linkerd-identity
       volumes:
-      - configMap:
-          name: linkerd-config
-        name: config
       - name: identity-issuer
         secret:
           secretName: linkerd-identity-issuer
