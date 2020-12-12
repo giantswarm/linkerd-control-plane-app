@@ -294,12 +294,15 @@ webImage: ghcr.io/linkerd/web
 # webProxyResources:
 
 
+# GS changes: the namespace is pre-created by chart-operator, therefore this should
+# always be set to false.
+#
 # If the namespace is controlled by an external tool or can't be installed with Helm
 # you can disable its installation. In this case:
 # - The namespace created by the external tool must match the namespace value above
 # - The external tool needs to create the namespace with the label:
 #     config.linkerd.io/admission-webhooks: disabled
-installNamespace: true
+installNamespace: false
 
 # Node selection constraints for control-plane components
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector.
