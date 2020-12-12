@@ -1,5 +1,5 @@
 {{if .Values.identity -}}
-{{if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") -}}
+{{if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "kubernetes.io/tls") -}}
 ---
 apiVersion: {{ template "cert-manager.apiversion" . }}
 kind: Issuer
@@ -29,11 +29,18 @@ metadata:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-5"
 spec:
-  secretName: linkerd-identity-issuer
   commonName: identity.{{.Release.Namespace}}.{{.Values.global.clusterDomain}}
+  duration: 24h
   isCA: true
-  keyAlgorithm: ecdsa
   issuerRef:
     name: linkerd-selfsigning-issuer
+  keyAlgorithm: ecdsa
+  renewBefore: 1h
+  secretName: linkerd-identity-issuer
+  usages:
+  - cert sign
+  - crl sign
+  - server auth
+  - client auth
 {{- end}}
 {{- end}}
