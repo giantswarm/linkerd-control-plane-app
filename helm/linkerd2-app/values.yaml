@@ -37,10 +37,14 @@ global:
   # requires the linkerd-cni plugin to already be installed
   cniEnabled: false
 
-  # GS changes: needed now as global value to be available in subcharts including _proxy.tpl
+  # GS changes: needed now as global value to be available in subcharts including partials/_proxy.tpl
+  # Set to linkerd.io/tls to use a pre-created CA provided via global.identityTrustAnchorsPEM (this
+  # is the upstream method.
+  # Set to kubernetes.io/tls to use cert-manager as a TLS issuer (default behaviour; requires
+  # cert-manager to be pre-installed).
   identity:
     issuer:
-      scheme: &identity_issuer_scheme linkerd.io/tls
+      scheme: &identity_issuer_scheme kubernetes.io/tls
 
   identityTrustAnchorsPEM: |
 

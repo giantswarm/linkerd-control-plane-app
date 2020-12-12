@@ -119,7 +119,14 @@ spec:
         - -identity-trust-domain={{.Values.global.identityTrustDomain}}
         - -identity-issuance-lifetime={{.Values.identity.issuer.issuanceLifetime}}
         - -identity-clock-skew-allowance={{.Values.identity.issuer.clockSkewAllowance}}
+        {{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "linkerd.io/tls") -}}
+        {{/* use certificate provided in values */}}
         - -identity-trust-anchors-pem={{b64enc .Values.global.identityTrustAnchorsPEM}}
+        {{- end }}
+        {{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "kubernetes.io/tls") -}}
+        {{/* use certificate created by cert-manager */}}
+        - -issuer=/var/run/linkerd/identity/issuer
+        {{- end }}
         - -identity-scheme={{.Values.identity.issuer.scheme}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
         image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}

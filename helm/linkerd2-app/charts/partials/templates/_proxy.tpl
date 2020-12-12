@@ -73,7 +73,7 @@ env:
 - name: LINKERD2_PROXY_IDENTITY_DIR
   value: /var/run/linkerd/identity/end-entity
 - name: LINKERD2_PROXY_IDENTITY_TRUST_ANCHORS
-{{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "linkerd.io/cert-manager") }}
+{{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "kubernetes.io/tls") }}
   valueFrom:
     secretKeyRef:
       name: linkerd-identity-issuer
