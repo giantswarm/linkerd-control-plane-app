@@ -1,6 +1,6 @@
 {{if .Values.identity -}}
 {{if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "kubernetes.io/tls") -}}
-{{ $hookName := "linkerd-trust-anchor-enocder" -}}
+{{ $hookName := "linkerd-trust-anchor-encoder" -}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
