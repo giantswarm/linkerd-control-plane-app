@@ -79,7 +79,7 @@ global:
     outboundConnectTimeout: 1000ms
     inboundConnectTimeout: 100ms
     image:
-      name: ghcr.io/linkerd/proxy
+      name: quay.io/linkerd2-proxy
       pullPolicy: *image_pull_policy
       version: *linkerd_version
     logLevel: warn,linkerd=info
@@ -121,7 +121,7 @@ global:
     ignoreInboundPorts: "25,443,587,3306,11211"
     ignoreOutboundPorts: "25,443,587,3306,11211"
     image:
-      name: ghcr.io/linkerd/proxy-init
+      name: quay.io/linkerd2-proxy-init
       pullPolicy: *image_pull_policy
       version: v1.3.6
     resources:
@@ -161,7 +161,7 @@ omitWebhookSideEffects: false
 webhookFailurePolicy: Ignore
 
 # controller configuration
-controllerImage: ghcr.io/linkerd/controller
+controllerImage: quay.io/linkerd2-controller
 controllerReplicas: 1
 controllerUID: 2103
 
@@ -180,7 +180,7 @@ dashboard:
 # debug configuration
 debugContainer:
   image:
-    name: ghcr.io/linkerd/debug
+    name: quay.io/linkerd2-debug
     pullPolicy: *image_pull_policy
     version: *linkerd_version
 
@@ -287,7 +287,7 @@ tap:
 # tapProxyResources:
 
 # web configuration
-webImage: ghcr.io/linkerd/web
+webImage: quay.io/linkerd2-web
 # set resources for web UI and its linkerd proxy respectively
 # see global.proxy.resources for details.
 # webResources:
