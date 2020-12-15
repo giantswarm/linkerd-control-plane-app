@@ -124,11 +124,21 @@ spec:
         - -identity-trust-anchors-pem={{b64enc .Values.global.identityTrustAnchorsPEM}}
         {{- end }}
         {{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "kubernetes.io/tls") -}}
-        {{/* use certificate created by cert-manager */}}
+        {{/* use certificates created by cert-manager */}}
+        - -identity-trust-anchors-pem=$(ROOT_CA)
         - -issuer=/var/run/linkerd/identity/issuer
         {{- end }}
         - -identity-scheme={{.Values.identity.issuer.scheme}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
+        {{- if and (.Values.global.identity.issuer) (eq .Values.global.identity.issuer.scheme "kubernetes.io/tls") -}}
+        {{/* inject the root ca (trust anchor) which was converted to a base64 encoded string by the pre-install hook */}}
+        env:
+          - name: ROOT_CA
+            valueFrom:
+              secretKeyRef:
+                name: linkerd-trust-anchor-base64
+                key: ca.crt.base64
+        {{- end }}
         image: {{.Values.controllerImage}}:{{default .Values.global.linkerdVersion .Values.global.controllerImageVersion}}
         imagePullPolicy: {{.Values.global.imagePullPolicy}}
         livenessProbe:
