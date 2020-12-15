@@ -21,7 +21,7 @@ global:
   controlPlaneTracing: false
 
   # control plane version. See Proxy section for proxy version
-  linkerdVersion: &linkerd_version stable-2.9.1
+  linkerdVersion: &linkerd_version stable-2.9.0
 
   # GS changes: currently this value isn't used - the namespace
   # is taken from the .Release.Namespace value.
