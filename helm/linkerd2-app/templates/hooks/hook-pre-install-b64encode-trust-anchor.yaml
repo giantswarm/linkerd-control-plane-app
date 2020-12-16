@@ -89,7 +89,7 @@ spec:
         - -c
         - >-
           while true; do
-              export CACERT=`kubectl -n {{ .Release.Namespace }} get secret linkerd-trust-anchor -o jsonpath="{.data['ca\.crt']}";
+              export CACERT=$(kubectl -n {{ .Release.Namespace }} get secret linkerd-trust-anchor -o jsonpath="{.data['ca\.crt']}");
               if [ $? -eq 0 ] && [ ! -z "$CACERT" ]; then
                   break;
               fi;
