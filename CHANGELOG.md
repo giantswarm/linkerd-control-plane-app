@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Disable Prometheus integration by default. ([#22](https://github.com/giantswarm/linkerd2-app/pull/22))
+
 ### Added
 
 - Added a values.schema.json file to help with validating user values.
