@@ -1,30 +1,25 @@
+{{ $hookName := "linkerd-janitor" -}}
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: linkerd-janitor
+  name: {{ $hookName }}
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: linkerd-janitor
+    app: {{ $hookName }}
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  resourceNames:
-  - linkerd-config
-  verbs:
-  - delete
 - apiGroups:
   - ""
   resources:
   - secrets
   resourceNames:
   - linkerd-identity-issuer
+  - linkerd-trust-anchor
+  - linkerd-trust-anchor-base64
   verbs:
   - delete
 - apiGroups:
@@ -41,6 +36,7 @@ rules:
   - issuers
   resourceNames:
   - linkerd-selfsigning-issuer
+  - linkerd-trust-anchor-issuer
   verbs:
   - delete
 - apiGroups:
@@ -49,6 +45,7 @@ rules:
   - certificates
   resourceNames:
   - linkerd-identity-issuer
+  - linkerd-trust-anchor
   verbs:
   - delete
 - apiGroups:
@@ -63,50 +60,50 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: linkerd-janitor
+  name: {{ $hookName }}
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: linkerd-janitor
+    app: {{ $hookName }}
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: linkerd-janitor
+  name: {{ $hookName }}
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-4"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: linkerd-janitor
+    app: {{ $hookName }}
 subjects:
   - kind: ServiceAccount
-    name: linkerd-janitor
+    name: {{ $hookName }}
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role
-  name: linkerd-janitor
+  name: {{ $hookName }}
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: linkerd-janitor
+  name: {{ $hookName }}
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": "post-delete"
     "helm.sh/hook-weight": "-3"
     "helm.sh/hook-delete-policy": "hook-succeeded,hook-failed"
   labels:
-    app: linkerd-janitor
+    app: {{ $hookName }}
 spec:
   template:
     spec:
-      serviceAccountName: linkerd-janitor
+      serviceAccountName: {{ $hookName }}
       containers:
       - name: janitor
         image: "{{ .Values.kubectlImage.registry }}/{{ .Values.kubectlImage.name }}:{{ .Values.kubectlImage.tag }}"
@@ -116,12 +113,15 @@ spec:
         - -e
         - -c
         - >-
-          kubectl -n {{ .Release.Namespace }} delete configmap linkerd-config;
 {{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "kubernetes.io/tls") }}
-          kubectl -n {{ .Release.Namespace }} delete issuer linkerd-selfsigning-issuer;
-          kubectl -n {{ .Release.Namespace }} delete certificate linkerd-identity-issuer;
-          kubectl -n {{ .Release.Namespace }} delete secret linkerd-identity-issuer;
+          kubectl -n {{ .Release.Namespace }} delete issuer linkerd-selfsigning-issuer 2>&1;
+          kubectl -n {{ .Release.Namespace }} delete certificate linkerd-identity-issuer 2>&1;
+          kubectl -n {{ .Release.Namespace }} delete secret linkerd-identity-issuer 2>&1;
+          kubectl -n {{ .Release.Namespace }} delete issuer linkerd-trust-anchor-issuer 2>&1;
+          kubectl -n {{ .Release.Namespace }} delete certificate linkerd-trust-anchor 2>&1;
+          kubectl -n {{ .Release.Namespace }} delete secret linkerd-trust-anchor 2>&1;
+          kubectl -n {{ .Release.Namespace }} delete secret linkerd-trust-anchor-base64 2>&1;
 {{- end }}
-          kubectl delete ns {{ .Release.Namespace }};
+          kubectl delete ns {{ .Release.Namespace }} 2>&1;
       restartPolicy: Never
   backoffLimit: 6
