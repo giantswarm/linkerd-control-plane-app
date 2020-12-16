@@ -1,6 +1,14 @@
 {{if .Values.identity -}}
 {{if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "kubernetes.io/tls") -}}
 {{ $hookName := "linkerd-trust-anchor-encoder" -}}
+{{/*
+The identity deployment requires the root CA cert to be passed as a base64 encoded string arg,
+but using the linkerd-trust-anchor cert secret as an env var won't work because Kubernetes will
+decode the secret data automatically. Therefore this Job is used to create a new secret with the
+data already encoded which will cause it to be encoded again. Then when the env var is decoded
+and passed to the identity deployment, it will still be encoded once and will satisfy the
+requirements.
+*/}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
