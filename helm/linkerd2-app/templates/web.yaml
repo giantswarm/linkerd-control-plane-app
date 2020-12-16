@@ -73,10 +73,10 @@ spec:
         {{- if .Values.global.grafanaUrl }}
         - -grafana-addr={{.Values.global.grafanaUrl}}
         {{- else if .Values.grafana.enabled }}
-        - -grafana-addr={{.Values.grafana.name}}.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:3000
+        - -grafana-addr=linkerd-grafana.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:3000
         {{- end}}
         {{- if .Values.tracing.enabled }}
-        - -jaeger-addr={{.Values.tracing.jaeger.name}}.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:16686
+        - -jaeger-addr=linkerd-jaeger.{{.Release.Namespace}}.svc.{{.Values.global.clusterDomain}}:16686
         {{- end}}
         - -controller-namespace={{.Release.Namespace}}
         - -log-level={{.Values.global.controllerLogLevel}}
