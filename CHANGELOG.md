@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Update chart to `stable-2.9.1`. ([#26](https://github.com/giantswarm/linkerd2-app/pull/26))
+
 ## [0.4.2] - 2020-12-16
 
 ### Changed
