@@ -117,7 +117,7 @@ spec:
         - -c
         - >-
           kubectl -n {{ .Release.Namespace }} delete configmap linkerd-config;
-{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/cert-manager") }}
+{{- if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "kubernetes.io/tls") }}
           kubectl -n {{ .Release.Namespace }} delete issuer linkerd-selfsigning-issuer;
           kubectl -n {{ .Release.Namespace }} delete certificate linkerd-identity-issuer;
           kubectl -n {{ .Release.Namespace }} delete secret linkerd-identity-issuer;
