@@ -17,14 +17,13 @@ rules:
   - ""
   resources:
   - secrets
-  resourceNames:
-  - linkerd-trust-anchor
-  - linkerd-trust-anchor-base64
   verbs:
   - "create"
   - "get"
   - "list"
   - "watch"
+  - "patch"
+  - "update"
 - apiGroups:
   - extensions
   resources:
