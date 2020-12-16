@@ -323,7 +323,7 @@ grafana:
 
 
 prometheus:
-  enabled: true
+  enabled: false
   # image: prom/prometheus:v2.15.3
   # args:
   #  storage.tsdb.retention.time: 6h
