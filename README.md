@@ -3,49 +3,45 @@
 # linkerd2-app chart
 
 This chart is based on the official linkerd2 helm chart. The main difference it offers is a
-direct integration with [cert-manager](https://cert-manager.io/) used to generate certificates
-for linkerd2 components.
-
-The chart is currently based on the "edge" release of linkerd2, as it supports loading certificates
-from `cert-manager` prepared secrets.
+direct integration with [cert-manager](https://cert-manager.io/) used to generate short-lived
+certificates for linkerd2 components. This results in an entirely hands-off install - no
+need to generate a CA certificate prior to installation.
 
 ## Requirements
 
-- you can install only one release of this chart per kubernetes cluster
-- *Warning*: Currently (as of 20.1.1 edge release) Linkerd has
-  [a bug](https://github.com/linkerd/linkerd2/issues/2800#issuecomment-492016952) related to the
-  [CoreDNS autopath](https://coredns.io/plugins/autopath/) module. If you want to test this release
-  of Linkerd before the bug is fixed, be sure to disable `autopath` in your `CoreDNS` config and
-  restart `CoreDNS` pods.
+- you can install only one release of this chart per kubernetes cluster.
+- `cert-manager` must already be deployed in the cluster.
+- it is strongly suggested to use the [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app) as this results in a more secure setup.
+  - the CNI must be installed before this chart, and `global.cniEnabled: true` must be set.
 
 ## Installation
 
 ### Dependencies
 
 This application requires the [`cert-manager`](https://github.com/giantswarm/cert-manager-app)
-application to be already deployed in the cluster. You can install it with the following command:
-
-```bash
-helm install --namespace kube-system -n cert-manager --version=1.0.1 giantswarm/cert-manager-app
-```
+application to be already deployed in the cluster. This can be installed from the Giant Swarm
+App Catalog via the Happa UI.
 
 ### Deployment
 
-When `cert-manager` is ready, you can install linkerd2 with the command below. Please note that
-we have to pass `-set Identity.Issuer.Scheme='linkerd.io/cert-manager` to make the chart use
-`cert-manager`. Also, for compatibility with upstream chart, please note that we need to specify the namespace
-to install to twice: first in the `--namespace` parameter of helm, then as `--set Namespace` parameter
-of the chart. Recommended namespace name is `linkerd`, which is already included below:
+When `cert-manager` is ready, you can install Linkerd2 with the command below. Note that integration
+with cert-manager is enabled by default and you don't need to do anything to configure this. If you
+wish to use certificates provided from elsewhere, you must set `global.identity.issuer.scheme: linkerd.io/tls`
+and also provide the required certificates via the values file.
+
+This chart diverges from the upstream chart slightly by taking the namespace value from Helm
+directly, rather than from the values file. This means the namespace must be created _before_
+this chart is deployed. Assuming a namespace `linkerd` already exists, this chart can be
+deployed with the following command:
 
 ```text
-helm install --namespace linkerd -n linkerd giantswarm-playground-catalog/linkerd2 --set Identity.Issuer.Scheme='linkerd.io/cert-manager' --set Namespace=linkerd
+helm install --namespace linkerd -n linkerd giantswarm-playground-catalog/linkerd2-app
 ```
 
 ## Configuration
 
-Two installation options, `Identity.Issuer.Scheme` and `Namespace` are required to install this chart,
-as shown above. You shouldn't need to change other defaults. Still, you can check available chart
-options [here](helm/linkerd2-app/values.yaml).
+If you are deploying this chart on top of Linkerd's CNI driver then you must enable this
+behaviour by setting `global.cniEnabled: true`.
 
 ### Note:
 
