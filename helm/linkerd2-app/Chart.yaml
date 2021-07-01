@@ -19,7 +19,3 @@ sources:
 - https://github.com/linkerd/linkerd2/
 - https://github.com/giantswarm/linkerd2-app
 version: 0.6.0
-maintainers:
-  - name: Linkerd authors
-    email: cncf-linkerd-dev@lists.cncf.io
-    url: https://linkerd.io/
