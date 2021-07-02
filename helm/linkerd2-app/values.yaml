@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 
 # -- Kubernetes DNS Domain name to use
-clusterDomain: cluster.local
+clusterDomain: &cluster_domain cluster.local
 
 # -- The cluster networks for which service discovery is performed. This should
 # include the pod network but need not include the node network.
@@ -37,7 +37,7 @@ cniEnabled: false
 identityTrustAnchorsPEM: |
 # -- Trust domain used for identity
 # @default -- clusterDomain
-identityTrustDomain: ""
+identityTrustDomain: *cluster_domain
 # -- Additional annotations to add to all pods
 podAnnotations: {}
 # -- Additional labels to add to all pods
@@ -151,7 +151,7 @@ webhookFailurePolicy: Ignore
 
 # controllerImage -- Docker image for the controller and identity
 # components
-controllerImage: cr.l5d.io/linkerd/controller
+controllerImage: quay.io/giantswarm/linkerd2-controller
 # -- Number of replicas for each control plane pod
 controllerReplicas: 1
 # -- User ID for the control plane components
@@ -162,16 +162,16 @@ controllerUID: 2103
 # set resources for the sp-validator and its linkerd proxy respectively
 # see proxy.resources for details.
 # destinationResources -- CPU and Memory resources required by destination (see `proxy.resources` for sub-fields)
-#destinationResources:
-#destinationProxyResources -- CPU and Memory resources required by proxy
+# destinationResources:
+# destinationProxyResources -- CPU and Memory resources required by proxy
 # injected into destination pod (see `proxy.resources` for sub-fields)
-#destinationProxyResources:
+# destinationProxyResources:
 
 # debug configuration
 debugContainer:
   image:
     # -- Docker image for the debug container
-    name: cr.l5d.io/linkerd/debug
+    name: quay.io/giantswarm/linkerd2-debug
     # -- Pull policy for the debug container Docker image
     # @default -- imagePullPolicy
     pullPolicy: ""
@@ -180,8 +180,13 @@ debugContainer:
     version: ""
 
 identity:
+  # GS changes: needed now as global value to be available in subcharts including partials/_proxy.tpl
+  # Set to linkerd.io/tls to use a pre-created CA provided via global.identityTrustAnchorsPEM (this
+  # is the upstream method.
+  # Set to kubernetes.io/tls to use cert-manager as a TLS issuer (default behaviour; requires
+  # cert-manager to be pre-installed).
   issuer:
-    scheme: linkerd.io/tls
+    scheme: &identity_issuer_scheme kubernetes.io/tls
 
     # -- Amount of time to allow for clock skew within a Linkerd cluster
     clockSkewAllowance: 20s
@@ -203,9 +208,9 @@ identity:
 
 
 # -|- CPU and Memory resources required by the identity controller (see `proxy.resources` for sub-fields)
-#identityResources:
+# identityResources:
 # -|- CPU and Memory resources required by proxy injected into identity pod (see `proxy.resources` for sub-fields)
-#identityProxyResources:
+# identityProxyResources:
 
 # heartbeat configuration
 # disableHeartBeat -- Set to true to not start the heartbeat cronjob
@@ -238,11 +243,11 @@ proxyInjector:
   caBundle: |
 
 # -|- CPU and Memory resources required by the proxy injector (see
-#`proxy.resources` for sub-fields)
-#proxyInjectorResources:
-#-|- CPU and Memory resources required by proxy injected into the proxy injector
-#pod (see `proxy.resources` for sub-fields)
-#proxyInjectorProxyResources:
+# `proxy.resources` for sub-fields)
+# proxyInjectorResources:
+# -|- CPU and Memory resources required by proxy injected into the proxy injector
+# pod (see `proxy.resources` for sub-fields)
+# proxyInjectorProxyResources:
 
 # service profile validator configuration
 profileValidator:
@@ -271,20 +276,20 @@ profileValidator:
   # as no certificate will be generated.
   caBundle: |
 
-# -|- CPU and Memory resources required by the SP validator (see
-#`proxy.resources` for sub-fields)
-#spValidatorResources:
-# -|- CPU and Memory resources required by proxy injected into the SP validator
-#pod (see `proxy.resources` for sub-fields)
-#spValidatorProxyResources:
+#  -|- CPU and Memory resources required by the SP validator (see
+# `proxy.resources` for sub-fields)
+# spValidatorResources:
+#  -|- CPU and Memory resources required by proxy injected into the SP validator
+# pod (see `proxy.resources` for sub-fields)
+# spValidatorProxyResources:
 
 # -|- CPU and Memory resources required by controllers publicAPI (see
-#`proxy.resources` for sub-fields)
-#publicAPIResources:
-#-|- CPU and Memory resources required by proxy injected into controllers public
-#API pod (see `proxy.resources` for sub-fields) values
-#`proxy.resources`
-#publicAPIProxyResources:
+# `proxy.resources` for sub-fields)
+# publicAPIResources:
+# -|- CPU and Memory resources required by proxy injected into controllers public
+# API pod (see `proxy.resources` for sub-fields) values
+# `proxy.resources`
+# publicAPIProxyResources:
 
 # If the namespace is controlled by an external tool or can't be installed with Helm
 # you can disable its installation. In this case:
@@ -305,4 +310,16 @@ nodeSelector:
 # -|- Tolerations section, See the
 # [K8S documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
 # for more information
-#tolerations:
+# tolerations:
+
+# GS changes: support older version of cert-manager's API. Setting this to anything later
+# than 0.11.0 will use the new API version and API group.
+certManager:
+  version: 1.0.2
+
+# GS changes: subcharts aren't included in this chart, but the variables are retained
+# for ease of upstream compatibility.
+grafana:
+  enabled: &grafana_enabled false
+tracing:
+  enabled: &tracing_enabled false

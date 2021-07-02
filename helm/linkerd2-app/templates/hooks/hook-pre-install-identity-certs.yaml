@@ -8,10 +8,10 @@ metadata:
   name: linkerd-selfsigning-issuer
   namespace: {{.Release.Namespace}}
   labels:
-    {{.Values.global.controllerComponentLabel}}: identity
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+    linkerd.io/control-plane-component: identity
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
   annotations:
-    {{.Values.global.createdByAnnotation}}: {{ printf "linkerd/helm %s" .Values.global.linkerdVersion }}
+    linkerd.io/created-by: {{ printf "linkerd/helm %s" .Values.linkerdVersion }}
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-6"
 spec:
@@ -24,14 +24,14 @@ metadata:
   name: linkerd-trust-anchor
   namespace: {{.Release.Namespace}}
   labels:
-    {{.Values.global.controllerComponentLabel}}: identity
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+    linkerd.io/control-plane-component: identity
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
   annotations:
-    {{.Values.global.createdByAnnotation}}: {{ printf "linkerd/helm %s" .Values.global.linkerdVersion }}
+    linkerd.io/created-by: {{ printf "linkerd/helm %s" .Values.linkerdVersion }}
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-5"
 spec:
-  commonName: identity.{{.Release.Namespace}}.{{.Values.global.clusterDomain}}
+  commonName: identity.{{.Release.Namespace}}.{{.Values.clusterDomain}}
   duration: 43800h # 5 years
   isCA: true
   issuerRef:
@@ -46,10 +46,10 @@ metadata:
   name: linkerd-trust-anchor-issuer
   namespace: {{.Release.Namespace}}
   labels:
-    {{.Values.global.controllerComponentLabel}}: identity
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+    linkerd.io/control-plane-component: identity
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
   annotations:
-    {{.Values.global.createdByAnnotation}}: {{ printf "linkerd/helm %s" .Values.global.linkerdVersion }}
+    linkerd.io/created-by: {{ printf "linkerd/helm %s" .Values.linkerdVersion }}
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-4"
 spec:
@@ -63,14 +63,14 @@ metadata:
   name: linkerd-identity-issuer
   namespace: {{.Release.Namespace}}
   labels:
-    {{.Values.global.controllerComponentLabel}}: identity
-    {{.Values.global.controllerNamespaceLabel}}: {{.Release.Namespace}}
+    linkerd.io/control-plane-component: identity
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
   annotations:
-    {{.Values.global.createdByAnnotation}}: {{ printf "linkerd/helm %s" .Values.global.linkerdVersion }}
+    linkerd.io/created-by: {{ printf "linkerd/helm %s" .Values.linkerdVersion }}
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-3"
 spec:
-  commonName: identity.{{.Release.Namespace}}.{{.Values.global.clusterDomain}}
+  commonName: identity.{{.Release.Namespace}}.{{.Values.clusterDomain}}
   duration: 24h
   isCA: true
   issuerRef:
