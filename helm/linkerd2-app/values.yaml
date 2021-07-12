@@ -43,6 +43,9 @@ enableEndpointSlices: false
 cniEnabled: true
 # -- Trust root certificate (ECDSA). It must be provided during install.
 identityTrustAnchorsPEM: |
+  this is just a dummy value to make this chart compatible
+  with conftest. You need to replace this value with a valid
+  trust root certificate in PEM format
 # -- Trust domain used for identity
 # @default -- clusterDomain
 identityTrustDomain: *cluster_domain
