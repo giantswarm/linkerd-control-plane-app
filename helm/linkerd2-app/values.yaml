@@ -5,6 +5,14 @@
 # -- Kubernetes DNS Domain name to use
 clusterDomain: &cluster_domain cluster.local
 
+controllerResources: &controller_resources
+  cpu: &controller_resources_cpu
+    limit: ""
+    request: 100m
+  memory:
+    limit: 250Mi
+    request: 50Mi
+
 # -- The cluster networks for which service discovery is performed. This should
 # include the pod network but need not include the node network.
 #
@@ -32,7 +40,7 @@ enableEndpointSlices: false
 # -- enabling this omits the NET_ADMIN capability in the PSP
 # and the proxy-init container when injecting the proxy;
 # requires the linkerd-cni plugin to already be installed
-cniEnabled: false
+cniEnabled: true
 # -- Trust root certificate (ECDSA). It must be provided during install.
 identityTrustAnchorsPEM: |
 # -- Trust domain used for identity
@@ -83,12 +91,12 @@ proxy:
       # -- Maximum amount of CPU units that the proxy can use
       limit: ""
       # -- Amount of CPU units that the proxy requests
-      request: ""
+      request: "100m"
     memory:
       # -- Maximum amount of memory that the proxy can use
-      limit: ""
+      limit: "250Mi"
       # -- Maximum amount of memory that the proxy requests
-      request: ""
+      request: "20Mi"
   # -- User id under which the proxy runs
   uid: 2102
   # -- If set the proxy sidecar will stay alive for at
@@ -146,14 +154,14 @@ enableH2Upgrade: true
 # -- Omit the `sideEffects` flag in the webhook manifests
 omitWebhookSideEffects: false
 # -- Failure policy for the proxy injector
-webhookFailurePolicy: Ignore
+webhookFailurePolicy: Fail
 
 
 # controllerImage -- Docker image for the controller and identity
 # components
 controllerImage: quay.io/giantswarm/linkerd2-controller
 # -- Number of replicas for each control plane pod
-controllerReplicas: 1
+controllerReplicas: 3
 # -- User ID for the control plane components
 controllerUID: 2103
 
@@ -162,7 +170,7 @@ controllerUID: 2103
 # set resources for the sp-validator and its linkerd proxy respectively
 # see proxy.resources for details.
 # destinationResources -- CPU and Memory resources required by destination (see `proxy.resources` for sub-fields)
-# destinationResources:
+destinationResources: *controller_resources
 # destinationProxyResources -- CPU and Memory resources required by proxy
 # injected into destination pod (see `proxy.resources` for sub-fields)
 # destinationProxyResources:
@@ -208,7 +216,11 @@ identity:
 
 
 # -|- CPU and Memory resources required by the identity controller (see `proxy.resources` for sub-fields)
-# identityResources:
+identityResources:
+  cpu: *controller_resources_cpu
+  memory:
+    limit: 250Mi
+    request: 10Mi
 # -|- CPU and Memory resources required by proxy injected into identity pod (see `proxy.resources` for sub-fields)
 # identityProxyResources:
 
@@ -244,7 +256,7 @@ proxyInjector:
 
 # -|- CPU and Memory resources required by the proxy injector (see
 # `proxy.resources` for sub-fields)
-# proxyInjectorResources:
+proxyInjectorResources: *controller_resources
 # -|- CPU and Memory resources required by proxy injected into the proxy injector
 # pod (see `proxy.resources` for sub-fields)
 # proxyInjectorProxyResources:
@@ -278,14 +290,14 @@ profileValidator:
 
 #  -|- CPU and Memory resources required by the SP validator (see
 # `proxy.resources` for sub-fields)
-# spValidatorResources:
+spValidatorResources: *controller_resources
 #  -|- CPU and Memory resources required by proxy injected into the SP validator
 # pod (see `proxy.resources` for sub-fields)
 # spValidatorProxyResources:
 
 # -|- CPU and Memory resources required by controllers publicAPI (see
 # `proxy.resources` for sub-fields)
-# publicAPIResources:
+publicAPIResources: *controller_resources
 # -|- CPU and Memory resources required by proxy injected into controllers public
 # API pod (see `proxy.resources` for sub-fields) values
 # `proxy.resources`
@@ -299,7 +311,7 @@ profileValidator:
 
 # installNamespace -- Set to false when installing Linkerd in a custom namespace. See the
 # [Linkerd documentation](https://linkerd.io/2/tasks/install-helmcustomizing-the-namespace) for more information.
-installNamespace: true
+installNamespace: false
 
 # -- NodeSelector section, See the [K8S
 # documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
@@ -323,3 +335,21 @@ grafana:
   enabled: &grafana_enabled false
 tracing:
   enabled: &tracing_enabled false
+
+# GS changes: hook kubectl image configuration
+kubectlImage:
+  registry: ""
+  name: ""
+  tag: ""
+
+# GS changes: hook resources
+hooks:
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "250m"
+    limits:
+      memory: "128Mi"
+      cpu: "500m"
+
+enablePodAntiAffinity: true

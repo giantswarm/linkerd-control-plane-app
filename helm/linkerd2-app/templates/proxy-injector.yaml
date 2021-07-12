@@ -81,6 +81,7 @@ spec:
         {{- end }}
         securityContext:
           runAsUser: {{.Values.controllerUID}}
+          readOnlyRootFilesystem: true
         volumeMounts:
         - mountPath: /var/run/linkerd/config
           name: config

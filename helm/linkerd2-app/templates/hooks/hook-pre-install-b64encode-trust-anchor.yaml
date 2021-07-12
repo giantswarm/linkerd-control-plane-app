@@ -89,6 +89,11 @@ spec:
       - name: {{ $hookName }}
         image: "{{ .Values.kubectlImage.registry }}/{{ .Values.kubectlImage.name }}:{{ .Values.kubectlImage.tag }}"
         imagePullPolicy: "{{ .Values.kubectlImage.pullPolicy }}"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+        resources: {{- toYaml .Values.hooks.resources | nindent 10 }}
         command:
         - /bin/sh
         - -e

@@ -166,6 +166,7 @@ spec:
         {{- end }}
         securityContext:
           runAsUser: {{.Values.controllerUID}}
+          readOnlyRootFilesystem: true
         volumeMounts:
         - mountPath: /var/run/linkerd/identity/issuer
           name: identity-issuer
