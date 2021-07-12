@@ -30,7 +30,24 @@ wish to use certificates provided from elsewhere, you must set `global.identity.
 and also provide the required certificates via the values file.
 
 This chart diverges from the upstream chart slightly by taking the namespace value from Helm
-directly, rather than from the values file. This means the namespace must be created _before_
+directly, rather than from the values file. When installing through the Giant Swarm App platform, we recommend
+to install via App CR. Make sure you set the required annotations and labels through the `spec.namespaceConfig`.
+
+```yaml
+...
+  namespaceConfig:
+    annotations:
+      linkerd.io/inject: disabled
+    labels:
+      linkerd.io/is-control-plane: "true"
+      config.linkerd.io/admission-webhooks: disabled
+      linkerd.io/control-plane-ns: linkerd2-app
+...
+```
+
+#### Deployment using helm
+
+When using helm, the namespace must be created _before_
 this chart is deployed. Assuming a namespace `linkerd` already exists, this chart can be
 deployed with the following command:
 
@@ -38,10 +55,15 @@ deployed with the following command:
 helm install --namespace linkerd -n linkerd giantswarm-playground-catalog/linkerd2-app
 ```
 
+Make sure to add the neccessary annotations and labels to your namespace. Check out file [helm/linkerd2-app/templates/namespace.yaml](helm/linkerd2-app/templates/namespace.yaml) as example.
+
 ## Configuration
 
 If you are deploying this chart on top of Linkerd's CNI driver then you must enable this
 behaviour by setting `global.cniEnabled: true`.
+
+Make sure you align the `global.namespace` value with the namespace you're planning to install this
+app to.
 
 ### Note:
 
