@@ -30,7 +30,7 @@ controlPlaneTracing: false
 # -- namespace to send control plane traces to
 controlPlaneTracingNamespace: linkerd-jaeger
 # -- control plane version. See Proxy section for proxy version
-linkerdVersion: linkerdVersionValue
+linkerdVersion: stable-2.10.2
 # -- Control plane namespace
 namespace: linkerd2-app
 # -- enables the use of EndpointSlice informers for the destination service;
@@ -65,7 +65,7 @@ proxy:
   inboundConnectTimeout: 100ms
   image:
     # -- Docker image for the proxy
-    name: cr.l5d.io/linkerd/proxy
+    name: quay.io/giantswarm/linkerd2-proxy
     # -- Pull policy for the proxy container Docker image
     # @default -- imagePullPolicy
     pullPolicy: ""
@@ -125,7 +125,7 @@ proxyInit:
   ignoreOutboundPorts: ""
   image:
     # -- Docker image for the proxy-init container
-    name: cr.l5d.io/linkerd/proxy-init
+    name: quay.io/giantswarm/linkerd2-proxy-init
     # -- Pull policy for the proxy-init container Docker image
     # @default -- imagePullPolicy
     pullPolicy: ""
