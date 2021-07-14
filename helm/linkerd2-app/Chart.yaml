@@ -19,3 +19,5 @@ sources:
 - https://github.com/linkerd/linkerd2/
 - https://github.com/giantswarm/linkerd2-app
 version: 0.6.0
+restrictions:
+  clusterSingleton: true
