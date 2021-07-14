@@ -59,8 +59,8 @@ Make sure to add the neccessary annotations and labels to your namespace. Check 
 
 ## Configuration
 
-If you are deploying this chart on top of Linkerd's CNI driver then you must enable this
-behaviour by setting `global.cniEnabled: true`.
+We've set `global.cniEnabled: true`, so if you're planning to install this chart
+without the CNI plugin, you'll need to disable this also in your values.
 
 Make sure you align the `global.namespace` value with the namespace you're planning to install this
 app to.
@@ -71,6 +71,10 @@ app to.
 be DRY where possible, however this can cause problems when these values are overridden by a custom
 values file. If you wish to enabled or disable deployment of the `grafana` and `tracing` subcharts
 then you should override the values at `.$subchart.enabled`, **not** `.global.$subchart.enabled`.
+
+## Usage with `linkerd` cli
+
+You can use the `linkerd` cli as usual with this app, be sure to specify the right namespace using the `--linkerd-namespace` flag.
 
 ## Compatibility
 
