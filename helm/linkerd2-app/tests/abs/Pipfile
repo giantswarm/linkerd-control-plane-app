@@ -1,0 +1,15 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+pytest-helm-charts = {git = "https://github.com/giantswarm/pytest-helm-charts.git", editable = false, ref = "add-kubectl"}
+pytest = "~=6.2.4"
+pykube-ng = "~=21.3.0"
+pyyaml = "~=5.4.1"
+pytest-rerunfailures = "~=10.0"
+requests = "~=2.25.1"
+
+[requires]
+python_version = "3"
