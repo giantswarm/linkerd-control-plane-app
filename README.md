@@ -9,8 +9,8 @@ This chart is based on the official linkerd2 helm chart.
 - you can install only one release of this chart per kubernetes cluster.
 - it is strongly suggested to use the [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app) as this results in a more secure setup.
   - the CNI must be installed before this chart, and `global.cniEnabled: true` must be set.
-- with linkerd CNI enabled all pods linked by linkerd require a PodSecurityPolicy, which allows use of `EmptyDir`
-  - the injected linkerd-proxy container requires an `EmptyDir`
+- with linkerd CNI enabled, all pods meshed by linkerd require a `PodSecurityPolicy`, which allows use of `EmptyDir` volumes
+  - the injected linkerd-proxy container requires an `EmptyDir` volumes
 
 ## Installation
 
