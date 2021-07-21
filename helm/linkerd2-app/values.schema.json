@@ -70,7 +70,7 @@
                             "type": "string"
                         },
                         "crtExpiry": {
-                            "type": ["string", "null"]
+                            "type": ["string"]
                         },
                         "issuanceLifetime": {
                             "type": "string"

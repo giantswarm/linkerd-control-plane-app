@@ -191,19 +191,14 @@ debugContainer:
     version: ""
 
 identity:
-  # GS changes: needed now as global value to be available in subcharts including partials/_proxy.tpl
-  # Set to linkerd.io/tls to use a pre-created CA provided via global.identityTrustAnchorsPEM (this
-  # is the upstream method.
-  # Set to kubernetes.io/tls to use cert-manager as a TLS issuer (default behaviour; requires
-  # cert-manager to be pre-installed).
   issuer:
-    scheme: &identity_issuer_scheme kubernetes.io/tls
+    scheme: linkerd.io/tls
 
     # -- Amount of time to allow for clock skew within a Linkerd cluster
     clockSkewAllowance: 20s
 
     # -- Expiration timestamp for the issuer certificate. It must be provided during install. Must match the expiry date in crtPEM
-    crtExpiry:
+    crtExpiry: REPLACE-ME
 
     # -- Amount of time for which the Identity issuer should certify identity
     issuanceLifetime: 24h0m0s
@@ -327,32 +322,11 @@ nodeSelector:
 # for more information
 # tolerations:
 
-# GS changes: support older version of cert-manager's API. Setting this to anything later
-# than 0.11.0 will use the new API version and API group.
-certManager:
-  version: 1.0.2
-
 # GS changes: subcharts aren't included in this chart, but the variables are retained
 # for ease of upstream compatibility.
 grafana:
   enabled: &grafana_enabled false
 tracing:
   enabled: &tracing_enabled false
-
-# GS changes: hook kubectl image configuration
-kubectlImage:
-  registry: ""
-  name: ""
-  tag: ""
-
-# GS changes: hook resources
-hooks:
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "250m"
-    limits:
-      memory: "128Mi"
-      cpu: "500m"
 
 enablePodAntiAffinity: true
