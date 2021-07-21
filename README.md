@@ -2,15 +2,11 @@
 
 # linkerd2-app chart
 
-This chart is based on the official linkerd2 helm chart. The main difference it offers is a
-direct integration with [cert-manager](https://cert-manager.io/) used to generate short-lived
-certificates for linkerd2 components. This results in an entirely hands-off install - no
-need to generate a CA certificate prior to installation.
+This chart is based on the official linkerd2 helm chart.
 
 ## Requirements
 
 - you can install only one release of this chart per kubernetes cluster.
-- `cert-manager` must already be deployed in the cluster.
 - it is strongly suggested to use the [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app) as this results in a more secure setup.
   - the CNI must be installed before this chart, and `global.cniEnabled: true` must be set.
 - with linkerd CNI enabled all pods linked by linkerd require a PodSecurityPolicy, which allows use of `EmptyDir`
@@ -20,16 +16,11 @@ need to generate a CA certificate prior to installation.
 
 ### Dependencies
 
-This application requires the [`cert-manager`](https://github.com/giantswarm/cert-manager-app)
+This application requires the [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app)
 application to be already deployed in the cluster. This can be installed from the Giant Swarm
 App Catalog via the Happa UI.
 
 ### Deployment
-
-When `cert-manager` is ready, you can install Linkerd2 with the command below. Note that integration
-with cert-manager is enabled by default and you don't need to do anything to configure this. If you
-wish to use certificates provided from elsewhere, you must set `global.identity.issuer.scheme: linkerd.io/tls`
-and also provide the required certificates via the values file.
 
 This chart diverges from the upstream chart slightly by taking the namespace value from Helm
 directly, rather than from the values file. When installing through the Giant Swarm App platform, we recommend
