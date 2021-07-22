@@ -4,7 +4,6 @@ replace-chart-version-with-git: true
 replace-app-version-with-git: false
 generate-metadata: true
 catalog-base-url: https://giantswarm.github.io/giantswarm-catalog/
-# smoke-tests-cluster-type: kind
 
 skip-steps: test_functional
 app-tests-skip-app-deploy: true
@@ -14,4 +13,5 @@ external-cluster-kubeconfig-path: kubebox-kubeconfig
 external-cluster-type: kind
 external-cluster-version: v1.21.1
 
-# smoke-tests-cluster-config-file: helm/linkerd2-cni-app/tests/kind_config.yaml
+#smoke-tests-cluster-config-file: helm/linkerd2-cni-app/tests/kind_config.yaml
+#smoke-tests-cluster-type: kind

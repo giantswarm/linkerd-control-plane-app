@@ -1,4 +1,5 @@
 import pytest
+import time
 
 from pykube import ConfigMap
 from pykube.exceptions import ObjectDoesNotExist
@@ -9,6 +10,7 @@ from pytest_helm_charts.utils import wait_for_namespaced_objects_condition
 cni_app_version = "0.3.1-beta-68af46a45a03e1cfc304fa40a0022fb163edb2d3"
 
 timeout = 120
+
 
 def app_cr_obj(name, catalog_name, version, namespace_config_annotations={}, namespace_config_labels={}):
     return {
@@ -36,6 +38,7 @@ def app_cr_obj(name, catalog_name, version, namespace_config_annotations={}, nam
        }
     }
 
+
 def catalog_cr_obj(name):
     return {
         "kind": "AppCatalog",
@@ -47,12 +50,6 @@ def catalog_cr_obj(name):
             "name": name
         },
         "spec": {
-            # "config": {
-            #     "configMap": {
-            #         "name": "",
-            #         "namespace": ""
-            #     }
-            # },
             "description": f"The {name} catalog.",
             "logoURL": "/images/repo_icons/managed.png",
             "storage": {
@@ -103,7 +100,10 @@ def cni_app_cr(kube_cluster, catalogs):
         "giantswarm-test",
         cni_app_version,
         namespace_config_annotations={"linkerd.io/inject": "disabled"},
-        namespace_config_labels={"linkerd.io/cni-resource": "true", "config.linkerd.io/admission-webhooks": "disabled"}
+        namespace_config_labels={
+            "linkerd.io/cni-resource": "true",
+            "config.linkerd.io/admission-webhooks": "disabled"
+        }
     )
     app_obj = AppCR(kube_cluster.kube_client, app)
     app_obj.create()
@@ -126,12 +126,13 @@ def user_configmap(filepath):
 
     return values
 
+
 @pytest.fixture(scope="module")
 def linkerd_app_cr(kube_cluster, chart_version):
     app_name = "linkerd2-app"
     app_cm_name = f"{app_name}-user-config"
 
-    app_cm: YamlDict = {
+    app_cm = {
         "apiVersion": "v1",
         "kind": "ConfigMap",
         "metadata": {"name": app_cm_name, "namespace": "giantswarm"},
@@ -151,7 +152,9 @@ def linkerd_app_cr(kube_cluster, chart_version):
             "linkerd.io/control-plane-ns": app_name
         }
     )
-    app["spec"]["userConfig"] = {"configMap": {"name": app_cm_name, "namespace": "giantswarm"}}
+    app["spec"]["userConfig"] = {
+        "configMap": {"name": app_cm_name, "namespace": "giantswarm"}
+    }
 
     app_obj = AppCR(kube_cluster.kube_client, app)
     app_obj.create()
@@ -166,6 +169,7 @@ def linkerd_app_cr(kube_cluster, chart_version):
     )
 
     return apps[0]
+
 
 def _app_deployed(app: AppCR) -> bool:
     complete = (
