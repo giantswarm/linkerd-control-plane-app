@@ -16,3 +16,14 @@ workflows:
           filters:
             tags:
               only: /^v.*/
+
+      - architect/run-tests-with-abs:
+          chart_dir: ./helm/linkerd2-app
+          name: execute chart tests
+          filters:
+            # Do not trigger the job on merge to master.
+            branches:
+              ignore:
+                - master
+          # requires:
+          #   - package and push linkerd2-app chart
