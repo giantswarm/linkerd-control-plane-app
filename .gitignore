@@ -4,3 +4,4 @@ helm/linkerd2-app/charts/
 test_results_*.xml
 .pytest_cache
 linkerd-cli
+__pycache__
