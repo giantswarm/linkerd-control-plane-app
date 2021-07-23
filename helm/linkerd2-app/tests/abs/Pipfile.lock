@@ -105,7 +105,7 @@
         "pytest-helm-charts": {
             "editable": false,
             "git": "https://github.com/giantswarm/pytest-helm-charts.git",
-            "ref": "cf5462274a3ef4856b68efe7786530a40b582bcd"
+            "ref": "4a24d4b33a49d95bf24013eab84c822a290bb01d"
         },
         "pytest-rerunfailures": {
             "hashes": [

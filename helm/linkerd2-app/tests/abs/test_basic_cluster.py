@@ -74,14 +74,14 @@ def test_cluster_info(
 
 
 @pytest.mark.smoke
-def test_prepare_cni(kube_cluster: Cluster, cni_app_cr: AppCR):
+def test_linkerd_cni_deployed(kube_cluster: Cluster, cni_app_cr: AppCR):
     """Install using the linkerd cni"""
     app_version = cni_app_cr.obj["status"]["appVersion"]
     logger.info(f"cni App CR shows installed appVersion {app_version}")
 
 
 @pytest.mark.smoke
-def test_installation(kube_cluster: Cluster, linkerd_app_cr: AppCR):
+def test_linkerd_deployed(kube_cluster: Cluster, linkerd_app_cr: AppCR):
     """Test using the linkerd cli using 'check'"""
     app_version = linkerd_app_cr.obj["status"]["appVersion"]
     logger.info(f"Installed App CR shows installed appVersion {app_version}")
@@ -103,23 +103,28 @@ def test_installation(kube_cluster: Cluster, linkerd_app_cr: AppCR):
         timeout,
     )
 
-    kube_cluster.kubectl("apply", filename="test-app-manifests.yaml", output=None)
-    logger.info("Installed additional manifest with to be injected proxy")
 
-    kube_cluster.kubectl("annotate namespace kube-system linkerd.io/inject=disabled")
-    kube_cluster.kubectl("label namespace kube-system config.linkerd.io/admission-webhooks=disabled")
-
-    get_linkerd_cli(app_version)
-
-    curr = 0
-    while curr < timeout:
-        success = exec_linkerd_cli(kube_cluster.kube_config_path, cni_namespace, linkerd_namespace, test_app_namespace)["success"]
-        if success:
-            break
-        time.sleep(1)
-
-    cli_output = exec_linkerd_cli(kube_cluster.kube_config_path, cni_namespace, linkerd_namespace, test_app_namespace)
-
-    logger.info(f"Final output of 'linkerd check`: {cli_output}")
-
-    assert cli_output["success"]
+#@pytest.mark.functional
+#def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
+#    app_version = linkerd_app_cr.obj["status"]["appVersion"]
+#    kube_cluster.kubectl("apply", filename="test-app-manifests.yaml", output=None)
+#    logger.info("Installed additional manifest with to be injected proxy")
+#
+#    kube_cluster.kubectl("annotate namespace kube-system linkerd.io/inject=disabled")
+#    kube_cluster.kubectl("label namespace kube-system config.linkerd.io/admission-webhooks=disabled")
+#
+#    get_linkerd_cli(app_version)
+#
+#    curr = 0
+#    while curr < timeout:
+#        success = exec_linkerd_cli(kube_cluster.kube_config_path, cni_namespace, linkerd_namespace, test_app_namespace)["success"]
+#        if success:
+#            break
+#        time.sleep(1)
+#
+#    cli_output = exec_linkerd_cli(kube_cluster.kube_config_path, cni_namespace, linkerd_namespace, test_app_namespace)
+#
+#    logger.info(f"Final output of 'linkerd check`: {cli_output}")
+#
+#    assert cli_output["success"]
+#

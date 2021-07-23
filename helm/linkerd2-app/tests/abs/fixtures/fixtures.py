@@ -1,10 +1,9 @@
 import pytest
-import time
 
 from pykube import ConfigMap
-from pykube.exceptions import ObjectDoesNotExist
+from pytest_helm_charts.giantswarm_app_platform.app_catalog import AppCatalogFactoryFunc
 
-from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR, AppCatalogCR
+from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR
 from pytest_helm_charts.utils import wait_for_namespaced_objects_condition
 
 cni_app_version = "0.3.1-beta-68af46a45a03e1cfc304fa40a0022fb163edb2d3"
@@ -14,82 +13,35 @@ timeout = 120
 
 def app_cr_obj(name, catalog_name, version, namespace_config_annotations={}, namespace_config_labels={}):
     return {
-       "kind": "App",
-       "apiVersion": "application.giantswarm.io/v1alpha1",
-       "metadata": {
-          "name": name,
-          "namespace": "giantswarm",
-          "labels": {
-              "app-operator.giantswarm.io/version": "0.0.0"
-          }
-       },
-       "spec": {
-          "catalog": catalog_name,
-          "kubeConfig": {
-             "inCluster": True
-          },
-          "name": name,
-          "namespace": name,
-          "namespaceConfig": {
-             "annotations":  namespace_config_annotations,
-             "labels": namespace_config_labels,
-          },
-          "version": version
-       }
-    }
-
-
-def catalog_cr_obj(name):
-    return {
-        "kind": "AppCatalog",
+        "kind": "App",
         "apiVersion": "application.giantswarm.io/v1alpha1",
         "metadata": {
-            "labels":{
-                "app-operator.giantswarm.io/version":"0.0.0"
-            },
-            "name": name
+            "name": name,
+            "namespace": "giantswarm",
+            "labels": {
+                "app-operator.giantswarm.io/version": "0.0.0"
+            }
         },
         "spec": {
-            "description": f"The {name} catalog.",
-            "logoURL": "/images/repo_icons/managed.png",
-            "storage": {
-                "URL": f"https://giantswarm.github.io/{name}-catalog/",
-                "type": "helm"
+            "catalog": catalog_name,
+            "kubeConfig": {
+                "inCluster": True
             },
-            "title": f"{name}-catalog"
+            "name": name,
+            "namespace": name,
+            "namespaceConfig": {
+                "annotations": namespace_config_annotations,
+                "labels": namespace_config_labels,
+            },
+            "version": version
         }
     }
 
 
 @pytest.fixture(scope="module")
-def catalogs(kube_cluster):
-    catalogs = ["giantswarm", "giantswarm-test"]
-
-    for catalog_name in catalogs:
-        try:
-            AppCatalogCR.objects(kube_cluster.kube_client).get_by_name(catalog_name)
-        except ObjectDoesNotExist:
-            cr_obj = catalog_cr_obj(catalog_name)
-            AppCatalogCR(kube_cluster.kube_client, cr_obj).create()
-
-    curr = 0
-    while curr < 30:
-        try:
-            gs_catalog = AppCatalogCR.objects(kube_cluster.kube_client).get_by_name("giantswarm")
-        except ObjectDoesNotExist:
-            pass
-
-        try:
-            test_catalog = AppCatalogCR.objects(kube_cluster.kube_client).get_by_name("giantswarm-test")
-        except ObjectDoesNotExist:
-            pass
-
-        if gs_catalog is not None and test_catalog is not None:
-            break
-
-        time.sleep(1)
-
-    assert curr != 30
+def catalogs(kube_cluster, app_catalog_factory: AppCatalogFactoryFunc):
+    for catalog_name in ["giantswarm", "giantswarm-test"]:
+        app_catalog_factory(catalog_name, f"https://giantswarm.github.io/{catalog_name}-catalog/")
 
 
 @pytest.fixture(scope="module")
@@ -173,10 +125,10 @@ def linkerd_app_cr(kube_cluster, chart_version):
 
 def _app_deployed(app: AppCR) -> bool:
     complete = (
-        "status" in app.obj
-        and "release" in app.obj["status"]
-        and "appVersion" in app.obj["status"]
-        and "status" in app.obj["status"]["release"]
-        and app.obj["status"]["release"]["status"] == "deployed"
+            "status" in app.obj
+            and "release" in app.obj["status"]
+            and "appVersion" in app.obj["status"]
+            and "status" in app.obj["status"]["release"]
+            and app.obj["status"]["release"]["status"] == "deployed"
     )
     return complete
