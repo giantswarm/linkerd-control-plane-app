@@ -11,7 +11,7 @@ import pykube
 import pytest
 from pytest_helm_charts.fixtures import Cluster
 from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR
-from pytest_helm_charts.utils import wait_for_deployments_to_run
+from pytest_helm_charts.utils import wait_for_deployments_to_run, wait_for_namespaced_objects_condition
 
 from fixtures.fixtures import linkerd_app_cr, cni_app_cr, catalogs
 
@@ -73,10 +73,30 @@ def test_cluster_info(
     assert cluster_type != ""
 
 
+def _app_deployed(app: AppCR) -> bool:
+    complete = (
+            "status" in app.obj
+            and "release" in app.obj["status"]
+            and "appVersion" in app.obj["status"]
+            and "status" in app.obj["status"]["release"]
+            and app.obj["status"]["release"]["status"] == "deployed"
+    )
+    return complete
+
+
 @pytest.mark.smoke
 def test_linkerd_cni_deployed(kube_cluster: Cluster, cni_app_cr: AppCR):
     """Install using the linkerd cni"""
-    app_version = cni_app_cr.obj["status"]["appVersion"]
+    apps = wait_for_namespaced_objects_condition(
+        kube_cluster.kube_client,
+        AppCR,
+        [cni_app_cr.app.metadata["name"]],
+        "default",
+        _app_deployed,
+        timeout,
+        False
+    )
+    app_version = apps[0].obj["status"]["appVersion"]
     logger.info(f"cni App CR shows installed appVersion {app_version}")
 
 

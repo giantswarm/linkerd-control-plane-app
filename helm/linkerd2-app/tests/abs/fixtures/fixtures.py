@@ -1,9 +1,10 @@
+from typing import List
+
 import pytest
-
 from pykube import ConfigMap
+from pytest_helm_charts.giantswarm_app_platform.app import AppFactoryFunc, ConfiguredApp
 from pytest_helm_charts.giantswarm_app_platform.app_catalog import AppCatalogFactoryFunc
-
-from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR
+from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR, AppCatalogCR
 from pytest_helm_charts.utils import wait_for_namespaced_objects_condition
 
 cni_app_version = "0.3.1-beta-68af46a45a03e1cfc304fa40a0022fb163edb2d3"
@@ -39,37 +40,53 @@ def app_cr_obj(name, catalog_name, version, namespace_config_annotations={}, nam
 
 
 @pytest.fixture(scope="module")
-def catalogs(kube_cluster, app_catalog_factory: AppCatalogFactoryFunc):
-    for catalog_name in ["giantswarm", "giantswarm-test"]:
-        app_catalog_factory(catalog_name, f"https://giantswarm.github.io/{catalog_name}-catalog/")
+def catalogs(app_catalog_factory: AppCatalogFactoryFunc) -> List[AppCatalogCR]:
+    res: List[AppCatalogCR] = []
+    for cat_name in ["giantswarm", "giantswarm-test"]:
+        res.append(app_catalog_factory(cat_name, f"https://giantswarm.github.io/{cat_name}-catalog/"))
 
 
 @pytest.fixture(scope="module")
-def cni_app_cr(kube_cluster, catalogs):
-    cni_app_name = "linkerd2-cni-app"
-    app = app_cr_obj(
-        cni_app_name,
-        "giantswarm-test",
-        cni_app_version,
-        namespace_config_annotations={"linkerd.io/inject": "disabled"},
-        namespace_config_labels={
-            "linkerd.io/cni-resource": "true",
-            "config.linkerd.io/admission-webhooks": "disabled"
-        }
-    )
-    app_obj = AppCR(kube_cluster.kube_client, app)
-    app_obj.create()
-    apps = wait_for_namespaced_objects_condition(
-        kube_cluster.kube_client,
-        AppCR,
-        [cni_app_name],
-        "giantswarm",
-        _app_deployed,
-        timeout,
-        True
-    )
+def cni_app_cr(app_factory: AppFactoryFunc) -> ConfiguredApp:
+    res = app_factory("linkerd2-cni-app",
+                      cni_app_version,
+                      "giantswarm-test",
+                      "https://giantswarm.github.io/giantswarm-test-catalog/",
+                      namespace_config_annotations={"linkerd.io/inject": "disabled"},
+                      namespace_config_labels={
+                          "linkerd.io/cni-resource": "true",
+                          "config.linkerd.io/admission-webhooks": "disabled"
+                      }
+                      )
+    return res
 
-    return apps[0]
+
+# @pytest.fixture(scope="module")
+# def cni_app_cr_old(kube_cluster, catalogs):
+#    cni_app_name = "linkerd2-cni-app"
+#    app = app_cr_obj(
+#        cni_app_name,
+#        "giantswarm-test",
+#        cni_app_version,
+#        namespace_config_annotations={"linkerd.io/inject": "disabled"},
+#        namespace_config_labels={
+#            "linkerd.io/cni-resource": "true",
+#            "config.linkerd.io/admission-webhooks": "disabled"
+#        }
+#    )
+#    app_obj = AppCR(kube_cluster.kube_client, app)
+#    app_obj.create()
+#    apps = wait_for_namespaced_objects_condition(
+#        kube_cluster.kube_client,
+#        AppCR,
+#        [cni_app_name],
+#        "giantswarm",
+#        _app_deployed,
+#        timeout,
+#        True
+#    )
+#
+#    return apps[0]
 
 
 def user_configmap(filepath):
