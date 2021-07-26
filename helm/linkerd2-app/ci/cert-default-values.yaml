@@ -1,0 +1,17 @@
+identity:
+  issuer:
+    crtExpiry: 2022-07-13T09:29:06Z
+    tls:
+      crtPEM: |
+        -----BEGIN CERTIFICATE-----
+        dummyDUMMYdummy
+        -----END CERTIFICATE-----
+      keyPEM: |
+        -----BEGIN EC PRIVATE KEY-----
+        dummyDUMMYdummy
+        -----END EC PRIVATE KEY-----
+identityTrustAnchorsPEM: |
+  -----BEGIN CERTIFICATE-----
+  dummyDUMMYdummy
+  -----END CERTIFICATE-----
+

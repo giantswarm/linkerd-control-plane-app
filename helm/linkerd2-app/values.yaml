@@ -198,7 +198,7 @@ identity:
     clockSkewAllowance: 20s
 
     # -- Expiration timestamp for the issuer certificate. It must be provided during install. Must match the expiry date in crtPEM
-    crtExpiry: REPLACE-ME
+    crtExpiry: ""
 
     # -- Amount of time for which the Identity issuer should certify identity
     issuanceLifetime: 24h0m0s
