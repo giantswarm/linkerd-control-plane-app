@@ -43,9 +43,6 @@ enableEndpointSlices: false
 cniEnabled: true
 # -- Trust root certificate (ECDSA). It must be provided during install.
 identityTrustAnchorsPEM: |
-  this is just a dummy value to make this chart compatible
-  with conftest. You need to replace this value with a valid
-  trust root certificate in PEM format
 # -- Trust domain used for identity
 # @default -- clusterDomain
 identityTrustDomain: *cluster_domain
@@ -321,12 +318,5 @@ nodeSelector:
 # [K8S documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
 # for more information
 # tolerations:
-
-# GS changes: subcharts aren't included in this chart, but the variables are retained
-# for ease of upstream compatibility.
-grafana:
-  enabled: &grafana_enabled false
-tracing:
-  enabled: &tracing_enabled false
 
 enablePodAntiAffinity: true

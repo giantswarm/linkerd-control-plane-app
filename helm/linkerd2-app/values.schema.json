@@ -29,6 +29,33 @@
         "controllerReplicas": {
             "type": "integer"
         },
+        "controllerResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "controllerUID": {
             "type": "integer"
         },
@@ -51,6 +78,33 @@
                 }
             }
         },
+        "destinationResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "disableHeartBeat": {
             "type": "boolean"
         },
@@ -58,6 +112,9 @@
             "type": "boolean"
         },
         "enableH2Upgrade": {
+            "type": "boolean"
+        },
+        "enablePodAntiAffinity": {
             "type": "boolean"
         },
         "identity": {
@@ -70,7 +127,7 @@
                             "type": "string"
                         },
                         "crtExpiry": {
-                            "type": ["string"]
+                            "type": "string"
                         },
                         "issuanceLifetime": {
                             "type": "string"
@@ -88,6 +145,33 @@
                                     "type": "string"
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "identityResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
                         }
                     }
                 }
@@ -369,6 +453,87 @@
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "proxyInjectorResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "publicAPIResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "spValidatorResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
                         }
                     }
                 }
