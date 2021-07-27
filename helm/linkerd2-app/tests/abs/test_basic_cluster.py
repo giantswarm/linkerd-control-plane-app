@@ -13,7 +13,7 @@ from pytest_helm_charts.fixtures import Cluster
 from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR
 from pytest_helm_charts.utils import wait_for_deployments_to_run, wait_for_namespaced_objects_condition
 
-from fixtures.fixtures import linkerd_app_cr, cni_app_cr, catalogs
+from fixtures.fixtures import linkerd_app_cr, cni_app_cr
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ def test_linkerd_cni_deployed(kube_cluster: Cluster, cni_app_cr: AppCR):
 @pytest.mark.smoke
 def test_linkerd_deployed(kube_cluster: Cluster, linkerd_app_cr: AppCR):
     """Test using the linkerd cli using 'check'"""
-    app_version = linkerd_app_cr.obj["status"]["appVersion"]
+    app_version = linkerd_app_cr.obj["spec"]["version"]
     logger.info(f"Installed App CR shows installed appVersion {app_version}")
 
     linkerd_namespace = "linkerd2-app"
