@@ -5,3 +5,4 @@ test_results_*.xml
 .pytest_cache
 linkerd-cli
 __pycache__
+**/.idea/

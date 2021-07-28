@@ -121,7 +121,7 @@ def test_linkerd_deployed(kube_cluster: Cluster, app_factory: AppFactoryFunc, ch
                           "linkerd.io/control-plane-ns": namespace
                       })
 
-    app_cr = AppCR.objects(kube_cluster.kube_client).get_by_name(app_name)
+    app_cr = AppCR.objects(kube_cluster.kube_client).filter(namespace=namespace).get_by_name(app_name)
     app_version = app_cr.obj["status"]["version"]
     assert app_version == chart_version
     wait_for_deployments_to_run(
