@@ -62,6 +62,17 @@ kubectl gs template app \
 The final `App` CR should look like this:
 
 ```yaml
+apiVersion: application.giantswarm.io/v1alpha1
+kind: App
+metadata:
+  name: linkerd2-app
+  namespace: <your-cluster-id>
+spec:
+  catalog: giantswarm
+  kubeConfig:
+    inCluster: false
+  name: linkerd2-app
+  namespace: linkerd
   namespaceConfig:
     annotations:
       linkerd.io/inject: disabled
@@ -69,6 +80,15 @@ The final `App` CR should look like this:
       linkerd.io/is-control-plane: "true"
       config.linkerd.io/admission-webhooks: disabled
       linkerd.io/control-plane-ns: linkerd
+  userConfig:
+    configMap:
+      name: linkerd2-app-userconfig
+      namespace: <your-cluster-id>
+    secret:
+      name: linkerd2-app-userconfig
+      namespace: <your-cluster-id>
+  version: 0.6.0
+
 ```
 
 When installing through the Giant Swarm web UI, you'll need to apply the above labels and annotations manually.
