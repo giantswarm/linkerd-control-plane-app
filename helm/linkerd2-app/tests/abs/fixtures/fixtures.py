@@ -73,50 +73,6 @@ def linkerd_app_cr(kube_cluster: Cluster, app_factory: AppFactoryFunc, chart_ver
     return apps[0]
 
 
-@pytest.fixture(scope="module")
-def linkerd_app_cr_old(kube_cluster, chart_version):
-    app_name = "linkerd2-app"
-    app_cm_name = f"{app_name}-user-config"
-
-    app_cm = {
-        "apiVersion": "v1",
-        "kind": "ConfigMap",
-        "metadata": {"name": app_cm_name, "namespace": "giantswarm"},
-        "data": {"values": user_configmap("test-values.yaml")}
-    }
-    app_cm_obj = ConfigMap(kube_cluster.kube_client, app_cm)
-    app_cm_obj.create()
-
-    app = app_cr_obj(
-        app_name,
-        "chartmuseum",
-        chart_version,
-        namespace_config_annotations={"linkerd.io/inject": "disabled"},
-        namespace_config_labels={
-            "linkerd.io/is-control-plane": "true",
-            "config.linkerd.io/admission-webhooks": "disabled",
-            "linkerd.io/control-plane-ns": app_name
-        }
-    )
-    app["spec"]["userConfig"] = {
-        "configMap": {"name": app_cm_name, "namespace": "giantswarm"}
-    }
-
-    app_obj = AppCR(kube_cluster.kube_client, app)
-    app_obj.create()
-    apps = wait_for_namespaced_objects_condition(
-        kube_cluster.kube_client,
-        AppCR,
-        [app_name],
-        "giantswarm",
-        _app_deployed,
-        timeout,
-        True
-    )
-
-    return apps[0]
-
-
 def _app_deployed(app: AppCR) -> bool:
     complete = (
             "status" in app.obj
