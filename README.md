@@ -91,7 +91,7 @@ spec:
 
 ```
 
-When installing through the Giant Swarm web UI, you'll need to apply the above labels and annotations manually.
+When installing via the Giant Swarm web UI, you'll need to apply the above labels and annotations manually.
 
 ### Step 4: After deployment
 
