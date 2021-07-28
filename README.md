@@ -2,8 +2,7 @@
 
 # linkerd2-app chart
 
-Linkerd2 service mesh for Giant Swarm clusters. Although based on the official linkerd2 helm chart,
-it diverges in few places to ease installation on Giant Swarm clusters.
+Linkerd2 service mesh for Giant Swarm clusters. Based on the official linkerd2 helm charts with a few changes, required to deploy to Giant Swarm clusters.
 
 **Before you install this app, please review this document from start to finish!**
 
