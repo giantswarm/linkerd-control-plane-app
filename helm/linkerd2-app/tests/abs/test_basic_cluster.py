@@ -1,23 +1,24 @@
 import json
 import logging
 import os
-import requests
 import shutil
 import subprocess  # nosec
-import time
 from typing import Dict
 
 import pykube
 import pytest
+import pytest_helm_charts.giantswarm_app_platform.custom_resources
+import requests
+import yaml
 from pytest_helm_charts.fixtures import Cluster
+from pytest_helm_charts.giantswarm_app_platform.app import AppFactoryFunc
 from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR
-from pytest_helm_charts.utils import wait_for_deployments_to_run, wait_for_namespaced_objects_condition
-
-from fixtures.fixtures import linkerd_app_cr, cni_app_cr
+from pytest_helm_charts.utils import wait_for_deployments_to_run, ensure_namespace_exists
 
 logger = logging.getLogger(__name__)
 
 timeout: int = 360
+cni_app_version = "0.3.1-beta-68af46a45a03e1cfc304fa40a0022fb163edb2d3"
 
 
 def get_linkerd_cli(version):
@@ -33,16 +34,15 @@ def get_linkerd_cli(version):
 
 def exec_linkerd_cli(kube_config_path, cni_namespace, namespace, app_namespace):
     result = subprocess.run([
-            "./linkerd-cli",
-            "check",
-            "--kubeconfig", kube_config_path,
-            "--cni-namespace", cni_namespace,
-            "--linkerd-namespace", namespace,
-            "--proxy",
-            "--namespace", app_namespace,
-            "--output", "json",
-        ],
-        check=False,
+        "./linkerd-cli",
+        "check",
+        "--kubeconfig", kube_config_path,
+        "--cni-namespace", cni_namespace,
+        "--linkerd-namespace", namespace,
+        "--proxy",
+        "--namespace", app_namespace,
+        "--output", "json",
+    ],
         encoding="utf-8",
         stdout=subprocess.PIPE,
         stderr=None,
@@ -62,7 +62,7 @@ def test_api_working(kube_cluster: Cluster) -> None:
 
 @pytest.mark.smoke
 def test_cluster_info(
-    kube_cluster: Cluster, cluster_type: str, chart_extra_info: Dict[str, str]
+        kube_cluster: Cluster, cluster_type: str, chart_extra_info: Dict[str, str]
 ) -> None:
     """Test if the culster_info is available"""
     logger.info(f"Running on cluster type {cluster_type}")
@@ -73,43 +73,57 @@ def test_cluster_info(
     assert cluster_type != ""
 
 
-def _app_deployed(app: AppCR) -> bool:
-    complete = (
-            "status" in app.obj
-            and "release" in app.obj["status"]
-            and "appVersion" in app.obj["status"]
-            and "status" in app.obj["status"]["release"]
-            and app.obj["status"]["release"]["status"] == "deployed"
-    )
-    return complete
-
-
 @pytest.mark.smoke
-def test_linkerd_cni_deployed(kube_cluster: Cluster, cni_app_cr: AppCR):
+def test_linkerd_cni_deployed(kube_cluster: Cluster, app_factory: AppFactoryFunc):
     """Install using the linkerd cni"""
-    apps = wait_for_namespaced_objects_condition(
-        kube_cluster.kube_client,
-        AppCR,
-        [cni_app_cr.app.metadata["name"]],
-        "default",
-        _app_deployed,
-        timeout,
-        False
-    )
-    app_version = apps[0].obj["status"]["appVersion"]
+    app_name = "linkerd2-cni-app"
+    app_factory(app_name,
+                cni_app_version,
+                "giantswarm-test",
+                "https://giantswarm.github.io/giantswarm-test-catalog/",
+                namespace_config_annotations={"linkerd.io/inject": "disabled"},
+                namespace_config_labels={
+                    "linkerd.io/cni-resource": "true",
+                    "config.linkerd.io/admission-webhooks": "disabled"
+                }
+                )
+    app_cr = AppCR.objects(kube_cluster.kube_client).get_by_name(app_name)
+    app_version = app_cr.obj["status"]["version"]
+    assert app_version == cni_app_version
     logger.info(f"cni App CR shows installed appVersion {app_version}")
 
 
+def load_yaml_from_path(filepath):
+    with open(filepath, 'r', encoding='utf-8') as values_file:
+        values = values_file.read()
+
+    yaml_config = yaml.safe_load(values)
+    return yaml_config
+
+
 @pytest.mark.smoke
-def test_linkerd_deployed(kube_cluster: Cluster, linkerd_app_cr: AppCR):
+def test_linkerd_deployed(kube_cluster: Cluster, app_factory: AppFactoryFunc, chart_version: str):
     """Test using the linkerd cli using 'check'"""
-    app_version = linkerd_app_cr.obj["spec"]["version"]
-    logger.info(f"Installed App CR shows installed appVersion {app_version}")
+    app_name = "linkerd2-app"
+    namespace = "linkerd"
+    ensure_namespace_exists(kube_cluster.kube_client, namespace)
+    res = app_factory(app_name,
+                      chart_version,
+                      "chartmuseum-test-time",
+                      "http://chartmuseum-chartmuseum:8080/charts/",
+                      timeout_sec=timeout,
+                      namespace=namespace,
+                      config_values=load_yaml_from_path("test-values.yaml"),
+                      namespace_config_annotations={"linkerd.io/inject": "disabled"},
+                      namespace_config_labels={
+                          "linkerd.io/is-control-plane": "true",
+                          "config.linkerd.io/admission-webhooks": "disabled",
+                          "linkerd.io/control-plane-ns": namespace
+                      })
 
-    linkerd_namespace = "linkerd2-app"
-    cni_namespace = "linkerd2-cni-app"
-    test_app_namespace = "helloworld"
-
+    app_cr = AppCR.objects(kube_cluster.kube_client).get_by_name(app_name)
+    app_version = app_cr.obj["status"]["version"]
+    assert app_version == chart_version
     wait_for_deployments_to_run(
         kube_cluster.kube_client,
         [
@@ -119,13 +133,13 @@ def test_linkerd_deployed(kube_cluster: Cluster, linkerd_app_cr: AppCR):
             "linkerd-proxy-injector",
             "linkerd-sp-validator",
         ],
-        linkerd_namespace,
+        namespace,
         timeout,
     )
+    logger.info(f"Installed App CR shows installed appVersion {app_version}")
 
-
-#@pytest.mark.functional
-#def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
+# @pytest.mark.functional
+# def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
 #    app_version = linkerd_app_cr.obj["status"]["appVersion"]
 #    kube_cluster.kubectl("apply", filename="test-app-manifests.yaml", output=None)
 #    logger.info("Installed additional manifest with to be injected proxy")
