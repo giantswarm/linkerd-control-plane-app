@@ -5,29 +5,14 @@
 Linkerd2 service mesh for Giant Swarm clusters. Although based on the official linkerd2 helm chart,
 it diverges in few places to ease installation on Giant Swarm clusters.
 
-**Before you install this app, please review this document thoroughly!**
+**Before you install this app, please review this document from start to finish!**
 
-## Requirements
+## Quickstart Guide
 
-- You can install only one release of this chart per kubernetes cluster.
-- The only possible namespace name you can install into is `linkerd`.
-- Default installation values require the installation of [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app) before installing this app.
-  - the CNI must be installed before this chart, and `cniEnabled: true` must be set (default).
-- With linkerd CNI enabled, all of your workload pods meshed by linkerd require a `PodSecurityPolicy` which allows use of `EmptyDir` volumes.
-  - the injected linkerd-proxy container and proxy initContainer require an `EmptyDir` volume to store ephemeral information.
-- (Optional but recommended). The [`linkerd` cli tool](https://github.com/linkerd/linkerd2/releases/tag/stable-2.10.2) is very useful to verify your installation working and for installation of additional extensions. Make sure you [set the right flags](#usage-with-linkerd-cli)
+### Step 1: Pre-installation and Configuration
 
-## Configuration
-
-Please review the [default values.yaml file](helm/linkerd2-app/values.yaml) and change
-the defaults by specifying a [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/).
-
-With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled.
-
-If you're planning to install this chart without the CNI plugin,
-you'll need to set `cniEnabled: false` in your values file
-
-A successful install will require you to generate a trust anchor and issuer certificate. The following steps loosely follow [the official instructions](https://linkerd.io/2.10/tasks/generate-certificates/).
+- Install the linkerd CNI plugin by installing [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app) on your cluster. Be sure to review the instructions for the CNI plugin.
+- A successful install will require you to generate a trust anchor and issuer certificate. The following steps loosely follow [the official instructions](https://linkerd.io/2.10/tasks/generate-certificates/).
 
 Obtain the `step` cli (we're using `step_linux_0.16.1_amd64.tar.gz` from [here](https://github.com/smallstep/cli/releases/tag/v0.16.1)) and execute the following commands. Take note of the `--not-after` flag. (8760h = 1 year)
 
@@ -39,9 +24,9 @@ expiry_iso=$(date -Iseconds --utc --date "${expiry#notAfter=}")
 echo "${expiry_iso%+00:00}Z"
 ```
 
-Finally construct your config file like this:
+- Finally construct your user secrets file like this:
 
-```
+```yaml
 identity:
   issuer:
     crtExpiry: <the final output of the commands above>
@@ -54,27 +39,29 @@ identityTrustAnchorsPEM: |
   <contents of the ca.crt file>
 ```
 
-### Note:
+- Review the [default values.yaml file](helm/linkerd2-app/values.yaml) and change
+other defaults by specifying a [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled.
 
-`values.yaml` uses [YAML anchors](https://helm.sh/docs/chart_template_guide/yaml_techniques/#yaml-anchors) to
-be DRY where possible.
+### Step 2: Deploy Linkerd
 
-## Installation
+We recommend deploying the app by applying an `App` CR (Custom Resource) onto your management cluster. You can use the [`kubectl gs`](https://docs.giantswarm.io/ui-api/kubectl-gs/) plugin to generate a valid `App` CR with command
 
-### Dependencies
+```
+kubectl gs template app \
+  --catalog giantswarm \
+  --name linkerd2-app \
+  --namespace linkerd \
+  --cluster <your-cluster-id>  \
+  --version 0.6.0 \
+  --user-configmap my-linkerd-values.yaml \
+  --user-secrets my-linkerd-certificates.yaml
+```
 
-This application requires the [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app)
-application to be already deployed in the cluster. It can be installed from the Giant Swarm
-App Catalog through an `AppCR` (recommended) or via the Web UI (additional [labels/annotations required](https://github.com/giantswarm/linkerd2-cni-app#installation)).
+**Attention**: You'll need to edit the resulting `App` CR manifest to add `spec.namespaceConfig.labels` and `spec.namespaceConfig.annotations` fields.
 
-### Deployment
-
-This chart diverges from the upstream chart slightly by taking the namespace value from Helm
-directly, rather than from the values file. When installing through the Giant Swarm App platform, we recommend
-to install via App CR. Make sure you set the required annotations and labels through the `spec.namespaceConfig`.
+The final `App` CR should look like this:
 
 ```yaml
-...
   namespaceConfig:
     annotations:
       linkerd.io/inject: disabled
@@ -82,31 +69,22 @@ to install via App CR. Make sure you set the required annotations and labels thr
       linkerd.io/is-control-plane: "true"
       config.linkerd.io/admission-webhooks: disabled
       linkerd.io/control-plane-ns: linkerd
-...
 ```
 
-#### Deployment using helm
+When installing through the Giant Swarm web UI, you'll need to apply the above labels and annotations manually.
 
-When using helm, the namespace must be created _before_
-this chart is deployed. Assuming a namespace `linkerd` already exists, this chart can be
-deployed with the following command:
+### Step 4: After deployment
 
-```text
-helm install --namespace linkerd -n linkerd giantswarm-playground-catalog/linkerd2-app
-```
-
-Make sure to add the neccessary annotations and labels to your namespace. Check out file [helm/linkerd2-app/templates/namespace.yaml](helm/linkerd2-app/templates/namespace.yaml) as example.
-
-### After deployment
-
-After you've installed the app, linkerd requires some labels and annotations on the `kube-system` namespace to disable proxy injection for pods running there.
+- Disable proxy injections for pods running in the `kube-system` namespace by applying certain labels and annotations
 
 ```bash
 kubectl annotate namespace kube-system linkerd.io/inject=disabled
 kubectl label namespace kube-system config.linkerd.io/admission-webhooks=disabled
 ```
 
-We strongly recommend installing the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) by executing
+- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.10.2).
+
+- We strongly recommend installing the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) by executing
 
 ```bash
 linkerd viz install | kubectl apply -f -
@@ -117,6 +95,28 @@ After installation, you can open the dashboard by executing
 ```
 linkerd viz dashboard
 ```
+
+## Mesh your workloads
+
+After installation, linkerd looks for a `linkerd.io/inject: enabled` annotation on `Namespaces` or other workload resources. Adding this annotation to your workload namespaces will trigger automatic proxy container injection to your pods. More information on proxy injection can be found on the ["Automatic Proxy Injection" page](https://linkerd.io/2.10/features/proxy-injection/) in the upstream documentation.
+
+**Attention**: Proxy containers are using `EmptyDir` volumes for storing ephemeral data, so all of your workload pods meshed by linkerd require a `PodSecurityPolicy` which allows use of `EmptyDir` volumes.
+
+## Installing without the CNI plugin
+
+In order to install this app without the CNI plugin, you'll need to specify `cniEnabled: false` in your user configuration.
+
+Be aware that running without the CNI plugin, proxy containers will run as `root` and will require `NET_ADMIN` and `NET_RAW` capabilities.
+
+## Troubleshooting
+
+### App installation fails when I specify a namespace name other than `linkerd`
+
+The `linkerd` namespace name is assumed in several parts of the chart, so we restricted installation to namespaces named `linkerd` only.
+
+### Proxy containers fail to start
+
+Your workload must be able to create `EmptyDir` volumes, so you'll need to create a `PodSecurityPolicy` allowing the creation of `EmptyDir` volumes.
 
 ## Usage with `linkerd` cli
 
