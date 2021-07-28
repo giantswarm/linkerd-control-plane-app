@@ -106,10 +106,22 @@ kubectl annotate namespace kube-system linkerd.io/inject=disabled
 kubectl label namespace kube-system config.linkerd.io/admission-webhooks=disabled
 ```
 
+We strongly recommend installing the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) by executing
+
+```bash
+linkerd viz install | kubectl apply -f -
+```
+
+After installation, you can open the dashboard by executing
+
+```
+linkerd viz dashboard
+```
+
 ## Usage with `linkerd` cli
 
-You can use the `linkerd` cli as usual with this app. You'll probably need to specify the CNI plugin namespace using the `--cni-namespace` flag.
+You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.10.2).
 
 ## Credit
 
-* https://helm.linkerd.io/stable
+* https://linkerd.io/2.10/tasks/install-helm/
