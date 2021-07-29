@@ -86,8 +86,8 @@ def wait_for_all_linkerd_deployments_to_run(kube_client: HTTPClient, namespace: 
 def linkerd_cni_app_cr(app_factory: AppFactoryFunc) -> ConfiguredApp:
     res = app_factory(cni_app_name,
                       cni_app_version,
-                      "giantswarm-test",
-                      "https://giantswarm.github.io/giantswarm-test-catalog/",
+                      "giantswarm-stable",
+                      "https://giantswarm.github.io/giantswarm-catalog/",
                       timeout_sec=timeout,
                       namespace=cni_namespace,
                       namespace_config_annotations={"linkerd.io/inject": "disabled"},
