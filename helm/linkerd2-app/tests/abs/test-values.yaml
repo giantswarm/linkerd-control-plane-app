@@ -1,6 +1,6 @@
 identity:
   issuer:
-    crtExpiry: 2022-07-13T09:29:06Z
+    crtExpiry: "2022-07-13T09:29:06Z"
     tls:
       crtPEM: |
         -----BEGIN CERTIFICATE-----
