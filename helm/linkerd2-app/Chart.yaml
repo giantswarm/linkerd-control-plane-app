@@ -1,11 +1,8 @@
-annotations:
-  application.giantswarm.io/metadata: https://giantswarm.github.io/giantswarm-catalog/linkerd2-app-0.6.0-beta-c64d6e255fc11f62f68ea4f15807daf38671a6e8.tgz-meta/main.yaml
-  application.giantswarm.io/readme: https://giantswarm.github.io/giantswarm-catalog/linkerd2-app-0.6.0-beta-c64d6e255fc11f62f68ea4f15807daf38671a6e8.tgz-meta/README.md
-  application.giantswarm.io/values-schema: https://giantswarm.github.io/giantswarm-catalog/linkerd2-app-0.6.0-beta-c64d6e255fc11f62f68ea4f15807daf38671a6e8.tgz-meta/values.schema.json
-apiVersion: v1
+apiVersion: "v1"
 appVersion: stable-2.10.2
-description: "Linkerd gives you observability, reliability, and security\nfor your\
-  \ microservices \u2014 with no code change required.\n"
+description: |
+  Linkerd gives you observability, reliability, and security
+  for your microservices — with no code change required.
 home: https://linkerd.io
 icon: https://s.giantswarm.io/app-icons/1/png/linkerd2-app-light.png
 keywords:
@@ -18,10 +15,10 @@ maintainers:
 - name: Giant Swarm applications team
   url: https://github.com/giantswarm/linkerd2-app
 name: linkerd2-app
-restrictions:
-  clusterSingleton: true
-  fixedNamespace: linkerd
 sources:
 - https://github.com/linkerd/linkerd2/
 - https://github.com/giantswarm/linkerd2-app
-version: 0.6.0-beta-c64d6e255fc11f62f68ea4f15807daf38671a6e8
+version: 0.6.0
+restrictions:
+  clusterSingleton: true
+  fixedNamespace: linkerd

@@ -99,6 +99,9 @@ def linkerd_cni_app_cr(app_factory: AppFactoryFunc) -> ConfiguredApp:
     return res
 
 
+# As the fixture doesn't detect nor manage pre-created appCatalogs,
+# it can't manage the one created earlier apptestctl.
+# We're registering the same catalog here, just with different name to avoid name conflict.
 @pytest.fixture(scope="module")
 def linkerd_app_cr(kube_cluster: Cluster, app_factory: AppFactoryFunc, chart_version: str,
                    linkerd_cni_app_cr: ConfiguredApp) -> ConfiguredApp:
