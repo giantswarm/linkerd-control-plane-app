@@ -1,5 +1,5 @@
 #skip-steps: test_all
-chart-dir: helm/linkerd2-cni-app
+chart-dir: helm/linkerd2-app
 replace-chart-version-with-git: true
 replace-app-version-with-git: false
 generate-metadata: true

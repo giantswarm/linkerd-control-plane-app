@@ -92,6 +92,7 @@ metadata:
     app.kubernetes.io/version: {{default .Values.linkerdVersion .Values.controllerImageVersion}}
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    giantswarm.io/monitoring_basic_sli: "true"
   name: linkerd-identity
   namespace: {{.Values.namespace}}
 spec:
