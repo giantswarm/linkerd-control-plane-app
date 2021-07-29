@@ -7,7 +7,6 @@ from typing import Dict
 
 import pykube
 import pytest
-import pytest_helm_charts.giantswarm_app_platform.custom_resources
 import requests
 import yaml
 from pytest_helm_charts.fixtures import Cluster
@@ -138,27 +137,28 @@ def test_linkerd_deployed(kube_cluster: Cluster, app_factory: AppFactoryFunc, ch
     )
     logger.info(f"Installed App CR shows installed appVersion {app_version}")
 
-# @pytest.mark.functional
-# def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
-#    app_version = linkerd_app_cr.obj["status"]["appVersion"]
-#    kube_cluster.kubectl("apply", filename="test-app-manifests.yaml", output=None)
-#    logger.info("Installed additional manifest with to be injected proxy")
-#
-#    kube_cluster.kubectl("annotate namespace kube-system linkerd.io/inject=disabled")
-#    kube_cluster.kubectl("label namespace kube-system config.linkerd.io/admission-webhooks=disabled")
-#
-#    get_linkerd_cli(app_version)
-#
-#    curr = 0
-#    while curr < timeout:
-#        success = exec_linkerd_cli(kube_cluster.kube_config_path, cni_namespace, linkerd_namespace, test_app_namespace)["success"]
-#        if success:
-#            break
-#        time.sleep(1)
-#
-#    cli_output = exec_linkerd_cli(kube_cluster.kube_config_path, cni_namespace, linkerd_namespace, test_app_namespace)
-#
-#    logger.info(f"Final output of 'linkerd check`: {cli_output}")
-#
-#    assert cli_output["success"]
-#
+
+@pytest.mark.functional
+def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
+    app_version = linkerd_app_cr.obj["status"]["appVersion"]
+    kube_cluster.kubectl("apply", filename="test-app-manifests.yaml", output=None)
+    logger.info("Installed additional manifest with app to be included in the mesh")
+
+    kube_cluster.kubectl("annotate namespace kube-system linkerd.io/inject=disabled")
+    kube_cluster.kubectl("label namespace kube-system config.linkerd.io/admission-webhooks=disabled")
+
+    get_linkerd_cli(app_version)
+
+    curr = 0
+    while curr < timeout:
+        success = exec_linkerd_cli(kube_cluster.kube_config_path, cni_namespace, linkerd_namespace, test_app_namespace)[
+            "success"]
+        if success:
+            break
+        time.sleep(1)
+
+    cli_output = exec_linkerd_cli(kube_cluster.kube_config_path, cni_namespace, linkerd_namespace, test_app_namespace)
+
+    logger.info(f"Final output of 'linkerd check`: {cli_output}")
+
+    assert cli_output["success"]
