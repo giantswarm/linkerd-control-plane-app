@@ -19,7 +19,7 @@ from pytest_helm_charts.utils import wait_for_deployments_to_run, ensure_namespa
 logger = logging.getLogger(__name__)
 
 timeout: int = 360
-cni_app_version = "0.3.1-beta-68af46a45a03e1cfc304fa40a0022fb163edb2d3"
+cni_app_version = "0.4.0"
 linkerd_namespace = "linkerd"
 linkerd_app_name = "linkerd2-app"
 cni_namespace = "default"

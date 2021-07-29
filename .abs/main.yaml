@@ -5,7 +5,6 @@ replace-app-version-with-git: false
 generate-metadata: true
 catalog-base-url: https://giantswarm.github.io/giantswarm-catalog/
 
-skip-steps: test_functional
 app-tests-skip-app-deploy: true
 
 #smoke-tests-cluster-type: external
@@ -15,3 +14,5 @@ app-tests-skip-app-deploy: true
 
 smoke-tests-cluster-config-file: helm/linkerd2-app/tests/kind_config.yaml
 smoke-tests-cluster-type: kind
+functional-tests-cluster-config-file: helm/linkerd2-app/tests/kind_config.yaml
+functional-tests-cluster-type: kind
