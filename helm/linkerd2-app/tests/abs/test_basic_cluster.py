@@ -10,6 +10,7 @@ import pykube
 import pytest
 import requests
 import yaml
+from _pytest.config import Config
 from pykube import HTTPClient
 from pytest_helm_charts.fixtures import Cluster
 from pytest_helm_charts.giantswarm_app_platform.app import AppFactoryFunc, ConfiguredApp
@@ -83,10 +84,14 @@ def wait_for_all_linkerd_deployments_to_run(kube_client: HTTPClient, namespace: 
 
 
 @pytest.fixture(scope="module")
-def linkerd_cni_app_cr(app_factory: AppFactoryFunc) -> ConfiguredApp:
+def linkerd_cni_app_cr(app_factory: AppFactoryFunc, pytestconfig: Config) -> ConfiguredApp:
+    # app platform is too slow to correctly delete AppCatalog between 'smoke' and 'functional' runs,
+    # so to work-around we're adding test type to the name of the created AppCatalog
+    suffix: str = pytestconfig.getoption("markexpr")
+    suffix = suffix.replace(" ", "-")
     res = app_factory(cni_app_name,
                       cni_app_version,
-                      "giantswarm-stable",
+                      f"giantswarm-stable-{suffix}",
                       "https://giantswarm.github.io/giantswarm-catalog/",
                       timeout_sec=timeout,
                       namespace=cni_namespace,
