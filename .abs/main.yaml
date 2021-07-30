@@ -14,6 +14,6 @@ app-tests-skip-app-deploy: true
 
 smoke-tests-cluster-config-file: helm/linkerd2-app/tests/kind_config.yaml
 smoke-tests-cluster-type: kind
-skip-steps: test_functional
-#functional-tests-cluster-config-file: helm/linkerd2-app/tests/kind_config.yaml
-#functional-tests-cluster-type: kind
+#skip-steps: test_functional
+functional-tests-cluster-config-file: helm/linkerd2-app/tests/kind_config.yaml
+functional-tests-cluster-type: kind
