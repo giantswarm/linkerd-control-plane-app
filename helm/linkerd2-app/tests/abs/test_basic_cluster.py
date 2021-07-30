@@ -84,7 +84,8 @@ def wait_for_all_linkerd_deployments_to_run(kube_client: HTTPClient, namespace: 
 
 
 @pytest.fixture(scope="module")
-def linkerd_cni_app_cr(app_factory: AppFactoryFunc, pytestconfig: Config) -> ConfiguredApp:
+def linkerd_cni_app_cr(kube_cluster: Cluster, app_factory: AppFactoryFunc,
+                       pytestconfig: Config) -> ConfiguredApp:
     # app platform is too slow to correctly delete AppCatalog between 'smoke' and 'functional' runs,
     # so to work-around we're adding test type to the name of the created AppCatalog
     suffix: str = pytestconfig.getoption("markexpr")
