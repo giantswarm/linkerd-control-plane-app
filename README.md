@@ -53,14 +53,15 @@ kubectl gs template app \
   --cluster <your-cluster-id>  \
   --version 0.6.0 \
   --user-configmap my-linkerd-values.yaml \
-  --user-secrets my-linkerd-certificates.yaml
+  --user-secret my-linkerd-certificates.yaml \
+  --namespace-labels "linkerd.io/is-control-plane=true,config.linkerd.io/admission-webhooks=disabled,linkerd.io/control-plane-ns=linkerd" \
+  --namespace-annotations "linkerd.io/inject=disabled"
 ```
-
-**Attention**: You'll need to edit the resulting `App` CR manifest to add `spec.namespaceConfig.labels` and `spec.namespaceConfig.annotations` fields.
 
 The final `App` CR should look like this:
 
 ```yaml
+...
 apiVersion: application.giantswarm.io/v1alpha1
 kind: App
 metadata:
@@ -76,15 +77,15 @@ spec:
     annotations:
       linkerd.io/inject: disabled
     labels:
-      linkerd.io/is-control-plane: "true"
       config.linkerd.io/admission-webhooks: disabled
       linkerd.io/control-plane-ns: linkerd
+      linkerd.io/is-control-plane: "true"
   userConfig:
     configMap:
-      name: linkerd2-app-userconfig
+      name: linkerd2-app-userconfig-<your-cluster-id>
       namespace: <your-cluster-id>
     secret:
-      name: linkerd2-app-userconfig
+      name: linkerd2-app-userconfig-<your-cluster-id>
       namespace: <your-cluster-id>
   version: 0.6.0
 
