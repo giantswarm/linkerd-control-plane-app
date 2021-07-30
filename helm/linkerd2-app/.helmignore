@@ -20,3 +20,7 @@ OWNERS
 .project
 .idea/
 *.tmproj
+
+tests
+linkerd-cli
+__pycache__
