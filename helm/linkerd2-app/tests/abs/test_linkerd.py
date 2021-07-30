@@ -10,7 +10,6 @@ import pykube
 import pytest
 import requests
 import yaml
-from _pytest.config import Config
 from pykube import HTTPClient
 from pytest_helm_charts.fixtures import Cluster
 from pytest_helm_charts.giantswarm_app_platform.app import AppFactoryFunc, ConfiguredApp
@@ -84,14 +83,12 @@ def wait_for_all_linkerd_deployments_to_run(kube_client: HTTPClient, namespace: 
 
 
 @pytest.fixture(scope="module")
-def linkerd_cni_app_cr(app_factory: AppFactoryFunc, pytestconfig: Config) -> ConfiguredApp:
+def linkerd_cni_app_cr(app_factory: AppFactoryFunc) -> ConfiguredApp:
     # app platform is too slow to correctly delete AppCatalog between 'smoke' and 'functional' runs,
     # so to work-around we're adding test type to the name of the created AppCatalog
-    suffix: str = pytestconfig.getoption("markexpr")
-    suffix = suffix.replace(" ", "-")
     res = app_factory(cni_app_name,
                       cni_app_version,
-                      f"giantswarm-stable-{suffix}",
+                      f"giantswarm-stable",
                       "https://giantswarm.github.io/giantswarm-catalog/",
                       timeout_sec=timeout,
                       namespace=cni_namespace,
@@ -109,13 +106,10 @@ def linkerd_cni_app_cr(app_factory: AppFactoryFunc, pytestconfig: Config) -> Con
 # it can't manage the one created earlier apptestctl.
 # We're registering the same catalog here, just with different name to avoid name conflict.
 @pytest.fixture(scope="module")
-def linkerd_app_cr(app_factory: AppFactoryFunc, chart_version: str, linkerd_cni_app_cr: ConfiguredApp,
-                   pytestconfig: Config) -> ConfiguredApp:
-    suffix: str = pytestconfig.getoption("markexpr")
-    suffix = suffix.replace(" ", "-")
+def linkerd_app_cr(app_factory: AppFactoryFunc, chart_version: str, linkerd_cni_app_cr: ConfiguredApp) -> ConfiguredApp:
     res = app_factory(linkerd_app_name,
                       chart_version,
-                      f"chartmuseum-test-time-{suffix}",
+                      f"chartmuseum-test-time",
                       "http://chartmuseum-chartmuseum:8080/charts/",
                       timeout_sec=timeout,
                       namespace=linkerd_namespace,
@@ -168,7 +162,7 @@ def test_linkerd_deployed(kube_cluster: Cluster, linkerd_app_cr: AppCR, chart_ve
     logger.info(f"Installed App CR shows installed appVersion {app_version}")
 
 
-@pytest.mark.functional
+@pytest.mark.smoke
 def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
     wait_for_all_linkerd_deployments_to_run(kube_cluster.kube_client, linkerd_namespace, timeout)
     app_cr = AppCR.objects(kube_cluster.kube_client).filter(namespace=linkerd_namespace).get_by_name(linkerd_app_name)
