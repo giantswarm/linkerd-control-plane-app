@@ -15,7 +15,7 @@ from pykube import HTTPClient
 from pytest_helm_charts.fixtures import Cluster
 from pytest_helm_charts.giantswarm_app_platform.app import AppFactoryFunc, ConfiguredApp
 from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR
-from pytest_helm_charts.utils import wait_for_deployments_to_run, ensure_namespace_exists
+from pytest_helm_charts.utils import wait_for_deployments_to_run, wait_for_daemon_sets_to_run, ensure_namespace_exists
 
 logger = logging.getLogger(__name__)
 
@@ -137,12 +137,21 @@ def test_api_working(kube_cluster: Cluster) -> None:
     assert kube_cluster.kube_client is not None
     assert len(pykube.Node.objects(kube_cluster.kube_client)) >= 1
 
+    kube_cluster.kubectl("annotate --overwrite namespace kube-system linkerd.io/inject=disabled")
+    kube_cluster.kubectl("label --overwrite namespace kube-system config.linkerd.io/admission-webhooks=disabled")
+
 
 @pytest.mark.smoke
 def test_linkerd_cni_deployed(kube_cluster: Cluster, linkerd_cni_app_cr: AppCR):
     """Install using the linkerd cni"""
     app_cr = AppCR.objects(kube_cluster.kube_client).filter(namespace=cni_namespace).get_by_name(cni_app_name)
     app_version = app_cr.obj["status"]["version"]
+    wait_for_daemon_sets_to_run(
+        kube_cluster.kube_client,
+        ["linkerd-cni"],
+        cni_namespace,
+        timeout,
+    )
     assert app_version == cni_app_version
     logger.info(f"cni App CR shows installed appVersion {app_version}")
 
@@ -164,9 +173,6 @@ def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
     app_version = app_cr.obj["status"]["appVersion"]
     kube_cluster.kubectl("apply", filename="test-app-manifests.yaml", output_format="")
     logger.info("Installed additional manifest with app to be included in the mesh")
-
-    kube_cluster.kubectl("annotate --overwrite namespace kube-system linkerd.io/inject=disabled")
-    kube_cluster.kubectl("label --overwrite namespace kube-system config.linkerd.io/admission-webhooks=disabled")
 
     get_linkerd_cli(app_version)
 
