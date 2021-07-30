@@ -109,7 +109,10 @@ def linkerd_cni_app_cr(app_factory: AppFactoryFunc, pytestconfig: Config) -> Con
 # it can't manage the one created earlier apptestctl.
 # We're registering the same catalog here, just with different name to avoid name conflict.
 @pytest.fixture(scope="module")
-def linkerd_app_cr(app_factory: AppFactoryFunc, chart_version: str, linkerd_cni_app_cr: ConfiguredApp) -> ConfiguredApp:
+def linkerd_app_cr(app_factory: AppFactoryFunc, chart_version: str, linkerd_cni_app_cr: ConfiguredApp,
+                   pytestconfig: Config) -> ConfiguredApp:
+    suffix: str = pytestconfig.getoption("markexpr")
+    suffix = suffix.replace(" ", "-")
     res = app_factory(linkerd_app_name,
                       chart_version,
                       "chartmuseum-test-time",
