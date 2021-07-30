@@ -15,7 +15,7 @@ from pykube import HTTPClient
 from pytest_helm_charts.fixtures import Cluster
 from pytest_helm_charts.giantswarm_app_platform.app import AppFactoryFunc, ConfiguredApp
 from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR
-from pytest_helm_charts.utils import wait_for_deployments_to_run, wait_for_daemon_sets_to_run, ensure_namespace_exists
+from pytest_helm_charts.utils import wait_for_deployments_to_run, wait_for_daemon_sets_to_run
 
 logger = logging.getLogger(__name__)
 
@@ -84,19 +84,18 @@ def wait_for_all_linkerd_deployments_to_run(kube_client: HTTPClient, namespace: 
 
 
 @pytest.fixture(scope="module")
-def linkerd_cni_app_cr(kube_cluster: Cluster, app_factory: AppFactoryFunc,
-                       pytestconfig: Config) -> ConfiguredApp:
+def linkerd_cni_app_cr(app_factory: AppFactoryFunc, pytestconfig: Config) -> ConfiguredApp:
     # app platform is too slow to correctly delete AppCatalog between 'smoke' and 'functional' runs,
     # so to work-around we're adding test type to the name of the created AppCatalog
     suffix: str = pytestconfig.getoption("markexpr")
     suffix = suffix.replace(" ", "-")
-    ensure_namespace_exists(kube_cluster.kube_client, cni_namespace)
     res = app_factory(cni_app_name,
                       cni_app_version,
                       f"giantswarm-stable-{suffix}",
                       "https://giantswarm.github.io/giantswarm-catalog/",
                       timeout_sec=timeout,
                       namespace=cni_namespace,
+                      deployment_namespace=cni_namespace,
                       namespace_config_annotations={"linkerd.io/inject": "disabled"},
                       namespace_config_labels={
                           "linkerd.io/cni-resource": "true",
@@ -110,15 +109,14 @@ def linkerd_cni_app_cr(kube_cluster: Cluster, app_factory: AppFactoryFunc,
 # it can't manage the one created earlier apptestctl.
 # We're registering the same catalog here, just with different name to avoid name conflict.
 @pytest.fixture(scope="module")
-def linkerd_app_cr(kube_cluster: Cluster, app_factory: AppFactoryFunc, chart_version: str,
-                   linkerd_cni_app_cr: ConfiguredApp) -> ConfiguredApp:
-    ensure_namespace_exists(kube_cluster.kube_client, linkerd_namespace)
+def linkerd_app_cr(app_factory: AppFactoryFunc, chart_version: str, linkerd_cni_app_cr: ConfiguredApp) -> ConfiguredApp:
     res = app_factory(linkerd_app_name,
                       chart_version,
                       "chartmuseum-test-time",
                       "http://chartmuseum-chartmuseum:8080/charts/",
                       timeout_sec=timeout,
                       namespace=linkerd_namespace,
+                      deployment_namespace=linkerd_namespace,
                       config_values=load_yaml_from_path("test-values.yaml"),
                       namespace_config_annotations={"linkerd.io/inject": "disabled"},
                       namespace_config_labels={
@@ -148,6 +146,7 @@ def test_linkerd_cni_deployed(kube_cluster: Cluster, linkerd_cni_app_cr: AppCR):
     app_version = app_cr.obj["status"]["version"]
     wait_for_daemon_sets_to_run(
         kube_cluster.kube_client,
+        # this is the name of DaemonSet, not App
         ["linkerd-cni"],
         cni_namespace,
         timeout,
