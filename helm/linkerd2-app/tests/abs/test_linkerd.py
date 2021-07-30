@@ -115,7 +115,7 @@ def linkerd_app_cr(app_factory: AppFactoryFunc, chart_version: str, linkerd_cni_
     suffix = suffix.replace(" ", "-")
     res = app_factory(linkerd_app_name,
                       chart_version,
-                      "chartmuseum-test-time",
+                      f"chartmuseum-test-time-{suffix}",
                       "http://chartmuseum-chartmuseum:8080/charts/",
                       timeout_sec=timeout,
                       namespace=linkerd_namespace,
