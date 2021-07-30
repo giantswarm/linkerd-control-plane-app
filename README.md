@@ -118,7 +118,9 @@ linkerd viz dashboard
 
 ## Mesh your workloads
 
-After installation, linkerd looks for a `linkerd.io/inject: enabled` annotation on `Namespaces` or other workload resources. Adding this annotation to your workload namespaces will trigger automatic proxy container injection to your pods. More information on proxy injection can be found on the ["Automatic Proxy Injection" page](https://linkerd.io/2.10/features/proxy-injection/) in the upstream documentation.
+After installation, linkerd looks for a `linkerd.io/inject: enabled` annotation on `Namespaces` or other workload resources. Adding this annotation to your workload namespaces will trigger automatic proxy container injection to your pods. You can use the [`spec.namespaceConfig.annotations`](https://docs.giantswarm.io/app-platform/namespace-configuration/) field of your other apps `App` CR to automatically apply the required annotation.
+
+More information on proxy injection can be found on the ["Automatic Proxy Injection" page](https://linkerd.io/2.10/features/proxy-injection/) in the upstream documentation.
 
 **Attention**: Proxy containers are using `EmptyDir` volumes for storing ephemeral data, so all of your workload pods meshed by linkerd require a `PodSecurityPolicy` which allows use of `EmptyDir` volumes.
 
@@ -137,6 +139,8 @@ The `linkerd` namespace name is assumed in several parts of the chart, so we res
 ### Proxy containers fail to start
 
 Your workload must be able to create `EmptyDir` volumes, so you'll need to create a `PodSecurityPolicy` allowing the creation of `EmptyDir` volumes.
+
+Although not recommended, it is possible to edit the default `PodSecurityPolicy` named `restricted` to allow usage of`EmptyDir` volumes for all workloads without an own `PodSecurityPolicy`.
 
 ## Usage with `linkerd` cli
 
