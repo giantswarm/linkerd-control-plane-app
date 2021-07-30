@@ -23,7 +23,7 @@ timeout: int = 360
 cni_app_version = "0.4.0"
 linkerd_namespace = "linkerd"
 linkerd_app_name = "linkerd2-app"
-cni_namespace = "default"
+cni_namespace = "linkerd-cni"
 cni_app_name = "linkerd2-cni-app"
 test_app_namespace = "helloworld"
 
