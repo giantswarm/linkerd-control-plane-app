@@ -89,6 +89,7 @@ def linkerd_cni_app_cr(app_factory: AppFactoryFunc, pytestconfig: Config) -> Con
     # so to work-around we're adding test type to the name of the created AppCatalog
     suffix: str = pytestconfig.getoption("markexpr")
     suffix = suffix.replace(" ", "-")
+    ensure_namespace_exists(kube_cluster.kube_client, cni_namespace)
     res = app_factory(cni_app_name,
                       cni_app_version,
                       f"giantswarm-stable-{suffix}",
