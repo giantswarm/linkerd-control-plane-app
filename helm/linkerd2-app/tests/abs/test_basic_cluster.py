@@ -141,7 +141,7 @@ def test_api_working(kube_cluster: Cluster) -> None:
 @pytest.mark.smoke
 def test_linkerd_cni_deployed(kube_cluster: Cluster, linkerd_cni_app_cr: AppCR):
     """Install using the linkerd cni"""
-    app_cr = AppCR.objects(kube_cluster.kube_client).get_by_name(cni_app_name)
+    app_cr = AppCR.objects(kube_cluster.kube_client).filter(namespace=cni_namespace).get_by_name(cni_app_name)
     app_version = app_cr.obj["status"]["version"]
     assert app_version == cni_app_version
     logger.info(f"cni App CR shows installed appVersion {app_version}")
