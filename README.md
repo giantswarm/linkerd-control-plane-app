@@ -1,6 +1,6 @@
-[![CircleCI](https://circleci.com/gh/giantswarm/linkerd2-app.svg?style=shield)](https://circleci.com/gh/giantswarm/linkerd2-app)
-
 # linkerd2-app chart
+
+[![CircleCI](https://circleci.com/gh/giantswarm/linkerd2-app.svg?style=shield)](https://circleci.com/gh/giantswarm/linkerd2-app)
 
 Linkerd2 service mesh for Giant Swarm clusters. Based on the official linkerd2 helm charts with a few changes, required to deploy to Giant Swarm clusters.
 
@@ -15,7 +15,7 @@ Linkerd2 service mesh for Giant Swarm clusters. Based on the official linkerd2 h
 
 Obtain the `step` cli (we're using `step_linux_0.16.1_amd64.tar.gz` from [here](https://github.com/smallstep/cli/releases/tag/v0.16.1)) and execute the following commands. Take note of the `--not-after` flag. (8760h = 1 year)
 
-```
+```bash
 step certificate create root.linkerd.cluster.local ca.crt ca.key --profile root-ca --no-password --insecure --not-after=8760h
 step certificate create identity.linkerd.cluster.local issuer.crt issuer.key --profile intermediate-ca --not-after=8760h --no-password --insecure --ca ca.crt --ca-key ca.key
 expiry=$(openssl x509 -in issuer.crt -noout -enddate)
@@ -23,7 +23,7 @@ expiry_iso=$(date -Iseconds --utc --date "${expiry#notAfter=}")
 echo "${expiry_iso%+00:00}Z"
 ```
 
-- Finally construct your user secrets file like this:
+- Finally construct your user secrets file by filling this template and saving as `my-linkerd-certificates.yaml`:
 
 ```yaml
 identity:
@@ -38,14 +38,13 @@ identityTrustAnchorsPEM: |
   <contents of the ca.crt file>
 ```
 
-- Review the [default values.yaml file](helm/linkerd2-app/values.yaml) and change
-other defaults by specifying a [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled.
+- Download the [default values.yaml file](helm/linkerd2-app/values.yaml) and save it as `my-linkerd-values.yaml` to create a [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). Review the values in the file. With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled.
 
 ### Step 2: Deploy Linkerd
 
-We recommend deploying the app by applying an `App` CR (Custom Resource) onto your management cluster. You can use the [`kubectl gs`](https://docs.giantswarm.io/ui-api/kubectl-gs/) plugin to generate a valid `App` CR with command
+We recommend deploying the app by applying an `App` CR (Custom Resource) onto your management cluster. Use the [`kubectl gs`](https://docs.giantswarm.io/ui-api/kubectl-gs/) plugin to generate a valid `App` CR with command:
 
-```
+```bash
 kubectl gs template app \
   --catalog giantswarm \
   --name linkerd2-app \
@@ -55,7 +54,7 @@ kubectl gs template app \
   --user-configmap my-linkerd-values.yaml \
   --user-secret my-linkerd-certificates.yaml \
   --namespace-labels "linkerd.io/is-control-plane=true,config.linkerd.io/admission-webhooks=disabled,linkerd.io/control-plane-ns=linkerd" \
-  --namespace-annotations "linkerd.io/inject=disabled"
+  --namespace-annotations "linkerd.io/inject=disabled > linkerd-manifest.yaml"
 ```
 
 The final `App` CR should look like this:
@@ -88,10 +87,31 @@ spec:
       name: linkerd2-app-userconfig-<your-cluster-id>
       namespace: <your-cluster-id>
   version: 0.6.0
-
 ```
 
-When installing via the Giant Swarm web UI, you'll need to apply the above labels and annotations manually.
+Please note, that for security reasons Giant Swarm by default forbids the usage of
+`emptyDir` volumes as storage for pods. Linkerd needs this functionality to deploy
+linkerd itself, but also to run any deployment that is going to be included in
+the service mesh. Enabling `emptyDir` volumes poses a risk that a pod will create
+such big `emptyDir` that the underlying cluster node will run out of disk space.
+If you're OK with this potential issue, the easiest way to allow for `emptyDir`
+for all the deployments is to edit the default PSP of your cluster by running the
+command:
+
+```bash
+kubectl edit psp restricted
+```
+
+then finding the `spec.volumes` list and appending `emptyDir` value to the list. Then, write the file and exit your editor.
+
+To finally deploy linkerd, run
+
+```bash
+kubectl apply -f linkerd-manifest.yaml
+```
+
+When installing via the Giant Swarm web UI, you'll need to apply the labels
+and annotations listed in the `namespaceConfig` section above manually.
 
 ### Step 4: After deployment
 
@@ -104,7 +124,11 @@ kubectl label namespace kube-system config.linkerd.io/admission-webhooks=disable
 
 - Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.10.2).
 
-- We strongly recommend installing the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) by executing
+- We strongly recommend installing the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) command.
+
+Unfortunately, the template this generates uses some user IDs that are by default
+not permitted by the default cluster's PSP. To allow for that in the default PSP,
+edit it and change the value of `spec.runAsUser.ranges[0].min` to `472`.
 
 ```bash
 linkerd viz install | kubectl apply -f -
@@ -112,7 +136,7 @@ linkerd viz install | kubectl apply -f -
 
 After installation, you can open the dashboard by executing
 
-```
+```bash
 linkerd viz dashboard
 ```
 
@@ -148,4 +172,4 @@ You can use the `linkerd` cli as usual with this app as we're using the default 
 
 ## Credit
 
-* https://linkerd.io/2.10/tasks/install-helm/
+- <https://linkerd.io/2.10/tasks/install-helm/>
