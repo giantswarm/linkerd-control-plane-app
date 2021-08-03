@@ -90,8 +90,8 @@ spec:
 ```
 
 Please note, that for security reasons Giant Swarm by default forbids the usage of
-`emptyDir` volumes as storage for pods. Linkerd needs this functionality to deploy
-linkerd itself, but also to run any deployment that is going to be included in
+`emptyDir` volumes as storage for pods. Linkerd needs this functionality to deploy the
+linkerd control plane itself, but also to run the proxy containers in any deployment that is going to be included in
 the service mesh. Enabling `emptyDir` volumes poses a risk that a pod will create
 such big `emptyDir` that the underlying cluster node will run out of disk space.
 If you're OK with this potential issue, the easiest way to allow for `emptyDir`
