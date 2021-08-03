@@ -1,0 +1,19 @@
+#skip-steps: test_all
+chart-dir: helm/linkerd2-app
+replace-chart-version-with-git: true
+replace-app-version-with-git: false
+generate-metadata: true
+catalog-base-url: https://giantswarm.github.io/giantswarm-catalog/
+
+app-tests-skip-app-deploy: true
+
+#smoke-tests-cluster-type: external
+#external-cluster-kubeconfig-path: kubebox-kubeconfig
+#external-cluster-type: kind
+#external-cluster-version: v1.21.1
+
+smoke-tests-cluster-config-file: helm/linkerd2-app/tests/kind_config.yaml
+smoke-tests-cluster-type: kind
+skip-steps: test_functional
+  # functional-tests-cluster-config-file: helm/linkerd2-app/tests/kind_config.yaml
+  # functional-tests-cluster-type: kind
