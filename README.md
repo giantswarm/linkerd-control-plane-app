@@ -54,7 +54,7 @@ kubectl gs template app \
   --user-configmap my-linkerd-values.yaml \
   --user-secret my-linkerd-certificates.yaml \
   --namespace-labels "linkerd.io/is-control-plane=true,config.linkerd.io/admission-webhooks=disabled,linkerd.io/control-plane-ns=linkerd" \
-  --namespace-annotations "linkerd.io/inject=disabled > linkerd-manifest.yaml"
+  --namespace-annotations "linkerd.io/inject=disabled" > linkerd-manifest.yaml
 ```
 
 The final `App` CR should look like this:
