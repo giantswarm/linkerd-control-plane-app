@@ -104,7 +104,7 @@ kubectl edit psp restricted
 
 then finding the `spec.volumes` list and appending `emptyDir` value to the list. Then, write the file and exit your editor.
 
-To finally deploy linkerd, run
+Now you're ready to deploy linkerd - run the following command:
 
 ```bash
 kubectl apply -f linkerd-manifest.yaml
