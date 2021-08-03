@@ -90,8 +90,7 @@ spec:
 ```
 
 Please note, that for security reasons Giant Swarm by default forbids the usage of
-`emptyDir` volumes as storage for pods. Linkerd needs this functionality to deploy the
-linkerd control plane itself, but also to run the proxy containers in any deployment that is going to be included in
+`emptyDir` volumes as storage for pods. Linkerd needs this functionality to run the proxy containers in any deployment that is going to be included in
 the service mesh. Enabling `emptyDir` volumes poses a risk that a pod will create
 such big `emptyDir` that the underlying cluster node will run out of disk space.
 If you're OK with this potential issue, the easiest way to allow for `emptyDir`
@@ -99,10 +98,8 @@ for all the deployments is to edit the default PSP of your cluster by running th
 command:
 
 ```bash
-kubectl edit psp restricted
+kubectl patch psp restricted --type='json' -p='[{"op": "add", "path": "/spec/volumes/-", "value": "emptyDir"}]'
 ```
-
-then finding the `spec.volumes` list and appending `emptyDir` value to the list. Then, write the file and exit your editor.
 
 Now you're ready to deploy linkerd - run the following command:
 
@@ -127,8 +124,15 @@ kubectl label namespace kube-system config.linkerd.io/admission-webhooks=disable
 - We strongly recommend installing the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) command.
 
 Unfortunately, the template this generates uses some user IDs that are by default
-not permitted by the default cluster's PSP. To allow for that in the default PSP,
-edit it and change the value of `spec.runAsUser.ranges[0].min` to `472`.
+not permitted by the default cluster's PSP. It also needs to permit the usage
+of `emptyDir` volumes. To allow for that in the default cluster's PSP, run:
+
+```bash
+kubectl patch psp restricted --type='json' -p='[{"op": "add", "path": "/spec/volumes/-", "value": "emptyDir"}]' # if you haven't done this before
+kubectl patch psp restricted --type='json' -p='[{"op": "add", "path": "/spec/volumes/-", "value": "emptyDir"},{"op": "replace", "path":"/spec/runAsUser/ranges/0/min", "value": 472}]' # grafana from 'linkerd viz' uses UID 472
+```
+
+Now, you can deploy the viz extensions:
 
 ```bash
 linkerd viz install | kubectl apply -f -
