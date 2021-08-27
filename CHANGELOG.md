@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Specifically ignore the control and admin ports when intialising the proxies ([#48](https://github.com/giantswarm/linkerd2-app/pull/48))
+
 ## [0.6.0] - 2021-08-03
 
 ### Changed
