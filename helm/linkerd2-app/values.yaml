@@ -117,7 +117,7 @@ proxy:
 # proxy-init configuration
 proxyInit:
   # -- Default set of inbound ports to skip via itpables
-  ignoreInboundPorts: ""
+  ignoreInboundPorts: "4190,4191"
   # -- Default set of outbound ports to skip via itpables
   ignoreOutboundPorts: ""
   image:
