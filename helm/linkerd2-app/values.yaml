@@ -149,7 +149,7 @@ imagePullSecrets: []
 # - name: my-private-docker-registry-login-secret
 
 # -- Allow proxies to perform transparent HTTP/2 upgrading
-enableH2Upgrade: true
+enableH2Upgrade: false
 
 # -- Omit the `sideEffects` flag in the webhook manifests
 omitWebhookSideEffects: false

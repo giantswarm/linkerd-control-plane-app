@@ -141,7 +141,7 @@ Kubernetes: `>=1.16.0-0`
 | debugContainer.image.version | string | linkerdVersion | Tag for the debug container Docker image |
 | disableHeartBeat | bool | `false` | Set to true to not start the heartbeat cronjob |
 | enableEndpointSlices | bool | `false` | enables the use of EndpointSlice informers for the destination service; enableEndpointSlices should be set to true only if EndpointSlice K8s feature gate is on; the feature is still experimental. |
-| enableH2Upgrade | bool | `true` | Allow proxies to perform transparent HTTP/2 upgrading |
+| enableH2Upgrade | bool | `false` | Allow proxies to perform transparent HTTP/2 upgrading |
 | identity.issuer.clockSkewAllowance | string | `"20s"` | Amount of time to allow for clock skew within a Linkerd cluster |
 | identity.issuer.crtExpiry | string | `nil` | Expiration timestamp for the issuer certificate. It must be provided during install. Must match the expiry date in crtPEM |
 | identity.issuer.issuanceLifetime | string | `"24h0m0s"` | Amount of time for which the Identity issuer should certify identity |

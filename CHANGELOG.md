@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Disable HTTP/2 upgrade for proxies in the default values as this caused some issues ([#53](https://github.com/giantswarm/linkerd2-app/pull/53))
+
 ## [0.6.1] - 2021-08-27
 
 ### Changed
