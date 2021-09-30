@@ -23,6 +23,12 @@ expiry_iso=$(date -Iseconds --utc --date "${expiry#notAfter=}")
 echo "${expiry_iso%+00:00}Z"
 ```
 
+Note that in macOS systems, `date` command use different arguments. Install `coreutils` package with [`brew`](https://brew.sh/) (`brew install coreutils`) to download a GNU date replacement named `gdate`. `expiry_iso` can now be obtained with the command:
+
+```bash
+expiry_iso=$(gdate -Iseconds --utc --date "${expiry#notAfter=}")
+```
+
 - Finally construct your user secrets file by filling this template and saving as `my-linkerd-certificates.yaml`:
 
 ```yaml
