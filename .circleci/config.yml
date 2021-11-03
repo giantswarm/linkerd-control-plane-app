@@ -26,4 +26,4 @@ workflows:
               ignore:
                 - master
           requires:
-            - p"package and push linkerd2 chart"
+            - "package and push linkerd2 chart"
