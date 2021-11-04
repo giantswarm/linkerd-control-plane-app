@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  architect: giantswarm/architect@4.3.0
+  architect: giantswarm/architect@4.7.0
 
 workflows:
   package-and-push-chart-on-tag:
@@ -12,18 +12,18 @@ workflows:
           app_catalog: "giantswarm-catalog"
           app_catalog_test: "giantswarm-test-catalog"
           chart: "linkerd2-app"
+          persist_chart_archive: true
           # Trigger job on git tag.
           filters:
             tags:
               only: /^v.*/
 
-      - architect/run-tests-with-abs:
-          chart_dir: ./helm/linkerd2-app
+      - architect/run-tests-with-ats:
           name: execute chart tests
           filters:
             # Do not trigger the job on merge to master.
             branches:
               ignore:
                 - master
-          # requires:
-          #   - package and push linkerd2-app chart
+          requires:
+            - "package and push linkerd2 chart"
