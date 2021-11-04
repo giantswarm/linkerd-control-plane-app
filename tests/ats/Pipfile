@@ -4,12 +4,13 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-pytest-helm-charts = ">=0.5.0"
-pytest = "~=6.2.4"
-pykube-ng = "~=21.3.0"
+#pytest-helm-charts = ">=0.6.0"
+pytest-helm-charts = {git = "https://github.com/giantswarm/pytest-helm-charts.git", editable = false, ref = "ensure-catalog-namespace"}
+pytest = ">=6.2.5"
+pykube-ng = ">=21.10.0"
 pyyaml = "~=5.4.1"
-pytest-rerunfailures = "~=10.0"
+pytest-rerunfailures = ">=10.2"
 requests = "~=2.25.1"
 
 [requires]
-python_version = "3"
+python_version = "3.9"
