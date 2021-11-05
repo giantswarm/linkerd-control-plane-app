@@ -5,7 +5,7 @@ verify_ssl = true
 
 [packages]
 #pytest-helm-charts = ">=0.6.0"
-pytest-helm-charts = {git = "https://github.com/giantswarm/pytest-helm-charts.git", editable = false, ref = "ensure-catalog-namespace"}
+pytest-helm-charts = {git = "https://github.com/giantswarm/pytest-helm-charts.git", editable = false, ref = "add-wait-for-namespace"}
 pytest = ">=6.2.5"
 pykube-ng = ">=21.10.0"
 pyyaml = "~=5.4.1"
