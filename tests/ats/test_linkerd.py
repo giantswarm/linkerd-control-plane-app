@@ -111,7 +111,7 @@ def linkerd_app_cr(app_factory: AppFactoryFunc, chart_version: str, linkerd_cni_
     res = app_factory(linkerd_app_name,
                       chart_version,
                       f"chartmuseum-test-time",
-                      cni_namespace,
+                      linkerd_namespace,
                       "http://chartmuseum-chartmuseum:8080/charts/",
                       timeout_sec=timeout,
                       namespace=linkerd_namespace,
