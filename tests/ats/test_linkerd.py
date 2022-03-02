@@ -11,10 +11,10 @@ import pytest
 import requests
 import yaml
 from pykube import HTTPClient
-from pytest_helm_charts.fixtures import Cluster
-from pytest_helm_charts.giantswarm_app_platform.app import AppFactoryFunc, ConfiguredApp
-from pytest_helm_charts.giantswarm_app_platform.custom_resources import AppCR
-from pytest_helm_charts.utils import wait_for_deployments_to_run, wait_for_daemon_sets_to_run
+from pytest_helm_charts.clusters import Cluster
+from pytest_helm_charts.giantswarm_app_platform.app import AppCR, AppFactoryFunc, ConfiguredApp
+from pytest_helm_charts.k8s.deployment import wait_for_deployments_to_run
+from pytest_helm_charts.k8s.daemon_set import wait_for_daemon_sets_to_run
 
 logger = logging.getLogger(__name__)
 
