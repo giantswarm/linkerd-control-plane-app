@@ -15,6 +15,7 @@ from pytest_helm_charts.clusters import Cluster
 from pytest_helm_charts.giantswarm_app_platform.app import AppCR, AppFactoryFunc, ConfiguredApp
 from pytest_helm_charts.k8s.deployment import wait_for_deployments_to_run
 from pytest_helm_charts.k8s.daemon_set import wait_for_daemon_sets_to_run
+from pytest_helm_charts.k8s.namespace import ensure_namespace_exists
 
 logger = logging.getLogger(__name__)
 
@@ -83,9 +84,12 @@ def wait_for_all_linkerd_deployments_to_run(kube_client: HTTPClient, namespace: 
 
 
 @pytest.fixture(scope="module")
-def linkerd_cni_app_cr(app_factory: AppFactoryFunc) -> ConfiguredApp:
+def linkerd_cni_app_cr(kube_cluster: Cluster, app_factory: AppFactoryFunc) -> ConfiguredApp:
     # app platform is too slow to correctly delete AppCatalog between 'smoke' and 'functional' runs,
     # so to work-around we're adding test type to the name of the created AppCatalog
+    # FIXME: this should be provided by the pytest-helm-chart lib, will be fixed there
+    #  after that, it can be removed here
+    ensure_namespace_exists(kube_cluster.kube_client, cni_namespace)
     res = app_factory(cni_app_name,
                       cni_app_version,
                       f"giantswarm-stable",
@@ -164,6 +168,9 @@ def test_linkerd_deployed(kube_cluster: Cluster, linkerd_app_cr: AppCR, chart_ve
     logger.info(f"Installed App CR shows installed appVersion {app_version}")
 
 
+# FIXME: this should be an upgrade and functional test, but this needs some fixes from
+#  pytest-helm-charts lib - otherwise there's a reace condition between deleting the app and
+#  starting it again
 @pytest.mark.smoke
 def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
     wait_for_all_linkerd_deployments_to_run(kube_cluster.kube_client, linkerd_namespace, timeout)
