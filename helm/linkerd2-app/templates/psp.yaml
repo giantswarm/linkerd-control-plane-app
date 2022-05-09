@@ -1,3 +1,4 @@
+{{ if .Values.enablePSP -}}
 ---
 ###
 ### Control Plane PSP
@@ -84,9 +85,6 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 subjects:
 - kind: ServiceAccount
-  name: linkerd-controller
-  namespace: {{.Values.namespace}}
-- kind: ServiceAccount
   name: linkerd-destination
   namespace: {{.Values.namespace}}
 {{ if not .Values.disableHeartBeat -}}
@@ -103,3 +101,4 @@ subjects:
 - kind: ServiceAccount
   name: linkerd-sp-validator
   namespace: {{.Values.namespace}}
+{{ end -}}
