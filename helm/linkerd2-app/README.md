@@ -1,13 +1,13 @@
-# linkerd2
+# linkerd2-app
 
 Linkerd gives you observability, reliability, and security
 for your microservices — with no code change required.
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square)
 
-![AppVersion: edge-XX.X.X](https://img.shields.io/badge/AppVersion-edge--XX.X.X-informational?style=flat-square)
+![AppVersion: stable-2.11.2](https://img.shields.io/badge/AppVersion-stable--2.11.2-informational?style=flat-square)
 
-**Homepage:** <https://linkerd.io>
+**Homepage:** <https://github.com/giantswarm/linkerd2-app>
 
 ## Quickstart and documentation
 
@@ -125,21 +125,27 @@ Kubernetes: `>=1.17.0-0`
 |-----|------|---------|-------------|
 | clusterDomain | string | `"cluster.local"` | Kubernetes DNS Domain name to use |
 | clusterNetworks | string | `"10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16"` | The cluster networks for which service discovery is performed. This should include the pod and service networks, but need not include the node network. By default, all private networks are specified so that resolution works in typical Kubernetes environments. |
-| cniEnabled | bool | `false` | enabling this omits the NET_ADMIN capability in the PSP and the proxy-init container when injecting the proxy; requires the linkerd-cni plugin to already be installed |
+| cniEnabled | bool | `true` | enabling this omits the NET_ADMIN capability in the PSP and the proxy-init container when injecting the proxy; requires the linkerd-cni plugin to already be installed |
 | controlPlaneTracing | bool | `false` | enables control plane tracing |
 | controlPlaneTracingNamespace | string | `"linkerd-jaeger"` | namespace to send control plane traces to |
-| controllerImage | string | `"cr.l5d.io/linkerd/controller"` | Docker image for the destination and identity components |
+| controllerImage | string | `"quay.io/giantswarm/linkerd2-controller"` | Docker image for the controller and identity components |
 | controllerLogFormat | string | `"plain"` | Log format for the control plane components |
 | controllerLogLevel | string | `"info"` | Log level for the control plane components |
-| controllerReplicas | int | `1` | Number of replicas for each control plane pod |
+| controllerReplicas | int | `3` | Number of replicas for each control plane pod |
+| controllerResources.cpu.limit | string | `""` |  |
+| controllerResources.cpu.request | string | `"100m"` |  |
+| controllerResources.memory.limit | string | `"250Mi"` |  |
+| controllerResources.memory.request | string | `"50Mi"` |  |
 | controllerUID | int | `2103` | User ID for the control plane components |
-| debugContainer.image.name | string | `"cr.l5d.io/linkerd/debug"` | Docker image for the debug container |
+| debugContainer.image.name | string | `"quay.io/giantswarm/linkerd2-debug"` | Docker image for the debug container |
 | debugContainer.image.pullPolicy | string | imagePullPolicy | Pull policy for the debug container Docker image |
 | debugContainer.image.version | string | linkerdVersion | Tag for the debug container Docker image |
+| destinationResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | CPU and Memory resources required by destination (see `proxy.resources` for sub-fields) |
 | disableHeartBeat | bool | `false` | Set to true to not start the heartbeat cronjob |
 | enableEndpointSlices | bool | `false` | enables the use of EndpointSlice informers for the destination service; enableEndpointSlices should be set to true only if EndpointSlice K8s feature gate is on; the feature is still experimental. |
 | enableH2Upgrade | bool | `true` | Allow proxies to perform transparent HTTP/2 upgrading |
-| enablePSP | bool | `false` | Add a PSP resource and bind it to the control plane ServiceAccounts. Note PSP has been deprecated since k8s v1.21 |
+| enablePSP | bool | `true` | Add a PSP resource and bind it to the control plane ServiceAccounts. Note PSP has been deprecated since k8s v1.21 |
+| enablePodAntiAffinity | bool | `true` |  |
 | enablePprof | bool | `false` | enables the use of pprof endpoints on control plane component's admin servers |
 | identity.externalCA | bool | `false` | If the linkerd-identity-trust-roots ConfigMap has already been created |
 | identity.issuer.clockSkewAllowance | string | `"20s"` | Amount of time to allow for clock skew within a Linkerd cluster |
@@ -148,18 +154,22 @@ Kubernetes: `>=1.17.0-0`
 | identity.issuer.tls | object | `{"crtPEM":"","keyPEM":""}` | Which scheme is used for the identity issuer secret format |
 | identity.issuer.tls.crtPEM | string | `""` | Issuer certificate (ECDSA). It must be provided during install. |
 | identity.issuer.tls.keyPEM | string | `""` | Key for the issuer certificate (ECDSA). It must be provided during install |
+| identityResources.cpu.limit | string | `""` |  |
+| identityResources.cpu.request | string | `"100m"` |  |
+| identityResources.memory.limit | string | `"250Mi"` |  |
+| identityResources.memory.request | string | `"10Mi"` |  |
 | identityTrustAnchorsPEM | string | `""` | Trust root certificate (ECDSA). It must be provided during install. |
 | identityTrustDomain | string | clusterDomain | Trust domain used for identity |
 | imagePullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | imagePullSecrets | list | `[]` | For Private docker registries, authentication is needed.  Registry secrets are applied to the respective service accounts |
-| installNamespace | bool | `true` | Set to false when installing Linkerd in a custom namespace. See the [Linkerd documentation](https://linkerd.io/2/tasks/install-helm#customizing-the-namespace) for more information. |
-| linkerdVersion | string | `"linkerdVersionValue"` | control plane version. See Proxy section for proxy version |
+| installNamespace | bool | `false` | Set to false when installing Linkerd in a custom namespace. See the [Linkerd documentation](https://linkerd.io/2/tasks/install-helmcustomizing-the-namespace) for more information. |
+| linkerdVersion | string | `"stable-2.11.2"` | control plane version. See Proxy section for proxy version |
 | namespace | string | `"linkerd"` | Control plane namespace |
 | nodeSelector | object | `{"kubernetes.io/os":"linux"}` | NodeSelector section, See the [K8S documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) for more information |
 | podAnnotations | object | `{}` | Additional annotations to add to all pods |
 | podLabels | object | `{}` | Additional labels to add to all pods |
 | policyController.defaultAllowPolicy | string | "all-unauthenticated" | The default allow policy to use when no `Server` selects a pod.  One of: "all-authenticated", "all-unauthenticated", "cluster-authenticated", "cluster-unauthenticated", "deny" |
-| policyController.image.name | string | `"cr.l5d.io/linkerd/policy-controller"` | Docker image for the proxy |
+| policyController.image.name | string | `"quay.io/giantswarm/linkerd2-policy-controller"` | Docker image for the proxy |
 | policyController.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy container Docker image |
 | policyController.image.version | string | linkerdVersion | Tag for the proxy container Docker image |
 | policyController.logLevel | string | `"linkerd=info,warn"` | Log level for the policy controller |
@@ -178,10 +188,10 @@ Kubernetes: `>=1.17.0-0`
 | profileValidator.externalSecret | bool | `false` | Do not create a secret resource for the profileValidator webhook. If this is set to `true`, the value `profileValidator.caBundle` must be set (see below). |
 | profileValidator.keyPEM | string | `""` | Certificate key for the service profile validator. If not provided then Helm will generate one. |
 | profileValidator.namespaceSelector | object | `{"matchExpressions":[{"key":"config.linkerd.io/admission-webhooks","operator":"NotIn","values":["disabled"]}]}` | Namespace selector used by admission webhook |
-| proxy.await | bool | `true` | If set, the application container will not start until the proxy is ready |
+| proxy.await | bool | `true` |  |
 | proxy.cores | int | `0` | The `cpu.limit` and `cores` should be kept in sync. The value of `cores` must be an integer and should typically be set by rounding up from the limit. E.g. if cpu.limit is '1500m', cores should be 2. |
 | proxy.enableExternalProfiles | bool | `false` | Enable service profiles for non-Kubernetes services |
-| proxy.image.name | string | `"cr.l5d.io/linkerd/proxy"` | Docker image for the proxy |
+| proxy.image.name | string | `"quay.io/giantswarm/linkerd2-proxy"` | Docker image for the proxy |
 | proxy.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy container Docker image |
 | proxy.image.version | string | linkerdVersion | Tag for the proxy container Docker image |
 | proxy.inboundConnectTimeout | string | `"100ms"` | Maximum time allowed for the proxy to establish an inbound TCP connection |
@@ -195,15 +205,15 @@ Kubernetes: `>=1.17.0-0`
 | proxy.ports.outbound | int | `4140` | Outbound port for the proxy container |
 | proxy.requireIdentityOnInboundPorts | string | `""` |  |
 | proxy.resources.cpu.limit | string | `""` | Maximum amount of CPU units that the proxy can use |
-| proxy.resources.cpu.request | string | `""` | Amount of CPU units that the proxy requests |
-| proxy.resources.memory.limit | string | `""` | Maximum amount of memory that the proxy can use |
-| proxy.resources.memory.request | string | `""` | Maximum amount of memory that the proxy requests |
+| proxy.resources.cpu.request | string | `"100m"` | Amount of CPU units that the proxy requests |
+| proxy.resources.memory.limit | string | `"250Mi"` | Maximum amount of memory that the proxy can use |
+| proxy.resources.memory.request | string | `"20Mi"` | Maximum amount of memory that the proxy requests |
 | proxy.uid | int | `2102` | User id under which the proxy runs |
 | proxy.waitBeforeExitSeconds | int | `0` | If set the proxy sidecar will stay alive for at least the given period before receiving SIGTERM signal from Kubernetes but no longer than pod's `terminationGracePeriodSeconds`. See [Lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks) for more info on container lifecycle hooks. |
 | proxyInit.closeWaitTimeoutSecs | int | `0` |  |
-| proxyInit.ignoreInboundPorts | string | `"4567,4568"` | Default set of inbound ports to skip via iptables - Galera (4567,4568) |
-| proxyInit.ignoreOutboundPorts | string | `"4567,4568"` | Default set of outbound ports to skip via iptables - Galera (4567,4568) |
-| proxyInit.image.name | string | `"cr.l5d.io/linkerd/proxy-init"` | Docker image for the proxy-init container |
+| proxyInit.ignoreInboundPorts | string | `"4190,4191,4567,4568"` | Default set of inbound ports to skip via iptables - linkerd (4190,4191) - Galera (4567,4568) |
+| proxyInit.ignoreOutboundPorts | string | `"4190,4191,4567,4568"` | Default set of outbound ports to skip via iptables - linkerd (4190,4191) - Galera (4567,4568) |
+| proxyInit.image.name | string | `"quay.io/giantswarm/linkerd2-proxy-init"` | Docker image for the proxy-init container |
 | proxyInit.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy-init container Docker image |
 | proxyInit.image.version | string | `"v1.5.3"` | Tag for the proxy-init container Docker image |
 | proxyInit.logFormat | string | plain | Log format (`plain` or `json`) for the proxy-init |
@@ -221,7 +231,11 @@ Kubernetes: `>=1.17.0-0`
 | proxyInjector.externalSecret | bool | `false` | Do not create a secret resource for the profileValidator webhook. If this is set to `true`, the value `proxyInjector.caBundle` must be set (see below) |
 | proxyInjector.keyPEM | string | `""` | Certificate key for the proxy injector. If not provided then Helm will generate one. |
 | proxyInjector.namespaceSelector | object | `{"matchExpressions":[{"key":"config.linkerd.io/admission-webhooks","operator":"NotIn","values":["disabled"]}]}` | Namespace selector used by admission webhook. If not set defaults to all namespaces without the annotation config.linkerd.io/admission-webhooks=disabled |
-| webhookFailurePolicy | string | `"Ignore"` | Failure policy for the proxy injector |
+| proxyInjectorResources.cpu.limit | string | `""` |  |
+| proxyInjectorResources.cpu.request | string | `"100m"` |  |
+| proxyInjectorResources.memory.limit | string | `"250Mi"` |  |
+| proxyInjectorResources.memory.request | string | `"50Mi"` |  |
+| webhookFailurePolicy | string | `"Fail"` | Failure policy for the proxy injector |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.4.0](https://github.com/norwoodj/helm-docs/releases/v1.4.0)
+Autogenerated from chart metadata using [helm-docs v1.9.1](https://github.com/norwoodj/helm-docs/releases/v1.9.1)

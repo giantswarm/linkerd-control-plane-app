@@ -30,7 +30,7 @@ controlPlaneTracing: false
 # -- namespace to send control plane traces to
 controlPlaneTracingNamespace: linkerd-jaeger
 # -- control plane version. See Proxy section for proxy version
-linkerdVersion: stable-2.10.2
+linkerdVersion: stable-2.11.2
 # -- Control plane namespace
 namespace: linkerd
 # -- enables the use of EndpointSlice informers for the destination service;
@@ -59,7 +59,7 @@ policyController:
   # image -- Docker image for the policy controller
   image:
     # -- Docker image for the proxy
-    name: cr.l5d.io/linkerd/policy-controller
+    name: quay.io/giantswarm/linkerd2-policy-controller
     # -- Pull policy for the proxy container Docker image
     # @default -- imagePullPolicy
     pullPolicy: ""
@@ -212,7 +212,7 @@ enableH2Upgrade: true
 
 # -- Add a PSP resource and bind it to the control plane ServiceAccounts. Note
 # PSP has been deprecated since k8s v1.21
-enablePSP: false
+enablePSP: true
 
 # -- Failure policy for the proxy injector
 webhookFailurePolicy: Fail
