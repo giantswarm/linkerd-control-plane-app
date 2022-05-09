@@ -54,6 +54,7 @@ metadata:
     app.kubernetes.io/version: {{default .Values.linkerdVersion .Values.controllerImageVersion}}
     linkerd.io/control-plane-component: controller
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    giantswarm.io/monitoring_basic_sli: "true"
   name: linkerd-controller
   namespace: {{.Values.namespace}}
 spec:
@@ -121,6 +122,7 @@ spec:
         {{- end }}
         securityContext:
           runAsUser: {{.Values.controllerUID}}
+          readOnlyRootFilesystem: true
       {{- if not (empty .Values.publicAPIProxyResources) }}
       {{- $r := merge .Values.publicAPIProxyResources .Values.proxy.resources }}
       {{- $_ := set $tree.Values.proxy "resources" $r }}

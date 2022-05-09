@@ -1,20 +1,24 @@
 apiVersion: "v1"
-# this version will be updated by the CI before publishing the Helm tarball
-appVersion: edge-XX.X.X
+appVersion: stable-2.10.2
 description: |
   Linkerd gives you observability, reliability, and security
   for your microservices — with no code change required.
-home: https://linkerd.io
+home: https://github.com/giantswarm/linkerd2-app
+icon: https://s.giantswarm.io/app-icons/linkerd2/1/light.svg
 keywords:
 - service-mesh
-kubeVersion: ">=1.16.0-0"
-name: "linkerd2"
+kubeVersion: '>=1.16.0-0'
+maintainers:
+- email: cncf-linkerd-dev@lists.cncf.io
+  name: Linkerd authors
+  url: https://linkerd.io/
+name: linkerd2-app
 sources:
 - https://github.com/linkerd/linkerd2/
-# this version will be updated by the CI before publishing the Helm tarball
-version: 0.1.0
-icon: https://linkerd.io/images/logo-only-200h.png
-maintainers:
-  - name: Linkerd authors
-    email: cncf-linkerd-dev@lists.cncf.io
-    url: https://linkerd.io/
+- https://linkerd.io
+version: 0.6.0
+restrictions:
+  clusterSingleton: true
+  fixedNamespace: linkerd
+annotations:
+  application.giantswarm.io/team: team-cabbage

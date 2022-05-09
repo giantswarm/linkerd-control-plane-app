@@ -60,4 +60,5 @@ spec:
             {{- end }}
             securityContext:
               runAsUser: {{.Values.controllerUID}}
+              readOnlyRootFilesystem: true
 {{- end }}
