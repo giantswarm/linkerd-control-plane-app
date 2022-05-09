@@ -296,6 +296,7 @@ spec:
         {{- end }}
         securityContext:
           runAsUser: {{.Values.controllerUID}}
+          readOnlyRootFilesystem: true
         volumeMounts:
         - mountPath: /var/run/linkerd/tls
           name: policy-tls
