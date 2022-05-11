@@ -125,7 +125,7 @@ kubectl annotate namespace kube-system linkerd.io/inject=disabled
 kubectl label namespace kube-system config.linkerd.io/admission-webhooks=disabled
 ```
 
-- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.10.2).
+- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.2).
 
 - We strongly recommend installing the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) command.
 
@@ -178,7 +178,7 @@ Although not recommended, it is possible to edit the default `PodSecurityPolicy`
 
 ## Usage with `linkerd` cli
 
-You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.10.2).
+You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.2).
 
 ## Credit
 
