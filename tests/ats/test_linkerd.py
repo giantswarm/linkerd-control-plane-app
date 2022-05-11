@@ -195,7 +195,6 @@ def test_linkerd_cni_deployed(kube_cluster: Cluster, linkerd_cni_app_cr: AppCR):
 
 
 @pytest.mark.smoke
-@pytest.mark.upgrade
 def test_linkerd_deployed(
     kube_cluster: Cluster, linkerd_app_cr: AppCR, chart_version: str
 ):
@@ -217,7 +216,6 @@ def test_linkerd_deployed(
 #  pytest-helm-charts lib - otherwise there's a reace condition between deleting the app and
 #  starting it again
 @pytest.mark.smoke
-@pytest.mark.upgrade
 def test_linkerd_cli_check_passes(kube_cluster: Cluster, linkerd_app_cr: AppCR):
     wait_for_all_linkerd_deployments_to_run(
         kube_cluster.kube_client, linkerd_namespace, timeout

@@ -2,8 +2,4 @@ app-tests-skip-app-deploy: true
 
 smoke-tests-cluster-config-file: tests/kind_config.yaml
 smoke-tests-cluster-type: kind
-skip-steps: [functional]
-
-upgrade-tests-cluster-type: kind
-upgrade-tests-cluster-config-file: tests/kind_config.yaml
-upgrade-tests-app-catalog-url: https://giantswarm.github.io/giantswarm-catalog
+skip-steps: [functional, upgrade]
