@@ -11,22 +11,13 @@ Linkerd2 service mesh for Giant Swarm clusters. Based on the official linkerd2 h
 ### Step 1: Pre-installation and Configuration
 
 - Install the linkerd CNI plugin by installing [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app) on your cluster. Be sure to review the instructions for the CNI plugin.
-- A successful install will require you to generate a trust anchor and issuer certificate. The following steps loosely follow [the official instructions](https://linkerd.io/2.10/tasks/generate-certificates/).
+- A successful install will require you to generate a trust anchor and issuer certificate. The following steps loosely follow [the official instructions](https://linkerd.io/2.11/tasks/generate-certificates/).
 
-Obtain the `step` cli (we're using `step_linux_0.16.1_amd64.tar.gz` from [here](https://github.com/smallstep/cli/releases/tag/v0.16.1)) and execute the following commands. Take note of the `--not-after` flag. (8760h = 1 year)
+Obtain the `step` cli (we're using `step_linux_0.19.0_amd64.tar.gz` from [here](https://github.com/smallstep/cli/releases/tag/v0.19.0)) and execute the following commands. Take note of the `--not-after` flag. (8760h = 1 year)
 
 ```bash
 step certificate create root.linkerd.cluster.local ca.crt ca.key --profile root-ca --no-password --insecure --not-after=8760h
 step certificate create identity.linkerd.cluster.local issuer.crt issuer.key --profile intermediate-ca --not-after=8760h --no-password --insecure --ca ca.crt --ca-key ca.key
-expiry=$(openssl x509 -in issuer.crt -noout -enddate)
-expiry_iso=$(date -Iseconds --utc --date "${expiry#notAfter=}")
-echo "${expiry_iso%+00:00}Z"
-```
-
-Note that in macOS systems, `date` command use different arguments. Install `coreutils` package with [`brew`](https://brew.sh/) (`brew install coreutils`) to download a GNU date replacement named `gdate`. `expiry_iso` can now be obtained with the command:
-
-```bash
-expiry_iso=$(gdate -Iseconds --utc --date "${expiry#notAfter=}")
 ```
 
 - Finally construct your user secrets file by filling this template and saving as `my-linkerd-certificates.yaml`:
@@ -34,7 +25,6 @@ expiry_iso=$(gdate -Iseconds --utc --date "${expiry#notAfter=}")
 ```yaml
 identity:
   issuer:
-    crtExpiry: <the final output of the commands above>
     tls:
       crtPEM: |
         <contents of the issuer.crt file>
@@ -154,7 +144,7 @@ linkerd viz dashboard
 
 After installation, linkerd looks for a `linkerd.io/inject: enabled` annotation on `Namespaces` or other workload resources. Adding this annotation to your workload namespaces will trigger automatic proxy container injection to your pods. You can use the [`spec.namespaceConfig.annotations`](https://docs.giantswarm.io/app-platform/namespace-configuration/) field of your other apps `App` CR to automatically apply the required annotation.
 
-More information on proxy injection can be found on the ["Automatic Proxy Injection" page](https://linkerd.io/2.10/features/proxy-injection/) in the upstream documentation.
+More information on proxy injection can be found on the ["Automatic Proxy Injection" page](https://linkerd.io/2.11/features/proxy-injection/) in the upstream documentation.
 
 **Attention**: Proxy containers are using `EmptyDir` volumes for storing ephemeral data, so all of your workload pods meshed by linkerd require a `PodSecurityPolicy` which allows use of `EmptyDir` volumes.
 
@@ -182,4 +172,4 @@ You can use the `linkerd` cli as usual with this app as we're using the default 
 
 ## Credit
 
-- <https://linkerd.io/2.10/tasks/install-helm/>
+- <https://linkerd.io/2.11/tasks/install-helm/>
