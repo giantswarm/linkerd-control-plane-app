@@ -24,8 +24,8 @@ from pytest_helm_charts.k8s.namespace import ensure_namespace_exists
 logger = logging.getLogger(__name__)
 
 timeout: int = 360
-cni_app_version = "0.4.0-c3f2dd033a1b142fcb462845c5ec3a6e24e57165"
-cni_app_catalog_url = "https://giantswarm.github.io/giantswarm-test-catalog/"
+cni_app_version = "0.7.0"
+cni_app_catalog_url = "https://giantswarm.github.io/giantswarm-catalog/"
 linkerd_namespace = "linkerd"
 linkerd_app_name = "linkerd2-app"
 cni_namespace = "linkerd-cni"
@@ -85,11 +85,9 @@ def wait_for_all_linkerd_deployments_to_run(
     wait_for_deployments_to_run(
         kube_client,
         [
-            # "linkerd-controller",
             "linkerd-destination",
             "linkerd-identity",
             "linkerd-proxy-injector",
-            # "linkerd-sp-validator",
         ],
         namespace,
         timeout_sec,
