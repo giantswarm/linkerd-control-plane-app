@@ -117,7 +117,7 @@ kubectl label namespace kube-system config.linkerd.io/admission-webhooks=disable
 
 - Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.2).
 
-- We strongly recommend installing the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) command.
+- Optionally you can also install the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) command.
 
 Unfortunately, the template this generates uses some user IDs that are by default
 not permitted by the default cluster's PSP. It also needs to permit the usage
