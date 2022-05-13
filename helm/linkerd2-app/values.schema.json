@@ -114,19 +114,25 @@
         "enableH2Upgrade": {
             "type": "boolean"
         },
+        "enablePSP": {
+            "type": "boolean"
+        },
         "enablePodAntiAffinity": {
+            "type": "boolean"
+        },
+        "enablePprof": {
             "type": "boolean"
         },
         "identity": {
             "type": "object",
             "properties": {
+                "externalCA": {
+                    "type": "boolean"
+                },
                 "issuer": {
                     "type": "object",
                     "properties": {
                         "clockSkewAllowance": {
-                            "type": "string"
-                        },
-                        "crtExpiry": {
                             "type": "string"
                         },
                         "issuanceLifetime": {
@@ -201,19 +207,110 @@
         "nodeSelector": {
             "type": "object",
             "properties": {
-                "beta.kubernetes.io/os": {
+                "kubernetes.io/os": {
                     "type": "string"
                 }
             }
-        },
-        "omitWebhookSideEffects": {
-            "type": "boolean"
         },
         "podAnnotations": {
             "type": "object"
         },
         "podLabels": {
             "type": "object"
+        },
+        "policyController": {
+            "type": "object",
+            "properties": {
+                "defaultAllowPolicy": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "pullPolicy": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "logLevel": {
+                    "type": "string"
+                },
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "cpu": {
+                            "type": "object",
+                            "properties": {
+                                "limit": {
+                                    "type": "string"
+                                },
+                                "request": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "memory": {
+                            "type": "object",
+                            "properties": {
+                                "limit": {
+                                    "type": "string"
+                                },
+                                "request": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "policyValidator": {
+            "type": "object",
+            "properties": {
+                "caBundle": {
+                    "type": "string"
+                },
+                "crtPEM": {
+                    "type": "string"
+                },
+                "externalSecret": {
+                    "type": "boolean"
+                },
+                "keyPEM": {
+                    "type": "string"
+                },
+                "namespaceSelector": {
+                    "type": "object",
+                    "properties": {
+                        "matchExpressions": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "key": {
+                                        "type": "string"
+                                    },
+                                    "operator": {
+                                        "type": "string"
+                                    },
+                                    "values": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         },
         "profileValidator": {
             "type": "object",
@@ -260,6 +357,9 @@
         "proxy": {
             "type": "object",
             "properties": {
+                "await": {
+                    "type": "boolean"
+                },
                 "cores": {
                     "type": "integer"
                 },
@@ -376,6 +476,12 @@
                         }
                     }
                 },
+                "logFormat": {
+                    "type": "string"
+                },
+                "logLevel": {
+                    "type": "string"
+                },
                 "resources": {
                     "type": "object",
                     "properties": {
@@ -402,6 +508,12 @@
                             }
                         }
                     }
+                },
+                "runAsRoot": {
+                    "type": "boolean"
+                },
+                "skipSubnets": {
+                    "type": "string"
                 },
                 "xtMountPath": {
                     "type": "object",
@@ -459,60 +571,6 @@
             }
         },
         "proxyInjectorResources": {
-            "type": "object",
-            "properties": {
-                "cpu": {
-                    "type": "object",
-                    "properties": {
-                        "limit": {
-                            "type": "string"
-                        },
-                        "request": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "memory": {
-                    "type": "object",
-                    "properties": {
-                        "limit": {
-                            "type": "string"
-                        },
-                        "request": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "publicAPIResources": {
-            "type": "object",
-            "properties": {
-                "cpu": {
-                    "type": "object",
-                    "properties": {
-                        "limit": {
-                            "type": "string"
-                        },
-                        "request": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "memory": {
-                    "type": "object",
-                    "properties": {
-                        "limit": {
-                            "type": "string"
-                        },
-                        "request": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "spValidatorResources": {
             "type": "object",
             "properties": {
                 "cpu": {

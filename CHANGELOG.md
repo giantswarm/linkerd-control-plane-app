@@ -7,6 +7,12 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+Please be aware that linkerd will never recreate existing pods to update the injected proxy container image version. This will happen the next time your meshed pods will restart.
+
+### Changed
+
+- Align with and upgrade to upstream `stable-2.11.2`. ([#79](https://github.com/giantswarm/linkerd2-app/pull/79))
+
 ## [0.6.2] - 2021-11-03
 
 ### Changed
