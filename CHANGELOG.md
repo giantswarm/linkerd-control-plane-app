@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Update pytest-helm-charts from beta to v0.7.0 ([#84](https://github.com/giantswarm/linkerd2-app/pull/84))
+
 ## [0.7.0] - 2022-05-13
 
 Please be aware that linkerd will never recreate existing pods to update the injected proxy container image version. This will happen the next time your meshed pods will restart.
