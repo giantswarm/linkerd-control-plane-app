@@ -10,6 +10,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 ### Changed
 
 - Update pytest-helm-charts from beta to v0.7.0 ([#84](https://github.com/giantswarm/linkerd2-app/pull/84))
+- Add an init container to destination and injector services to avoid the [known issue](https://github.com/projectcalico/calico/issues/3499) of missing IP in post hook action
 
 ## [0.7.0] - 2022-05-13
 
