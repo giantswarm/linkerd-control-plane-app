@@ -9,6 +9,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: proxy-injector
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 rules:
 - apiGroups: [""]
   resources: ["events"]
@@ -33,6 +34,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: proxy-injector
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 subjects:
 - kind: ServiceAccount
   name: linkerd-proxy-injector
@@ -51,6 +53,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: proxy-injector
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 {{- include "partials.image-pull-secrets" .Values.imagePullSecrets }}
 ---
 {{- $host := printf "linkerd-proxy-injector.%s.svc" .Values.namespace }}
@@ -64,6 +67,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: proxy-injector
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 type: kubernetes.io/tls
@@ -79,6 +83,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: proxy-injector
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 webhooks:
 - name: linkerd-proxy-injector.linkerd.io
   namespaceSelector:

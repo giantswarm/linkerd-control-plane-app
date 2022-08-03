@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Add Giant Swarm team label to resources.
+
 ## [0.7.1] - 2022-08-03
 
 ### Changed

@@ -10,6 +10,7 @@ metadata:
     {{ include "partials.annotations.created-by" . }}
   labels:
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 spec:
   group: linkerd.io
   versions:
