@@ -9,8 +9,6 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [0.7.1] - 2022-08-03
 
-## [0.7.1] - 2022-08-03
-
 ### Changed
 
 - Update pytest-helm-charts from beta to v0.7.0 ([#84](https://github.com/giantswarm/linkerd2-app/pull/84))
