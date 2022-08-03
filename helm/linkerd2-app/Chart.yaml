@@ -6,17 +6,17 @@ description: |
 home: https://github.com/giantswarm/linkerd2-app
 icon: https://s.giantswarm.io/app-icons/linkerd2/1/light.svg
 keywords:
-- service-mesh
+  - service-mesh
 kubeVersion: ">=1.17.0-0"
 maintainers:
-- email: cncf-linkerd-dev@lists.cncf.io
-  name: Linkerd authors
-  url: https://linkerd.io/
+  - email: cncf-linkerd-dev@lists.cncf.io
+    name: Linkerd authors
+    url: https://linkerd.io/
 name: linkerd2-app
 sources:
-- https://github.com/linkerd/linkerd2/
-- https://linkerd.io
-version: 0.7.0
+  - https://github.com/linkerd/linkerd2/
+  - https://linkerd.io
+version: 0.7.1
 restrictions:
   clusterSingleton: true
   fixedNamespace: linkerd
