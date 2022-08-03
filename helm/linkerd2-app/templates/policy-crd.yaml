@@ -8,6 +8,7 @@ metadata:
   labels:
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 spec:
   group: policy.linkerd.io
   names:
@@ -153,6 +154,7 @@ metadata:
     {{ include "partials.annotations.created-by" . }}
   labels:
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 spec:
   group: policy.linkerd.io
   scope: Namespaced

@@ -18,6 +18,7 @@ metadata:
     linkerd.io/control-plane-component: proxy-injector
     linkerd.io/control-plane-ns: {{.Values.namespace}}
     giantswarm.io/monitoring_basic_sli: "true"
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   name: linkerd-proxy-injector
   namespace: {{.Values.namespace}}
 spec:
@@ -45,6 +46,7 @@ spec:
         linkerd.io/control-plane-component: proxy-injector
         linkerd.io/control-plane-ns: {{.Values.namespace}}
         linkerd.io/workload-ns: {{.Values.namespace}}
+        {{- include "linkerd.giantswarm-labels" . | nindent 8 }}
         {{- include "partials.proxy.labels" $tree.Values.proxy | nindent 8}}
         {{- with .Values.podLabels }}{{ toYaml . | trim | nindent 8 }}{{- end }}
     spec:
@@ -141,6 +143,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: proxy-injector
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
     config.linkerd.io/opaque-ports: "443"
@@ -162,6 +165,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: proxy-injector
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 spec:

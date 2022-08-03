@@ -9,6 +9,7 @@ metadata:
   name: linkerd-{{.Values.namespace}}-control-plane
   labels:
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 spec:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
@@ -65,6 +66,7 @@ metadata:
   namespace: {{.Values.namespace}}
   labels:
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 rules:
 - apiGroups: ['policy', 'extensions']
   resources: ['podsecuritypolicies']
@@ -79,6 +81,7 @@ metadata:
   namespace: {{.Values.namespace}}
   labels:
     linkerd.io/control-plane-ns: {{.Values.namespace}}
+    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 roleRef:
   kind: Role
   name: linkerd-psp
