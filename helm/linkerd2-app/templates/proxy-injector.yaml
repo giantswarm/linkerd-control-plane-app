@@ -110,7 +110,14 @@ spec:
       {{ if not .Values.cniEnabled -}}
       initContainers:
       - {{- include "partials.proxy-init" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{- if .Values.postHookInitHack -}}
+      - {{- include "post-hook-init-hack.container" . }}
+      {{- end }}
       {{ end -}}
+      {{- else if .Values.postHookInitHack }}
+      initContainers:
+      - {{- include "post-hook-init-hack.container" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{- end }}
       serviceAccountName: linkerd-proxy-injector
       volumes:
       - configMap:
