@@ -7,6 +7,8 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+## [0.7.1] - 2022-08-03
+
 ### Changed
 
 - Update pytest-helm-charts from beta to v0.7.0 ([#84](https://github.com/giantswarm/linkerd2-app/pull/84))
@@ -81,7 +83,8 @@ Please be aware that linkerd will never recreate existing pods to update the inj
 
 - Update chart to v2.7.1.
 
-[Unreleased]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/giantswarm/linkerd2-app/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/giantswarm/linkerd2-app/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/giantswarm/linkerd2-app/compare/v0.6.0...v0.6.1
