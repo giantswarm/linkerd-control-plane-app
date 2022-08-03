@@ -312,6 +312,9 @@
                 }
             }
         },
+        "postHookInitHack": {
+            "type": "boolean"
+        },
         "profileValidator": {
             "type": "object",
             "properties": {

@@ -309,7 +309,13 @@ spec:
       */}}
       {{- $_ := set $tree.Values.proxyInit "ignoreOutboundPorts" "443" }}
       - {{- include "partials.proxy-init" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
-      {{ end -}}
+      {{- if .Values.postHookInitHack -}}
+      - {{- include "post-hook-init-hack.container" . }}
+      {{- end }}
+      {{- else if .Values.postHookInitHack }}
+      initContainers:
+      - {{- include "post-hook-init-hack.container" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{- end }}
       serviceAccountName: linkerd-destination
       volumes:
       - name: sp-tls
