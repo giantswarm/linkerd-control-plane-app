@@ -1,5 +1,7 @@
 {{- define "post-hook-init-hack.container" -}}
 name: init-post-hook-hack
+securityContext:
+  runAsUser: 1003
 command:
   - /bin/sh
   - -c
