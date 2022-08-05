@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Make image configurable in post start init procedure.
+
 ## [0.7.2] - 2022-08-03
 
 ### Changed
