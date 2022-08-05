@@ -399,4 +399,6 @@ enablePodAntiAffinity: true
 # There is a race condition in Kubernetes for cluster running a CNI different than calico as
 # primary together with Calico as a policy engine (network policies). This is a workaround
 # to make it work it. More info in https://github.com/giantswarm/roadmap/issues/1174
-postHookInitHack: true
+postHookInitHack: 
+  enabled: true
+  image: giantswarm/alpine:3.15.5
