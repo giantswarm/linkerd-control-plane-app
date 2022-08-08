@@ -14,5 +14,5 @@ command:
     Source: https://github.com/giantswarm/roadmap/issues/1174
     Upstream issue: https://github.com/kubernetes/kubernetes/issues/85966
     EOF
-image: giantswarm/alpine:3.15.5
+image: {{ .Values.postHookInitHack.image }}
 {{- end -}}

@@ -317,7 +317,7 @@ spec:
       */}}
       {{- $_ := set $tree.Values.proxyInit "ignoreOutboundPorts" "443" }}
       - {{- include "partials.proxy-init" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
-      {{- if .Values.postHookInitHack -}}
+      {{- if .Values.postHookInitHack.enabled -}}
       - {{- include "post-hook-init-hack.container" . }}
       {{- end }}
       {{- else if .Values.postHookInitHack }}

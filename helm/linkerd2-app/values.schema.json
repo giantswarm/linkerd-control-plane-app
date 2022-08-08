@@ -313,7 +313,15 @@
             }
         },
         "postHookInitHack": {
-            "type": "boolean"
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "image": {
+                    "type": "string"
+                }
+            }
         },
         "profileValidator": {
             "type": "object",
