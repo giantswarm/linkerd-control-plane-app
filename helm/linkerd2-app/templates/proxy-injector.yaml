@@ -115,7 +115,7 @@ spec:
       {{- if .Values.postHookInitHack.enabled -}}
       - {{- include "post-hook-init-hack.container" . }}
       {{- end }}
-      {{- else if .Values.postHookInitHack }}
+      {{- else if .Values.postHookInitHack.enabled }}
       initContainers:
       - {{- include "post-hook-init-hack.container" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{- end }}
