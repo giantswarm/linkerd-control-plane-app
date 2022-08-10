@@ -21,4 +21,4 @@ restrictions:
   clusterSingleton: true
   fixedNamespace: linkerd
 annotations:
-  application.giantswarm.io/team: team-cabbage
+  application.giantswarm.io/team: cabbage
