@@ -12,6 +12,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 ### Changed
 
 - Make image configurable in post start init procedure.
+- Fix postHookInitHack check in deployments.
 
 ## [0.7.2] - 2022-08-03
 
