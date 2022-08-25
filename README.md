@@ -34,7 +34,7 @@ identityTrustAnchorsPEM: |
   <contents of the ca.crt file>
 ```
 
-- Download the [default values.yaml file](helm/linkerd2-app/values.yaml) and save it as `my-linkerd-values.yaml` to create a [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). Review the values in the file. With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled.
+- Download the [default values.yaml file](https://github.com/giantswarm/linkerd2-app/blob/master/helm/linkerd2-app/values.yaml) and save it as `my-linkerd-values.yaml` to create a [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). Review the values in the file. With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled.
 
 ### Step 2: Deploy Linkerd
 
