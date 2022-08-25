@@ -30,7 +30,7 @@ controlPlaneTracing: false
 # -- namespace to send control plane traces to
 controlPlaneTracingNamespace: linkerd-jaeger
 # -- control plane version. See Proxy section for proxy version
-linkerdVersion: stable-2.11.2
+linkerdVersion: stable-2.11.4
 # -- Control plane namespace
 namespace: linkerd
 # -- enables the use of EndpointSlice informers for the destination service;
