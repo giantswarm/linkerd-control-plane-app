@@ -7,6 +7,13 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Align with upstream release `stable-2.11.4`
+- Fix security for when a user manually specified the `policyValidator.keyPEM` setting
+- Multiple smaller fixes around `linkerd-multicluster`
+- For details see upstream [changelog entry for version stable-2.11.4](https://github.com/linkerd/linkerd2/blob/stable-2.11.4/CHANGES.md#stable-2114) and [stable-2.11.3](https://github.com/linkerd/linkerd2/blob/stable-2.11.4/CHANGES.md#stable-2113)
+
 ## [0.7.3] - 2022-08-10
 
 ### Changed
