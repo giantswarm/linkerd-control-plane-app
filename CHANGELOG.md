@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Add image registry switch
+
 ## [0.7.4] - 2022-08-25
 
 ### Changed
