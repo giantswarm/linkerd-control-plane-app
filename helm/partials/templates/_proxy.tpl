@@ -129,7 +129,7 @@ be used in other contexts.
 - name: LINKERD2_PROXY_POLICY_SVC_NAME
   value: linkerd-destination.{{.Values.namespace}}.serviceaccount.identity.{{.Values.namespace}}.{{$trustDomain}}
 {{ end -}}
-image: {{.Values.proxy.image.name}}:{{.Values.proxy.image.version | default .Values.linkerdVersion}}
+image: "{{.Values.image.registry}}/{{.Values.proxy.image.name}}:{{.Values.proxy.image.version | default .Values.linkerdVersion}}"
 imagePullPolicy: {{.Values.proxy.image.pullPolicy | default .Values.imagePullPolicy}}
 livenessProbe:
   httpGet:

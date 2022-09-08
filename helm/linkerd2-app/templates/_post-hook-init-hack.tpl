@@ -14,5 +14,5 @@ command:
     Source: https://github.com/giantswarm/roadmap/issues/1174
     Upstream issue: https://github.com/kubernetes/kubernetes/issues/85966
     EOF
-image: {{ .Values.postHookInitHack.image }}
+image: "{{ .Values.image.registry }}/{{ .Values.postHookInitHack.image }}"
 {{- end -}}

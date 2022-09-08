@@ -205,7 +205,7 @@ spec:
         - -default-opaque-ports={{.Values.proxy.opaquePorts}}
         - -enable-pprof={{.Values.enablePprof | default false}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
-        image: {{.Values.controllerImage}}:{{default .Values.linkerdVersion .Values.controllerImageVersion}}
+        image: "{{.Values.image.registry}}/{{.Values.controllerImage}}:{{default .Values.linkerdVersion .Values.controllerImageVersion}}"
         imagePullPolicy: {{.Values.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -234,7 +234,7 @@ spec:
         - -log-level={{.Values.controllerLogLevel}}
         - -log-format={{.Values.controllerLogFormat}}
         - -enable-pprof={{.Values.enablePprof | default false}}
-        image: {{.Values.controllerImage}}:{{.Values.controllerImageVersion | default .Values.linkerdVersion}}
+        image: "{{.Values.image.registry}}/{{.Values.controllerImage}}:{{.Values.controllerImageVersion | default .Values.linkerdVersion}}"
         imagePullPolicy: {{.Values.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -274,7 +274,7 @@ spec:
         - --default-policy={{.Values.policyController.defaultAllowPolicy}}
         - --log-level={{.Values.policyController.logLevel | default "linkerd=info,warn"}}
         - --log-format={{.Values.controllerLogFormat}}
-        image: {{.Values.policyController.image.name}}:{{.Values.policyController.image.version | default .Values.linkerdVersion}}
+        image: "{{.Values.image.registry}}/{{.Values.policyController.image.name}}:{{.Values.policyController.image.version | default .Values.linkerdVersion}}"
         imagePullPolicy: {{.Values.policyController.image.pullPolicy | default .Values.imagePullPolicy}}
         livenessProbe:
           httpGet:
