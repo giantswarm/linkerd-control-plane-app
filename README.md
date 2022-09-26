@@ -46,7 +46,7 @@ kubectl gs template app \
   --name linkerd2-app \
   --namespace linkerd \
   --cluster <your-cluster-id>  \
-  --version 0.7.1 \
+  --version 0.7.4 \
   --user-configmap my-linkerd-values.yaml \
   --user-secret my-linkerd-certificates.yaml \
   --namespace-labels "linkerd.io/is-control-plane=true,config.linkerd.io/admission-webhooks=disabled,linkerd.io/control-plane-ns=linkerd" \
@@ -82,7 +82,7 @@ spec:
     secret:
       name: linkerd2-app-userconfig-<your-cluster-id>
       namespace: <your-cluster-id>
-  version: 0.7.1
+  version: 0.7.4
 ```
 
 Please note, that for security reasons Giant Swarm by default forbids the usage of
