@@ -44,8 +44,8 @@ We recommend deploying the app by applying an `App` CR (Custom Resource) onto yo
 kubectl gs template app \
   --catalog giantswarm \
   --name linkerd2-app \
-  --namespace linkerd \
-  --cluster <your-cluster-id>  \
+  --target-namespace linkerd \
+  --cluster-name <your-cluster-id>  \
   --version 0.7.4 \
   --user-configmap my-linkerd-values.yaml \
   --user-secret my-linkerd-certificates.yaml \
