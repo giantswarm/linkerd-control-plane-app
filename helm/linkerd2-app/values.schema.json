@@ -189,6 +189,14 @@
         "identityTrustDomain": {
             "type": "string"
         },
+        "image": {
+            "type": "object",
+            "properties": {
+                "registry": {
+                    "type": "string"
+                }
+            }
+        },
         "imagePullPolicy": {
             "type": "string"
         },

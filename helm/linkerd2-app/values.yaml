@@ -13,6 +13,11 @@ controllerResources: &controller_resources
     limit: 250Mi
     request: 50Mi
 
+# -- Registry switch
+# Do not overwrite this as it is automatically set based on the installation region
+image:
+  registry: quay.io
+
 # -- The cluster networks for which service discovery is performed. This should
 # include the pod and service networks, but need not include the node network.
 #
@@ -59,7 +64,7 @@ policyController:
   # image -- Docker image for the policy controller
   image:
     # -- Docker image for the proxy
-    name: quay.io/giantswarm/linkerd2-policy-controller
+    name: giantswarm/linkerd2-policy-controller
     # -- Pull policy for the proxy container Docker image
     # @default -- imagePullPolicy
     pullPolicy: ""
@@ -101,7 +106,7 @@ proxy:
   inboundConnectTimeout: 100ms
   image:
     # -- Docker image for the proxy
-    name: quay.io/giantswarm/linkerd2-proxy
+    name: giantswarm/linkerd2-proxy
     # -- Pull policy for the proxy container Docker image
     # @default -- imagePullPolicy
     pullPolicy: ""
@@ -178,7 +183,7 @@ proxyInit:
   logFormat: ""
   image:
     # -- Docker image for the proxy-init container
-    name: quay.io/giantswarm/linkerd2-proxy-init
+    name: giantswarm/linkerd2-proxy-init
     # -- Pull policy for the proxy-init container Docker image
     # @default -- imagePullPolicy
     pullPolicy: ""
@@ -219,7 +224,7 @@ webhookFailurePolicy: Fail
 
 # controllerImage -- Docker image for the controller and identity
 # components
-controllerImage: quay.io/giantswarm/linkerd2-controller
+controllerImage: giantswarm/linkerd2-controller
 # -- Number of replicas for each control plane pod
 controllerReplicas: 3
 # -- User ID for the control plane components
@@ -238,7 +243,7 @@ destinationResources: *controller_resources
 debugContainer:
   image:
     # -- Docker image for the debug container
-    name: quay.io/giantswarm/linkerd2-debug
+    name: giantswarm/linkerd2-debug
     # -- Pull policy for the debug container Docker image
     # @default -- imagePullPolicy
     pullPolicy: ""

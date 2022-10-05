@@ -128,7 +128,7 @@ Kubernetes: `>=1.17.0-0`
 | cniEnabled | bool | `true` | enabling this omits the NET_ADMIN capability in the PSP and the proxy-init container when injecting the proxy; requires the linkerd-cni plugin to already be installed |
 | controlPlaneTracing | bool | `false` | enables control plane tracing |
 | controlPlaneTracingNamespace | string | `"linkerd-jaeger"` | namespace to send control plane traces to |
-| controllerImage | string | `"quay.io/giantswarm/linkerd2-controller"` | Docker image for the controller and identity components |
+| controllerImage | string | `"giantswarm/linkerd2-controller"` | Docker image for the controller and identity components |
 | controllerLogFormat | string | `"plain"` | Log format for the control plane components |
 | controllerLogLevel | string | `"info"` | Log level for the control plane components |
 | controllerReplicas | int | `3` | Number of replicas for each control plane pod |
@@ -137,7 +137,7 @@ Kubernetes: `>=1.17.0-0`
 | controllerResources.memory.limit | string | `"250Mi"` |  |
 | controllerResources.memory.request | string | `"50Mi"` |  |
 | controllerUID | int | `2103` | User ID for the control plane components |
-| debugContainer.image.name | string | `"quay.io/giantswarm/linkerd2-debug"` | Docker image for the debug container |
+| debugContainer.image.name | string | `"giantswarm/linkerd2-debug"` | Docker image for the debug container |
 | debugContainer.image.pullPolicy | string | imagePullPolicy | Pull policy for the debug container Docker image |
 | debugContainer.image.version | string | linkerdVersion | Tag for the debug container Docker image |
 | destinationResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | CPU and Memory resources required by destination (see `proxy.resources` for sub-fields) |
@@ -169,7 +169,7 @@ Kubernetes: `>=1.17.0-0`
 | podAnnotations | object | `{}` | Additional annotations to add to all pods |
 | podLabels | object | `{}` | Additional labels to add to all pods |
 | policyController.defaultAllowPolicy | string | "all-unauthenticated" | The default allow policy to use when no `Server` selects a pod.  One of: "all-authenticated", "all-unauthenticated", "cluster-authenticated", "cluster-unauthenticated", "deny" |
-| policyController.image.name | string | `"quay.io/giantswarm/linkerd2-policy-controller"` | Docker image for the proxy |
+| policyController.image.name | string | `"giantswarm/linkerd2-policy-controller"` | Docker image for the proxy |
 | policyController.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy container Docker image |
 | policyController.image.version | string | linkerdVersion | Tag for the proxy container Docker image |
 | policyController.logLevel | string | `"linkerd=info,warn"` | Log level for the policy controller |
@@ -191,7 +191,7 @@ Kubernetes: `>=1.17.0-0`
 | proxy.await | bool | `true` |  |
 | proxy.cores | int | `0` | The `cpu.limit` and `cores` should be kept in sync. The value of `cores` must be an integer and should typically be set by rounding up from the limit. E.g. if cpu.limit is '1500m', cores should be 2. |
 | proxy.enableExternalProfiles | bool | `false` | Enable service profiles for non-Kubernetes services |
-| proxy.image.name | string | `"quay.io/giantswarm/linkerd2-proxy"` | Docker image for the proxy |
+| proxy.image.name | string | `"giantswarm/linkerd2-proxy"` | Docker image for the proxy |
 | proxy.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy container Docker image |
 | proxy.image.version | string | linkerdVersion | Tag for the proxy container Docker image |
 | proxy.inboundConnectTimeout | string | `"100ms"` | Maximum time allowed for the proxy to establish an inbound TCP connection |
@@ -213,7 +213,7 @@ Kubernetes: `>=1.17.0-0`
 | proxyInit.closeWaitTimeoutSecs | int | `0` |  |
 | proxyInit.ignoreInboundPorts | string | `"4190,4191,4567,4568"` | Default set of inbound ports to skip via iptables - linkerd (4190,4191) - Galera (4567,4568) |
 | proxyInit.ignoreOutboundPorts | string | `"4190,4191,4567,4568"` | Default set of outbound ports to skip via iptables - linkerd (4190,4191) - Galera (4567,4568) |
-| proxyInit.image.name | string | `"quay.io/giantswarm/linkerd2-proxy-init"` | Docker image for the proxy-init container |
+| proxyInit.image.name | string | `"giantswarm/linkerd2-proxy-init"` | Docker image for the proxy-init container |
 | proxyInit.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy-init container Docker image |
 | proxyInit.image.version | string | `"v1.5.3"` | Tag for the proxy-init container Docker image |
 | proxyInit.logFormat | string | plain | Log format (`plain` or `json`) for the proxy-init |
