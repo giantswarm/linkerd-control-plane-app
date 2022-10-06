@@ -1,6 +1,5 @@
 linkerd2-app*.tgz
 linkerd2-app*.tgz-meta/
-helm/linkerd2-app/charts/
 test_results_*.xml
 .pytest_cache
 linkerd-cli
