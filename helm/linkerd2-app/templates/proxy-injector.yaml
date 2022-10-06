@@ -112,8 +112,8 @@ spec:
       {{ if not .Values.cniEnabled -}}
       initContainers:
       - {{- include "partials.proxy-init" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
-      {{- if .Values.postHookInitHack.enabled -}}
-      - {{- include "post-hook-init-hack.container" . }}
+      {{- if .Values.postHookInitHack.enabled }}
+      - {{- include "post-hook-init-hack.container" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{- end }}
       {{- else if .Values.postHookInitHack.enabled }}
       initContainers:
