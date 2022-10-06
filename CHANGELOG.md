@@ -12,6 +12,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 ### Changed
 
 - Add image registry switch to automatically switch the used image registry based on the installation region
+- Convert linkerd chart into a subchart of the GS linkerd-app chart
 
 ### Removed
 
