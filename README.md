@@ -35,7 +35,7 @@ linkerd-control-plane:
     <contents of the ca.crt file>
 ```
 
-- Create a file `my-linkerd-values.yaml` with your [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). Override only the values that you are interested in. With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled. You can check the full list in the [README](https://github.com/giantswarm/linkerd2-app/blob/master/helm/linkerd2-app/README.md).
+- (Optional) Create a file `my-linkerd-values.yaml` with your [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). Override only the values that are of your interest. With the default values, Linkerd is installed in High-Availability mode and with CNI plugin enabled. Check the full list in the [README](https://github.com/giantswarm/linkerd2-app/blob/master/helm/linkerd2-app/README.md).
 
 ### Step 2: Deploy Linkerd
 
@@ -151,7 +151,7 @@ More information on proxy injection can be found on the ["Automatic Proxy Inject
 
 ## Installing without the CNI plugin
 
-In order to install this app without the CNI plugin, you'll need to specify `linkerd-control-plan.cniEnabled: false` in your user configuration.
+In order to install this app without the CNI plugin, you'll need to specify `linkerd-control-plane.cniEnabled: false` in your user configuration.
 
 Be aware that running without the CNI plugin, proxy containers will run as `root` and will require `NET_ADMIN` and `NET_RAW` capabilities.
 
