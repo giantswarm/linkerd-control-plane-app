@@ -1,15 +1,16 @@
-identity:
-  issuer:
-    tls:
-      crtPEM: |
-        -----BEGIN CERTIFICATE-----
-        dummyDUMMYdummy
-        -----END CERTIFICATE-----
-      keyPEM: |
-        -----BEGIN EC PRIVATE KEY-----
-        dummyDUMMYdummy
-        -----END EC PRIVATE KEY-----
-identityTrustAnchorsPEM: |
-  -----BEGIN CERTIFICATE-----
-  dummyDUMMYdummy
-  -----END CERTIFICATE-----
+linkerd-control-plane:
+  identity:
+    issuer:
+      tls:
+        crtPEM: |
+          -----BEGIN CERTIFICATE-----
+          dummyDUMMYdummy
+          -----END CERTIFICATE-----
+        keyPEM: |
+          -----BEGIN EC PRIVATE KEY-----
+          dummyDUMMYdummy
+          -----END EC PRIVATE KEY-----
+  identityTrustAnchorsPEM: |
+    -----BEGIN CERTIFICATE-----
+    dummyDUMMYdummy
+    -----END CERTIFICATE-----
