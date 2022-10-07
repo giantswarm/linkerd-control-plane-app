@@ -11,6 +11,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 - Add image registry switch to automatically switch the used image registry based on the installation region
 
+### Removed
+
+- Post hook init hack when CNI is disabled since there's another init container around already.
+
 ## [0.7.4] - 2022-08-25
 
 ### Changed
