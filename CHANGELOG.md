@@ -7,6 +7,8 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+## [0.7.5] - 2022-10-13
+
 ### Changed
 
 - Add image registry switch to automatically switch the used image registry based on the installation region
@@ -113,7 +115,8 @@ Please be aware that linkerd will never recreate existing pods to update the inj
 
 - Update chart to v2.7.1.
 
-[Unreleased]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.4...HEAD
+[Unreleased]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.5...HEAD
+[0.7.5]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/giantswarm/linkerd2-app/compare/v0.7.1...v0.7.2

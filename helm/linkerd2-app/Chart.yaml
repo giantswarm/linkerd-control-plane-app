@@ -16,7 +16,7 @@ name: linkerd2-app
 sources:
   - https://github.com/linkerd/linkerd2/
   - https://linkerd.io
-version: 0.7.4
+version: 0.7.5
 restrictions:
   clusterSingleton: true
   fixedNamespace: linkerd
