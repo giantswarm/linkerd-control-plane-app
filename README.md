@@ -23,18 +23,20 @@ step certificate create identity.linkerd.cluster.local issuer.crt issuer.key --p
 - Finally construct your user secrets file by filling this template and saving as `my-linkerd-certificates.yaml`:
 
 ```yaml
-identity:
-  issuer:
-    tls:
-      crtPEM: |
-        <contents of the issuer.crt file>
-      keyPEM: |
-        <contents of the issuer.key file>
-identityTrustAnchorsPEM: |
-  <contents of the ca.crt file>
+linkerd-control-plane:
+  identity:
+    issuer:
+      tls:
+        crtPEM: |
+          <contents of the issuer.crt file>
+        keyPEM: |
+          <contents of the issuer.key file>
+  identityTrustAnchorsPEM: |
+    <contents of the ca.crt file>
 ```
 
-- Download the [default values.yaml file](https://github.com/giantswarm/linkerd2-app/blob/master/helm/linkerd2-app/values.yaml) and save it as `my-linkerd-values.yaml` to create a [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). Review the values in the file. With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled.
+- (Optional) Create a file `my-linkerd-values.yaml` with your [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). The user configuration should only contain values that are additional to or diverge from the default values provided by the chart. Check the link above to see how configurations are merged.
+With the default values, Linkerd is installed in High-Availability mode and with CNI plugin enabled. Check the full list in the [README](https://github.com/giantswarm/linkerd2-app/blob/master/helm/linkerd2-app/README.md).
 
 ### Step 2: Deploy Linkerd
 
@@ -150,7 +152,7 @@ More information on proxy injection can be found on the ["Automatic Proxy Inject
 
 ## Installing without the CNI plugin
 
-In order to install this app without the CNI plugin, you'll need to specify `cniEnabled: false` in your user configuration.
+In order to install this app without the CNI plugin, you'll need to specify `linkerd-control-plane.cniEnabled: false` in your user configuration.
 
 Be aware that running without the CNI plugin, proxy containers will run as `root` and will require `NET_ADMIN` and `NET_RAW` capabilities.
 
@@ -168,7 +170,13 @@ Although not recommended, it is possible to edit the default `PodSecurityPolicy`
 
 ## Usage with `linkerd` cli
 
-You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.2).
+You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.4).
+
+## Breaking changes.
+
+### Version 0.8 and above
+
+- Starting from version 0.8, the linkerd2 (renamed to linkerd-control-plane) chart from upstream is a subchart of the Giantswarm linkerd2-app chart. This means that any value needs to be scoped under the `linkerd-control-plane`. [Click here](https://github.com/giantswarm/linkerd2-cni-app/blob/master/helm/linkerd2-app/README.md) for details.
 
 ## Credit
 
