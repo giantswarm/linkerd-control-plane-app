@@ -172,6 +172,12 @@ Although not recommended, it is possible to edit the default `PodSecurityPolicy`
 
 You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.4).
 
+## Breaking changes.
+
+### Version 0.8 and above
+
+- Starting from version 0.8, the linkerd2 (renamed to linkerd-control-plane) chart from upstream is a subchart of the Giantswarm linkerd2-app chart. This means that any value needs to be scoped under the `linkerd-control-plane`. [Click here](https://github.com/giantswarm/linkerd2-cni-app/blob/master/helm/linkerd2-app/README.md) for details.
+
 ## Credit
 
 - <https://linkerd.io/2.11/tasks/install-helm/>
