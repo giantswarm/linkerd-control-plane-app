@@ -5,10 +5,10 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.namespace}}-destination
+  name: linkerd-{{.Release.Namespace}}-destination
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 rules:
 - apiGroups: ["apps"]
@@ -23,9 +23,6 @@ rules:
 - apiGroups: ["linkerd.io"]
   resources: ["serviceprofiles"]
   verbs: ["list", "get", "watch"]
-- apiGroups: ["split.smi-spec.io"]
-  resources: ["trafficsplits"]
-  verbs: ["list", "get", "watch"]
   {{- if .Values.enableEndpointSlices }}
 - apiGroups: ["discovery.k8s.io"]
   resources: ["endpointslices"]
@@ -35,43 +32,42 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.namespace}}-destination
+  name: linkerd-{{.Release.Namespace}}-destination
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: linkerd-{{.Values.namespace}}-destination
+  name: linkerd-{{.Release.Namespace}}-destination
 subjects:
 - kind: ServiceAccount
   name: linkerd-destination
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.Namespace}}
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: linkerd-destination
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 {{- include "partials.image-pull-secrets" .Values.imagePullSecrets }}
 ---
-{{- $host := printf "linkerd-sp-validator.%s.svc" .Values.namespace }}
+{{- $host := printf "linkerd-sp-validator.%s.svc" .Release.Namespace }}
 {{- $ca := genSelfSignedCert $host (list) (list $host) 365 }}
 {{- if (not .Values.profileValidator.externalSecret) }}
 kind: Secret
 apiVersion: v1
 metadata:
   name: linkerd-sp-validator-k8s-tls
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 type: kubernetes.io/tls
@@ -80,13 +76,23 @@ data:
   tls.key: {{ ternary (b64enc (trim $ca.Key)) (b64enc (trim .Values.profileValidator.keyPEM)) (empty .Values.profileValidator.keyPEM) }}
 ---
 {{- end }}
+{{- include "linkerd.webhook.validation" .Values.profileValidator }}
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: linkerd-sp-validator-webhook-config
+  {{- if or (.Values.profileValidator.injectCaFrom) (.Values.profileValidator.injectCaFromSecret) }}
+  annotations:
+  {{- if .Values.profileValidator.injectCaFrom }}
+    cert-manager.io/inject-ca-from: {{ .Values.profileValidator.injectCaFrom }}
+  {{- end }}
+  {{- if .Values.profileValidator.injectCaFromSecret }}
+    cert-manager.io/inject-ca-from-secret: {{ .Values.profileValidator.injectCaFromSecret }}
+  {{- end }}
+  {{- end }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 webhooks:
 - name: linkerd-sp-validator.linkerd.io
@@ -95,12 +101,11 @@ webhooks:
   clientConfig:
     service:
       name: linkerd-sp-validator
-      namespace: {{ .Values.namespace }}
+      namespace: {{ .Release.Namespace }}
       path: "/"
-{{- if and (.Values.profileValidator.externalSecret) (empty .Values.profileValidator.caBundle) }}
-  {{- fail "If profileValidator.externalSecret is true then you need to provide profileValidator.caBundle" }}
-{{- end }}
+    {{- if and (empty .Values.profileValidator.injectCaFrom) (empty .Values.profileValidator.injectCaFromSecret) }}
     caBundle: {{ ternary (b64enc (trim $ca.Cert)) (b64enc (trim .Values.profileValidator.caBundle)) (empty .Values.profileValidator.caBundle) }}
+    {{- end }}
   failurePolicy: {{.Values.webhookFailurePolicy}}
   admissionReviewVersions: ["v1", "v1beta1"]
   rules:
@@ -110,17 +115,17 @@ webhooks:
     resources: ["serviceprofiles"]
   sideEffects: None
 ---
-{{- $host := printf "linkerd-policy-validator.%s.svc" .Values.namespace }}
+{{- $host := printf "linkerd-policy-validator.%s.svc" .Release.Namespace }}
 {{- $ca := genSelfSignedCert $host (list) (list $host) 365 }}
 {{- if (not .Values.policyValidator.externalSecret) }}
 kind: Secret
 apiVersion: v1
 metadata:
   name: linkerd-policy-validator-k8s-tls
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
@@ -130,13 +135,23 @@ data:
   tls.key: {{ ternary (b64enc (trim $ca.Key)) (b64enc (trim .Values.policyValidator.keyPEM)) (empty .Values.policyValidator.keyPEM) }}
 ---
 {{- end }}
+{{- include "linkerd.webhook.validation" .Values.policyValidator }}
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: linkerd-policy-validator-webhook-config
+  {{- if or (.Values.policyValidator.injectCaFrom) (.Values.policyValidator.injectCaFromSecret) }}
+  annotations:
+  {{- if .Values.policyValidator.injectCaFrom }}
+    cert-manager.io/inject-ca-from: {{ .Values.policyValidator.injectCaFrom }}
+  {{- end }}
+  {{- if .Values.policyValidator.injectCaFromSecret }}
+    cert-manager.io/inject-ca-from-secret: {{ .Values.policyValidator.injectCaFromSecret }}
+  {{- end }}
+  {{- end }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 webhooks:
 - name: linkerd-policy-validator.linkerd.io
@@ -145,12 +160,11 @@ webhooks:
   clientConfig:
     service:
       name: linkerd-policy-validator
-      namespace: {{ .Values.namespace }}
+      namespace: {{ .Release.Namespace }}
       path: "/"
-{{- if and (.Values.policyValidator.externalSecret) (empty .Values.policyValidator.caBundle) }}
-  {{- fail "If policyValidator.externalSecret is true then you need to provide policyValidator.caBundle" }}
-{{- end }}
+    {{- if and (empty .Values.policyValidator.injectCaFrom) (empty .Values.policyValidator.injectCaFromSecret) }}
     caBundle: {{ ternary (b64enc (trim $ca.Cert)) (b64enc (trim .Values.policyValidator.caBundle)) (empty .Values.policyValidator.caBundle) }}
+    {{- end }}
   failurePolicy: {{.Values.webhookFailurePolicy}}
   admissionReviewVersions: ["v1", "v1beta1"]
   rules:
@@ -158,6 +172,10 @@ webhooks:
     apiGroups: ["policy.linkerd.io"]
     apiVersions: ["v1alpha1", "v1beta1"]
     resources:
+    - authorizationpolicies
+    - httproutes
+    - networkauthentications
+    - meshtlsauthentications
     - serverauthorizations
     - servers
   sideEffects: None
@@ -169,7 +187,7 @@ metadata:
   labels:
     app.kubernetes.io/part-of: Linkerd
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 rules:
   - apiGroups:
@@ -183,6 +201,10 @@ rules:
   - apiGroups:
       - policy.linkerd.io
     resources:
+      - authorizationpolicies
+      - httproutes
+      - meshtlsauthentications
+      - networkauthentications
       - servers
       - serverauthorizations
     verbs:
@@ -197,7 +219,7 @@ metadata:
   labels:
     app.kubernetes.io/part-of: Linkerd
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -206,4 +228,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: linkerd-destination
-    namespace: {{.Values.namespace}}
+    namespace: {{.Release.Namespace}}

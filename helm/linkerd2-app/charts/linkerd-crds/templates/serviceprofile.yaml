@@ -9,8 +9,8 @@ metadata:
   annotations:
     {{ include "partials.annotations.created-by" . }}
   labels:
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
 spec:
   group: linkerd.io
   versions:

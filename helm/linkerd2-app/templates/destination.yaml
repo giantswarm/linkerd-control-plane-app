@@ -6,10 +6,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-dst
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
@@ -26,10 +26,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-dst-headless
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
@@ -46,10 +46,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-sp-validator
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
@@ -66,10 +66,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-policy
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
@@ -86,10 +86,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: linkerd-policy-validator
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
@@ -101,16 +101,16 @@ spec:
   - name: policy-https
     port: 443
     targetPort: policy-https
-{{- if .Values.enablePodAntiAffinity }}
+{{- if .Values.enablePodDisruptionBudget }}
 ---
 kind: PodDisruptionBudget
-apiVersion: policy/v1beta1
+apiVersion: policy/v1
 metadata:
   name: linkerd-dst
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
@@ -124,7 +124,6 @@ spec:
 {{- $tree := deepCopy . }}
 {{ $_ := set $tree.Values.proxy "workloadKind" "deployment" -}}
 {{ $_ := set $tree.Values.proxy "component" "linkerd-destination" -}}
-{{ include "linkerd.proxy.validation" .Values.proxy -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -133,30 +132,29 @@ metadata:
   labels:
     app.kubernetes.io/name: destination
     app.kubernetes.io/part-of: Linkerd
-    app.kubernetes.io/version: {{default .Values.linkerdVersion .Values.controllerImageVersion}}
+    app.kubernetes.io/version: {{.Values.linkerdVersion}}
     linkerd.io/control-plane-component: destination
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     giantswarm.io/monitoring_basic_sli: "true"
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   name: linkerd-destination
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{.Values.controllerReplicas}}
   selector:
     matchLabels:
       linkerd.io/control-plane-component: destination
-      linkerd.io/control-plane-ns: {{.Values.namespace}}
+      linkerd.io/control-plane-ns: {{.Release.Namespace}}
       {{- include "partials.proxy.labels" $tree.Values.proxy | nindent 6}}
-  {{- if .Values.enablePodAntiAffinity }}
+  {{- if .Values.deploymentStrategy }}
   strategy:
-    rollingUpdate:
-      maxUnavailable: 1
+    {{- with .Values.deploymentStrategy }}{{ toYaml . | trim | nindent 4 }}{{- end }}
   {{- end }}
   template:
     metadata:
       annotations:
-        {{- if (or (empty .Values.cliVersion) (not (eq (.Values.stage | toString) "control-plane"))) }}
-        checksum/config: {{ include (print $.Template.BasePath "/destination-rbac.yaml") . | sha256sum }}
+        {{- if empty .Values.cliVersion }}
+        linkerd.io/helm-release-version: {{.Release.Revision | quote}}
         {{- end }}
         {{ include "partials.annotations.created-by" . }}
         {{- include "partials.proxy.annotations" . | nindent 8}}
@@ -164,26 +162,27 @@ spec:
         config.linkerd.io/default-inbound-policy: "all-unauthenticated"
       labels:
         linkerd.io/control-plane-component: destination
-        linkerd.io/control-plane-ns: {{.Values.namespace}}
-        linkerd.io/workload-ns: {{.Values.namespace}}
+        linkerd.io/control-plane-ns: {{.Release.Namespace}}
+        linkerd.io/workload-ns: {{.Release.Namespace}}
         {{- include "linkerd.giantswarm-labels" . | nindent 8 }}
         {{- include "partials.proxy.labels" $tree.Values.proxy | nindent 8}}
         {{- with .Values.podLabels }}{{ toYaml . | trim | nindent 8 }}{{- end }}
     spec:
+      {{- with .Values.runtimeClassName }}
+      runtimeClassName: {{ . | quote }}
+      {{- end }}
       {{- if .Values.tolerations -}}
       {{- include "linkerd.tolerations" . | nindent 6 }}
       {{- end -}}
       {{- include "linkerd.node-selector" . | nindent 6 }}
-      {{- if .Values.enablePodAntiAffinity -}}
-      {{- $local := dict "component" "destination" -}}
-      {{- include "linkerd.pod-affinity" $local | nindent 6 -}}
-      {{- end }}
+      {{- $_ := set $tree "component" "destination" -}}
+      {{- include "linkerd.affinity" $tree | nindent 6 }}
       containers:
       {{- if not (empty .Values.destinationProxyResources) }}
       {{- $r := merge .Values.destinationProxyResources .Values.proxy.resources }}
       {{- $_ := set $tree.Values.proxy "resources" $r }}
       {{- end }}
-      {{- $_ := set $tree.Values.proxy "await" true }}
+      {{- $_ := set $tree.Values.proxy "await" $tree.Values.proxy.await }}
       {{- $_ := set $tree.Values.proxy "loadTrustBundleFromConfigMap" true }}
       {{- $_ := set $tree.Values.proxy "podInboundPorts" "8086,8090,8443,9443,9990,9996,9997" }}
       {{- /*
@@ -195,7 +194,7 @@ spec:
       - args:
         - destination
         - -addr=:8086
-        - -controller-namespace={{.Values.namespace}}
+        - -controller-namespace={{.Release.Namespace}}
         - -enable-h2-upgrade={{.Values.enableH2Upgrade}}
         - -log-level={{.Values.controllerLogLevel}}
         - -log-format={{.Values.controllerLogFormat}}
@@ -205,7 +204,7 @@ spec:
         - -default-opaque-ports={{.Values.proxy.opaquePorts}}
         - -enable-pprof={{.Values.enablePprof | default false}}
         {{- include "partials.linkerd.trace" . | nindent 8 -}}
-        image: "{{.Values.image.registry}}/{{.Values.controllerImage}}:{{default .Values.linkerdVersion .Values.controllerImageVersion}}"
+        image: "{{.Values.image.registry}}/{{.Values.controllerImage}}:{{.Values.linkerdVersion}}"
         imagePullPolicy: {{.Values.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -229,12 +228,13 @@ spec:
         securityContext:
           runAsUser: {{.Values.controllerUID}}
           readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
       - args:
         - sp-validator
         - -log-level={{.Values.controllerLogLevel}}
         - -log-format={{.Values.controllerLogFormat}}
         - -enable-pprof={{.Values.enablePprof | default false}}
-        image: "{{.Values.image.registry}}/{{.Values.controllerImage}}:{{.Values.controllerImageVersion | default .Values.linkerdVersion}}"
+        image: "{{.Values.image.registry}}/{{.Values.controllerImage}}:{{.Values.linkerdVersion}}"
         imagePullPolicy: {{.Values.imagePullPolicy}}
         livenessProbe:
           httpGet:
@@ -258,22 +258,26 @@ spec:
         securityContext:
           runAsUser: {{.Values.controllerUID}}
           readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
         volumeMounts:
         - mountPath: /var/run/linkerd/tls
           name: sp-tls
           readOnly: true
       - args:
         - --admin-addr=0.0.0.0:9990
-        - --control-plane-namespace={{.Values.namespace}}
+        - --control-plane-namespace={{.Release.Namespace}}
         - --grpc-addr=0.0.0.0:8090
         - --server-addr=0.0.0.0:9443
         - --server-tls-key=/var/run/linkerd/tls/tls.key
         - --server-tls-certs=/var/run/linkerd/tls/tls.crt
         - --cluster-networks={{.Values.clusterNetworks}}
         - --identity-domain={{.Values.identityTrustDomain | default .Values.clusterDomain}}
-        - --default-policy={{.Values.policyController.defaultAllowPolicy}}
+        - --default-policy={{.Values.proxy.defaultInboundPolicy}}
         - --log-level={{.Values.policyController.logLevel | default "linkerd=info,warn"}}
         - --log-format={{.Values.controllerLogFormat}}
+        {{- if .Values.policyController.probeNetworks }}
+        - --probe-networks={{.Values.policyController.probeNetworks | join ","}}
+        {{- end}}
         image: "{{.Values.image.registry}}/{{.Values.policyController.image.name}}:{{.Values.policyController.image.version | default .Values.linkerdVersion}}"
         imagePullPolicy: {{.Values.policyController.image.pullPolicy | default .Values.imagePullPolicy}}
         livenessProbe:
@@ -305,6 +309,7 @@ spec:
         securityContext:
           runAsUser: {{.Values.controllerUID}}
           readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
         volumeMounts:
         - mountPath: /var/run/linkerd/tls
           name: policy-tls
@@ -320,7 +325,10 @@ spec:
       {{- else if .Values.postHookInitHack.enabled }}
       initContainers:
       - {{- include "post-hook-init-hack.container" . | indent 8 | trimPrefix (repeat 7 " ") }}
-      {{- end }}
+      {{ end -}}
+      {{- if .Values.priorityClassName -}}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{ end -}}
       serviceAccountName: linkerd-destination
       volumes:
       - name: sp-tls
@@ -331,5 +339,8 @@ spec:
           secretName: linkerd-policy-validator-k8s-tls
       {{ if not .Values.cniEnabled -}}
       - {{- include "partials.proxyInit.volumes.xtables" . | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ end -}}
+      {{if .Values.identity.serviceAccountTokenProjection -}}
+      - {{- include "partials.proxy.volumes.service-account-token" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{ end -}}
       - {{- include "partials.proxy.volumes.identity" . | indent 8 | trimPrefix (repeat 7 " ") }}
