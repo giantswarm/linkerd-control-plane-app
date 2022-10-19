@@ -1,24 +1,24 @@
-apiVersion: v2
+apiVersion: "v1"
 appVersion: stable-2.11.4
-annotations:
-  application.giantswarm.io/team: team-cabbage
-name: linkerd2-app
 description: |
   Linkerd gives you observability, reliability, and security
   for your microservices — with no code change required.
 home: https://github.com/giantswarm/linkerd2-app
-icon: https://linkerd.io/images/logo-only-200h.png
-dependencies:
-  - name: linkerd-control-plane
-    version: 0.1.0
-  - name: partials
-    version: 0.1.0
+icon: https://s.giantswarm.io/app-icons/linkerd2/1/light.svg
 keywords:
   - service-mesh
 kubeVersion: ">=1.17.0-0"
+maintainers:
+  - email: cncf-linkerd-dev@lists.cncf.io
+    name: Linkerd authors
+    url: https://linkerd.io/
+name: linkerd2-app
 sources:
   - https://github.com/linkerd/linkerd2/
+  - https://linkerd.io
 version: 0.7.5
 restrictions:
   clusterSingleton: true
   fixedNamespace: linkerd
+annotations:
+  application.giantswarm.io/team: cabbage
