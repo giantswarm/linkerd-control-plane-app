@@ -305,9 +305,9 @@ identity:
 
 
 # -|- CPU, Memory and Ephemeral Storage resources required by the identity controller (see `proxy.resources` for sub-fields)
-#identityResources:
+# identityResources:
 # -|- CPU, Memory and Ephemeral Storage resources required by proxy injected into identity pod (see `proxy.resources` for sub-fields)
-#identityProxyResources:
+# identityProxyResources:
 
 # heartbeat configuration
 # disableHeartBeat -- Set to true to not start the heartbeat cronjob
@@ -374,11 +374,11 @@ proxyInjector:
   injectCaFromSecret: ""
 
 # -|- CPU, Memory and Ephemeral Storage resources required by the proxy injector (see
-#`proxy.resources` for sub-fields)
-#proxyInjectorResources:
-#-|- CPU, Memory and Ephemeral Storage resources required by proxy injected into the proxy injector
-#pod (see `proxy.resources` for sub-fields)
-#proxyInjectorProxyResources:
+# `proxy.resources` for sub-fields)
+# proxyInjectorResources:
+# -|- CPU, Memory and Ephemeral Storage resources required by proxy injected into the proxy injector
+# pod (see `proxy.resources` for sub-fields)
+# proxyInjectorProxyResources:
 
 # service profile validator configuration
 profileValidator:
