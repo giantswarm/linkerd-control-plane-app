@@ -29,6 +29,33 @@
         "controllerReplicas": {
             "type": "integer"
         },
+        "controllerResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "controllerUID": {
             "type": "integer"
         },
@@ -61,6 +88,33 @@
                             "type": "string"
                         },
                         "maxUnavailable": {
+                            "type": ["integer","string"]
+                        }
+                    }
+                }
+            }
+        },
+        "destinationResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
                             "type": "string"
                         }
                     }
@@ -87,6 +141,33 @@
         },
         "enablePprof": {
             "type": "boolean"
+        },
+        "heartbeatResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         },
         "identity": {
             "type": "object",
@@ -121,6 +202,33 @@
                 },
                 "serviceAccountTokenProjection": {
                     "type": "boolean"
+                }
+            }
+        },
+        "identityResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -612,8 +720,62 @@
                 }
             }
         },
+        "proxyInjectorResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "runtimeClassName": {
             "type": "string"
+        },
+        "spValidatorResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         },
         "webhookFailurePolicy": {
             "type": "string"
