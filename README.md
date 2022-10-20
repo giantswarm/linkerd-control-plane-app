@@ -171,6 +171,13 @@ Although not recommended, it is possible to edit the default `PodSecurityPolicy`
 
 You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.2).
 
+## Maintainer info
+
+This chart is maintained using the vendir method. You need [vendir](https://github.com/vmware-tanzu/carvel-vendir) and [yq](https://github.com/mikefarah/yq) binaries for it to work.
+
+Run `make upgrade-chart` to pull the last stable version of the chart from 
+<https://github.com/giantswarm/linkerd2-upstream>.
+
 ## Credit
 
 - <https://linkerd.io/2.11/tasks/install-helm/>
