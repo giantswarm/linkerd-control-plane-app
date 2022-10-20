@@ -133,18 +133,21 @@ Kubernetes: `>=1.21.0-0`
 | controllerLogFormat | string | `"plain"` | Log format for the control plane components |
 | controllerLogLevel | string | `"info"` | Log level for the control plane components |
 | controllerReplicas | int | `3` | Number of replicas for each control plane pod |
+| controllerResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | Resource limits for controller |
 | controllerUID | int | `2103` | User ID for the control plane components |
 | debugContainer.image.name | string | `"giantswarm/linkerd2-debug"` | Docker image for the debug container |
 | debugContainer.image.pullPolicy | string | imagePullPolicy | Pull policy for the debug container Docker image |
 | debugContainer.image.version | string | linkerdVersion | Tag for the debug container Docker image |
-| deploymentStrategy | object | `{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"}}` | default kubernetes deployment strategy |
+| deploymentStrategy | object | `{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":1}}` | default kubernetes deployment strategy |
+| destinationResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | CPU, Memory and Ephemeral Storage resources required by destination (see `proxy.resources` for sub-fields) |
 | disableHeartBeat | bool | `false` | Set to true to not start the heartbeat cronjob |
 | enableEndpointSlices | bool | `true` | enables the use of EndpointSlice informers for the destination service; enableEndpointSlices should be set to true only if EndpointSlice K8s feature gate is on |
 | enableH2Upgrade | bool | `true` | Allow proxies to perform transparent HTTP/2 upgrading |
 | enablePSP | bool | `true` | Add a PSP resource and bind it to the control plane ServiceAccounts. Note PSP has been deprecated since k8s v1.21 |
 | enablePodAntiAffinity | bool | `true` | enables pod anti affinity creation on deployments for high availability |
-| enablePodDisruptionBudget | bool | `false` | enables the creation of pod disruption budgets for control plane components |
+| enablePodDisruptionBudget | bool | `true` | enables the creation of pod disruption budgets for control plane components |
 | enablePprof | bool | `false` | enables the use of pprof endpoints on control plane component's admin servers |
+| heartbeatResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | Config for the heartbeat cronjob heartbeatSchedule: "0 0 * * *" |
 | identity.externalCA | bool | `false` | If the linkerd-identity-trust-roots ConfigMap has already been created |
 | identity.issuer.clockSkewAllowance | string | `"20s"` | Amount of time to allow for clock skew within a Linkerd cluster |
 | identity.issuer.issuanceLifetime | string | `"24h0m0s"` | Amount of time for which the Identity issuer should certify identity |
@@ -153,6 +156,10 @@ Kubernetes: `>=1.21.0-0`
 | identity.issuer.tls.crtPEM | string | `""` | Issuer certificate (ECDSA). It must be provided during install. |
 | identity.issuer.tls.keyPEM | string | `""` | Key for the issuer certificate (ECDSA). It must be provided during install |
 | identity.serviceAccountTokenProjection | bool | `true` | Use [Service Account token Volume projection](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#service-account-token-volume-projection) for pod validation instead of the default token |
+| identityResources.cpu.limit | string | `""` |  |
+| identityResources.cpu.request | string | `"100m"` |  |
+| identityResources.memory.limit | string | `"250Mi"` |  |
+| identityResources.memory.request | string | `"10Mi"` |  |
 | identityTrustAnchorsPEM | string | `""` | Trust root certificate (ECDSA). It must be provided during install. |
 | identityTrustDomain | string | clusterDomain | Trust domain used for identity |
 | image | object | `{"registry":"quay.io"}` | Registry switch Do not overwrite this as it is automatically set based on the installation region |
@@ -244,8 +251,16 @@ Kubernetes: `>=1.21.0-0`
 | proxyInjector.keyPEM | string | `""` | Certificate key for the proxy injector. If not provided and not using an external secret then Helm will generate one. |
 | proxyInjector.namespaceSelector | object | `{"matchExpressions":[{"key":"config.linkerd.io/admission-webhooks","operator":"NotIn","values":["disabled"]},{"key":"kubernetes.io/metadata.name","operator":"NotIn","values":["kube-system","cert-manager"]}]}` | Namespace selector used by admission webhook. |
 | proxyInjector.objectSelector | object | `{"matchExpressions":[{"key":"linkerd.io/control-plane-component","operator":"DoesNotExist"},{"key":"linkerd.io/cni-resource","operator":"DoesNotExist"}]}` | Object selector used by admission webhook. |
+| proxyInjectorResources.cpu.limit | string | `""` |  |
+| proxyInjectorResources.cpu.request | string | `"100m"` |  |
+| proxyInjectorResources.memory.limit | string | `"250Mi"` |  |
+| proxyInjectorResources.memory.request | string | `"50Mi"` |  |
 | runtimeClassName | string | `""` | Runtime Class Name for all the pods |
-| webhookFailurePolicy | string | `"Ignore"` | Failure policy for the proxy injector |
+| spValidatorResources.cpu.limit | string | `""` |  |
+| spValidatorResources.cpu.request | string | `"100m"` |  |
+| spValidatorResources.memory.limit | string | `"250Mi"` |  |
+| spValidatorResources.memory.request | string | `"50Mi"` |  |
+| webhookFailurePolicy | string | `"Fail"` | Failure policy for the proxy injector |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
