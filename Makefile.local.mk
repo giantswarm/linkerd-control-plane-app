@@ -29,4 +29,3 @@ apply-vendor:
 	cp -r $(VENDOR_CHART_LINKERD)/templates $(MAIN_CHART)
 	cp -r $(VENDOR_CHART_PARTIALS) $(MAIN_CHART)/charts/
 	cp -r $(VENDOR_CHART_CRDS) $(MAIN_CHART)/charts/
-
