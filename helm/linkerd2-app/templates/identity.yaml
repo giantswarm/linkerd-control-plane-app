@@ -3,7 +3,6 @@
 ### Identity Controller Service
 ###
 {{ if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/tls") -}}
----
 kind: Secret
 apiVersion: v1
 metadata:

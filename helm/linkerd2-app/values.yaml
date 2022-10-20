@@ -38,7 +38,7 @@ deploymentStrategy:
 # gate is on
 enableEndpointSlices: true
 # -- enables pod anti affinity creation on deployments for high availability
-enablePodAntiAffinity: false
+enablePodAntiAffinity: true
 # -- enables the use of pprof endpoints on control plane component's admin
 # servers
 enablePprof: false
