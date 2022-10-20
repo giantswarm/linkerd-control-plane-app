@@ -1,9 +1,0 @@
-dependencies:
-- name: linkerd-control-plane
-  repository: ""
-  version: 0.1.0
-- name: partials
-  repository: ""
-  version: 0.1.0
-digest: sha256:236e6353cae127b1a159d7cff060291c70045ba440581b108af3cc055c87b8c1
-generated: "2022-10-05T16:59:48.836770518+02:00"
