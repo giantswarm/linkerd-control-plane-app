@@ -22,9 +22,9 @@ workflows:
           name: execute chart tests
           app-test-suite_container_tag: "0.2.3"
           filters:
-            # Do not trigger the job on merge to master.
+            # Do not trigger the job on merge to main.
             branches:
               ignore:
-                - master
+                - main
           requires:
             - "package and push linkerd2 chart"
