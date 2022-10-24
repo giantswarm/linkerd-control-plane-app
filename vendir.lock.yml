@@ -2,10 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: add post-hook init hack
-      sha: 1ed540f22c796cd6738aa1b2933c47aebaaa7283
+      commitTitle: remove malformed yaml doc
+      sha: 267c734998cbed450619ae9c8508ef62efc2ee33
       tags:
-      - stable-2.10.1-2037-g1ed540f22
+      - stable-2.10.1-2039-g267c73499
     path: linkerd
   path: vendor
 kind: LockConfig
