@@ -3,14 +3,15 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: linkerd-config
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: controller
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 data:
+  linkerd-crds-chart-version: linkerd-crds-1.0.0-edge
   values: |
   {{- $values := deepCopy .Values }}
   {{- /*

@@ -3,9 +3,9 @@
 Linkerd gives you observability, reliability, and security
 for your microservices — with no code change required.
 
-![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square)
+![Version: 0.7.5](https://img.shields.io/badge/Version-0.7.5-informational?style=flat-square)
 
-![AppVersion: stable-2.11.2](https://img.shields.io/badge/AppVersion-stable--2.11.2-informational?style=flat-square)
+![AppVersion: stable-2.12.1](https://img.shields.io/badge/AppVersion-stable--2.12.1-informational?style=flat-square)
 
 **Homepage:** <https://github.com/giantswarm/linkerd2-app>
 
@@ -113,40 +113,41 @@ extensions:
 
 ## Requirements
 
-Kubernetes: `>=1.17.0-0`
+Kubernetes: `>=1.21.0-0`
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../partials | partials | 0.1.0 |
+|  | linkerd-crds | 1.4.0 |
+|  | partials | 0.1.0 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | clusterDomain | string | `"cluster.local"` | Kubernetes DNS Domain name to use |
-| clusterNetworks | string | `"10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16"` | The cluster networks for which service discovery is performed. This should include the pod and service networks, but need not include the node network. By default, all private networks are specified so that resolution works in typical Kubernetes environments. |
+| clusterNetworks | string | `"10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16"` | The cluster networks for which service discovery is performed. This should include the pod and service networks, but need not include the node network.  By default, all private networks are specified so that resolution works in typical Kubernetes environments. |
 | cniEnabled | bool | `true` | enabling this omits the NET_ADMIN capability in the PSP and the proxy-init container when injecting the proxy; requires the linkerd-cni plugin to already be installed |
 | controlPlaneTracing | bool | `false` | enables control plane tracing |
 | controlPlaneTracingNamespace | string | `"linkerd-jaeger"` | namespace to send control plane traces to |
-| controllerImage | string | `"giantswarm/linkerd2-controller"` | Docker image for the controller and identity components |
+| controllerImage | string | `"giantswarm/linkerd2-controller"` | Docker image for the destination and identity components |
 | controllerLogFormat | string | `"plain"` | Log format for the control plane components |
 | controllerLogLevel | string | `"info"` | Log level for the control plane components |
 | controllerReplicas | int | `3` | Number of replicas for each control plane pod |
-| controllerResources.cpu.limit | string | `""` |  |
-| controllerResources.cpu.request | string | `"100m"` |  |
-| controllerResources.memory.limit | string | `"250Mi"` |  |
-| controllerResources.memory.request | string | `"50Mi"` |  |
+| controllerResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | Resource limits for controller |
 | controllerUID | int | `2103` | User ID for the control plane components |
 | debugContainer.image.name | string | `"giantswarm/linkerd2-debug"` | Docker image for the debug container |
 | debugContainer.image.pullPolicy | string | imagePullPolicy | Pull policy for the debug container Docker image |
 | debugContainer.image.version | string | linkerdVersion | Tag for the debug container Docker image |
-| destinationResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | CPU and Memory resources required by destination (see `proxy.resources` for sub-fields) |
+| deploymentStrategy | object | `{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":1}}` | default kubernetes deployment strategy |
+| destinationResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | CPU, Memory and Ephemeral Storage resources required by destination (see `proxy.resources` for sub-fields) |
 | disableHeartBeat | bool | `false` | Set to true to not start the heartbeat cronjob |
-| enableEndpointSlices | bool | `false` | enables the use of EndpointSlice informers for the destination service; enableEndpointSlices should be set to true only if EndpointSlice K8s feature gate is on; the feature is still experimental. |
+| enableEndpointSlices | bool | `true` | enables the use of EndpointSlice informers for the destination service; enableEndpointSlices should be set to true only if EndpointSlice K8s feature gate is on |
 | enableH2Upgrade | bool | `true` | Allow proxies to perform transparent HTTP/2 upgrading |
 | enablePSP | bool | `true` | Add a PSP resource and bind it to the control plane ServiceAccounts. Note PSP has been deprecated since k8s v1.21 |
-| enablePodAntiAffinity | bool | `true` |  |
+| enablePodAntiAffinity | bool | `true` | enables pod anti affinity creation on deployments for high availability |
+| enablePodDisruptionBudget | bool | `true` | enables the creation of pod disruption budgets for control plane components |
 | enablePprof | bool | `false` | enables the use of pprof endpoints on control plane component's admin servers |
+| heartbeatResources | object | `{"cpu":{"limit":"","request":"100m"},"memory":{"limit":"250Mi","request":"50Mi"}}` | Config for the heartbeat cronjob heartbeatSchedule: "0 0 * * *" |
 | identity.externalCA | bool | `false` | If the linkerd-identity-trust-roots ConfigMap has already been created |
 | identity.issuer.clockSkewAllowance | string | `"20s"` | Amount of time to allow for clock skew within a Linkerd cluster |
 | identity.issuer.issuanceLifetime | string | `"24h0m0s"` | Amount of time for which the Identity issuer should certify identity |
@@ -154,42 +155,51 @@ Kubernetes: `>=1.17.0-0`
 | identity.issuer.tls | object | `{"crtPEM":"","keyPEM":""}` | Which scheme is used for the identity issuer secret format |
 | identity.issuer.tls.crtPEM | string | `""` | Issuer certificate (ECDSA). It must be provided during install. |
 | identity.issuer.tls.keyPEM | string | `""` | Key for the issuer certificate (ECDSA). It must be provided during install |
+| identity.serviceAccountTokenProjection | bool | `true` | Use [Service Account token Volume projection](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#service-account-token-volume-projection) for pod validation instead of the default token |
 | identityResources.cpu.limit | string | `""` |  |
 | identityResources.cpu.request | string | `"100m"` |  |
 | identityResources.memory.limit | string | `"250Mi"` |  |
 | identityResources.memory.request | string | `"10Mi"` |  |
 | identityTrustAnchorsPEM | string | `""` | Trust root certificate (ECDSA). It must be provided during install. |
 | identityTrustDomain | string | clusterDomain | Trust domain used for identity |
+| image | object | `{"registry":"quay.io"}` | Registry switch Do not overwrite this as it is automatically set based on the installation region |
 | imagePullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | imagePullSecrets | list | `[]` | For Private docker registries, authentication is needed.  Registry secrets are applied to the respective service accounts |
-| installNamespace | bool | `false` | Set to false when installing Linkerd in a custom namespace. See the [Linkerd documentation](https://linkerd.io/2/tasks/install-helmcustomizing-the-namespace) for more information. |
-| linkerdVersion | string | `"stable-2.11.2"` | control plane version. See Proxy section for proxy version |
-| namespace | string | `"linkerd"` | Control plane namespace |
+| linkerdVersion | string | `"stable-2.12.1"` | control plane version. See Proxy section for proxy version |
 | nodeSelector | object | `{"kubernetes.io/os":"linux"}` | NodeSelector section, See the [K8S documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) for more information |
 | podAnnotations | object | `{}` | Additional annotations to add to all pods |
 | podLabels | object | `{}` | Additional labels to add to all pods |
-| policyController.defaultAllowPolicy | string | "all-unauthenticated" | The default allow policy to use when no `Server` selects a pod.  One of: "all-authenticated", "all-unauthenticated", "cluster-authenticated", "cluster-unauthenticated", "deny" |
-| policyController.image.name | string | `"giantswarm/linkerd2-policy-controller"` | Docker image for the proxy |
+| policyController.image.name | string | `"giantswarm/linkerd2-policy-controller"` | Docker image for the policy controller |
 | policyController.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy container Docker image |
 | policyController.image.version | string | linkerdVersion | Tag for the proxy container Docker image |
-| policyController.logLevel | string | `"linkerd=info,warn"` | Log level for the policy controller |
+| policyController.logLevel | string | `"info"` | Log level for the policy controller |
+| policyController.probeNetworks | list | `["0.0.0.0/0"]` | The networks from which probes are performed.  By default, all networks are allowed so that all probes are authorized. |
 | policyController.resources | object | destinationResources | policy controller resource requests & limits |
 | policyController.resources.cpu.limit | string | `""` | Maximum amount of CPU units that the policy controller can use |
 | policyController.resources.cpu.request | string | `""` | Amount of CPU units that the policy controller requests |
+| policyController.resources.ephemeral-storage.limit | string | `""` | Maximum amount of ephemeral storage that the policy controller can use |
+| policyController.resources.ephemeral-storage.request | string | `""` | Amount of ephemeral storage that the policy controller requests |
 | policyController.resources.memory.limit | string | `""` | Maximum amount of memory that the policy controller can use |
 | policyController.resources.memory.request | string | `""` | Maximum amount of memory that the policy controller requests |
-| policyValidator.caBundle | string | `""` | Bundle of CA certificates for policy validator. If not provided then Helm will use the certificate generated  for `policyValidator.crtPEM`. If `policyValidator.externalSecret` is set to true, this value must be set, as no certificate will be generated. |
-| policyValidator.crtPEM | string | `""` | Certificate for the policy validator. If not provided then Helm will generate one. |
-| policyValidator.externalSecret | bool | `false` | Do not create a secret resource for the policyValidator webhook. If this is set to `true`, the value `policyValidator.caBundle` must be set (see below). |
-| policyValidator.keyPEM | string | `""` | Certificate key for the policy validator. If not provided then Helm will generate one. |
+| policyValidator.caBundle | string | `""` | Bundle of CA certificates for proxy injector. If not provided nor injected with cert-manager, then Helm will use the certificate generated for `policyValidator.crtPEM`. If `policyValidator.externalSecret` is set to true, this value, injectCaFrom, or injectCaFromSecret must be set, as no certificate will be generated. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector) for more information. |
+| policyValidator.crtPEM | string | `""` | Certificate for the policy validator. If not provided and not using an external secret then Helm will generate one. |
+| policyValidator.externalSecret | bool | `false` | Do not create a secret resource for the policyValidator webhook. If this is set to `true`, the value `policyValidator.caBundle` must be set or the ca bundle must injected with cert-manager ca injector using `policyValidator.injectCaFrom` or `policyValidator.injectCaFromSecret` (see below). |
+| policyValidator.injectCaFrom | string | `""` | Inject the CA bundle from a cert-manager Certificate. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-certificate-resource) for more information. |
+| policyValidator.injectCaFromSecret | string | `""` | Inject the CA bundle from a Secret. If set, the `cert-manager.io/inject-ca-from-secret` annotation will be added to the webhook. The Secret must have the CA Bundle stored in the `ca.crt` key and have the `cert-manager.io/allow-direct-injection` annotation set to `true`. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-secret-resource) for more information. |
+| policyValidator.keyPEM | string | `""` | Certificate key for the policy validator. If not provided and not using an external secret then Helm will generate one. |
 | policyValidator.namespaceSelector | object | `{"matchExpressions":[{"key":"config.linkerd.io/admission-webhooks","operator":"NotIn","values":["disabled"]}]}` | Namespace selector used by admission webhook |
-| profileValidator.caBundle | string | `""` | Bundle of CA certificates for service profile validator. If not provided then Helm will use the certificate generated  for `profileValidator.crtPEM`. If `profileValidator.externalSecret` is set to true, this value must be set, as no certificate will be generated. |
-| profileValidator.crtPEM | string | `""` | Certificate for the service profile validator. If not provided then Helm will generate one. |
-| profileValidator.externalSecret | bool | `false` | Do not create a secret resource for the profileValidator webhook. If this is set to `true`, the value `profileValidator.caBundle` must be set (see below). |
-| profileValidator.keyPEM | string | `""` | Certificate key for the service profile validator. If not provided then Helm will generate one. |
+| postHookInitHack | object | `{"enabled":true,"image":"giantswarm/alpine:3.15.5"}` | postHookInitHack There is a race condition in Kubernetes for cluster running a CNI different than calico as primary together with Calico as a policy engine (network policies). This is a workaround to make it work it. More info in https://github.com/giantswarm/roadmap/issues/1174 |
+| priorityClassName | string | `""` | Kubernetes priorityClassName for the Linkerd Pods |
+| profileValidator.caBundle | string | `""` | Bundle of CA certificates for proxy injector. If not provided nor injected with cert-manager, then Helm will use the certificate generated for `profileValidator.crtPEM`. If `profileValidator.externalSecret` is set to true, this value, injectCaFrom, or injectCaFromSecret must be set, as no certificate will be generated. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector) for more information. |
+| profileValidator.crtPEM | string | `""` | Certificate for the service profile validator. If not provided and not using an external secret then Helm will generate one. |
+| profileValidator.externalSecret | bool | `false` | Do not create a secret resource for the profileValidator webhook. If this is set to `true`, the value `proxyInjector.caBundle` must be set or the ca bundle must injected with cert-manager ca injector using `proxyInjector.injectCaFrom` or `proxyInjector.injectCaFromSecret` (see below). |
+| profileValidator.injectCaFrom | string | `""` | Inject the CA bundle from a cert-manager Certificate. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-certificate-resource) for more information. |
+| profileValidator.injectCaFromSecret | string | `""` | Inject the CA bundle from a Secret. If set, the `cert-manager.io/inject-ca-from-secret` annotation will be added to the webhook. The Secret must have the CA Bundle stored in the `ca.crt` key and have the `cert-manager.io/allow-direct-injection` annotation set to `true`. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-secret-resource) for more information. |
+| profileValidator.keyPEM | string | `""` | Certificate key for the service profile validator. If not provided and not using an external secret then Helm will generate one. |
 | profileValidator.namespaceSelector | object | `{"matchExpressions":[{"key":"config.linkerd.io/admission-webhooks","operator":"NotIn","values":["disabled"]}]}` | Namespace selector used by admission webhook |
-| proxy.await | bool | `true` |  |
+| proxy.await | bool | `true` | If set, the application container will not start until the proxy is ready |
 | proxy.cores | int | `0` | The `cpu.limit` and `cores` should be kept in sync. The value of `cores` must be an integer and should typically be set by rounding up from the limit. E.g. if cpu.limit is '1500m', cores should be 2. |
+| proxy.defaultInboundPolicy | string | "all-unauthenticated" | The default allow policy to use when no `Server` selects a pod.  One of: "all-authenticated", "all-unauthenticated", "cluster-authenticated", "cluster-unauthenticated", "deny" |
 | proxy.enableExternalProfiles | bool | `false` | Enable service profiles for non-Kubernetes services |
 | proxy.image.name | string | `"giantswarm/linkerd2-proxy"` | Docker image for the proxy |
 | proxy.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy container Docker image |
@@ -206,36 +216,51 @@ Kubernetes: `>=1.17.0-0`
 | proxy.requireIdentityOnInboundPorts | string | `""` |  |
 | proxy.resources.cpu.limit | string | `""` | Maximum amount of CPU units that the proxy can use |
 | proxy.resources.cpu.request | string | `"100m"` | Amount of CPU units that the proxy requests |
+| proxy.resources.ephemeral-storage.limit | string | `""` | Maximum amount of ephemeral storage that the proxy can use |
+| proxy.resources.ephemeral-storage.request | string | `""` | Amount of ephemeral storage that the proxy requests |
 | proxy.resources.memory.limit | string | `"250Mi"` | Maximum amount of memory that the proxy can use |
 | proxy.resources.memory.request | string | `"20Mi"` | Maximum amount of memory that the proxy requests |
+| proxy.shutdownGracePeriod | string | `""` | Grace period for graceful proxy shutdowns. If this timeout elapses before all open connections have completed, the proxy will terminate forcefully, closing any remaining connections. |
 | proxy.uid | int | `2102` | User id under which the proxy runs |
 | proxy.waitBeforeExitSeconds | int | `0` | If set the proxy sidecar will stay alive for at least the given period before receiving SIGTERM signal from Kubernetes but no longer than pod's `terminationGracePeriodSeconds`. See [Lifecycle hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks) for more info on container lifecycle hooks. |
 | proxyInit.closeWaitTimeoutSecs | int | `0` |  |
-| proxyInit.ignoreInboundPorts | string | `"4190,4191,4567,4568"` | Default set of inbound ports to skip via iptables - linkerd (4190,4191) - Galera (4567,4568) |
-| proxyInit.ignoreOutboundPorts | string | `"4190,4191,4567,4568"` | Default set of outbound ports to skip via iptables - linkerd (4190,4191) - Galera (4567,4568) |
+| proxyInit.ignoreInboundPorts | string | `"4567,4568"` | Default set of inbound ports to skip via iptables - Galera (4567,4568) |
+| proxyInit.ignoreOutboundPorts | string | `"4567,4568"` | Default set of outbound ports to skip via iptables - Galera (4567,4568) |
 | proxyInit.image.name | string | `"giantswarm/linkerd2-proxy-init"` | Docker image for the proxy-init container |
 | proxyInit.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy-init container Docker image |
-| proxyInit.image.version | string | `"v1.5.3"` | Tag for the proxy-init container Docker image |
+| proxyInit.image.version | string | `"v2.0.0"` | Tag for the proxy-init container Docker image |
+| proxyInit.iptablesMode | string | `"legacy"` | Variant of iptables that will be used to configure routing. Currently, proxy-init can be run either in 'nft' or in 'legacy' mode. The mode will control which utility binary will be called. The host must support whichever mode will be used |
 | proxyInit.logFormat | string | plain | Log format (`plain` or `json`) for the proxy-init |
 | proxyInit.logLevel | string | info | Log level for the proxy-init |
 | proxyInit.resources.cpu.limit | string | `"100m"` | Maximum amount of CPU units that the proxy-init container can use |
-| proxyInit.resources.cpu.request | string | `"10m"` | Amount of CPU units that the proxy-init container requests |
+| proxyInit.resources.cpu.request | string | `"100m"` | Amount of CPU units that the proxy-init container requests |
+| proxyInit.resources.ephemeral-storage.limit | string | `""` | Maximum amount of ephemeral storage that the proxy-init container can use |
+| proxyInit.resources.ephemeral-storage.request | string | `""` | Amount of ephemeral storage that the proxy-init container requests |
 | proxyInit.resources.memory.limit | string | `"50Mi"` | Maximum amount of memory that the proxy-init container can use |
-| proxyInit.resources.memory.request | string | `"10Mi"` | Amount of memory that the proxy-init container requests |
-| proxyInit.runAsRoot | bool | `true` | Allow overriding the runAsNonRoot behaviour |
+| proxyInit.resources.memory.request | string | `"20Mi"` | Amount of memory that the proxy-init container requests |
+| proxyInit.runAsRoot | bool | `false` | Allow overriding the runAsNonRoot behaviour (<https://github.com/linkerd/linkerd2/issues/7308>) |
+| proxyInit.runAsUser | int | `65534` | This value is used only if runAsRoot is false; otherwise runAsUser will be 0 |
 | proxyInit.skipSubnets | string | `""` | Comma-separated list of subnets in valid CIDR format that should be skipped by the proxy |
 | proxyInit.xtMountPath.mountPath | string | `"/run"` |  |
 | proxyInit.xtMountPath.name | string | `"linkerd-proxy-init-xtables-lock"` |  |
-| proxyInjector.caBundle | string | `""` | Bundle of CA certificates for proxy injector. If not provided then Helm will use the certificate generated  for `proxyInjector.crtPEM`. If `proxyInjector.externalSecret` is set to true, this value must be set, as no certificate will be generated. |
-| proxyInjector.crtPEM | string | `""` | Certificate for the proxy injector. If not provided then Helm will generate one. |
-| proxyInjector.externalSecret | bool | `false` | Do not create a secret resource for the profileValidator webhook. If this is set to `true`, the value `proxyInjector.caBundle` must be set (see below) |
-| proxyInjector.keyPEM | string | `""` | Certificate key for the proxy injector. If not provided then Helm will generate one. |
-| proxyInjector.namespaceSelector | object | `{"matchExpressions":[{"key":"config.linkerd.io/admission-webhooks","operator":"NotIn","values":["disabled"]}]}` | Namespace selector used by admission webhook. If not set defaults to all namespaces without the annotation config.linkerd.io/admission-webhooks=disabled |
+| proxyInjector.caBundle | string | `""` | Bundle of CA certificates for proxy injector. If not provided nor injected with cert-manager, then Helm will use the certificate generated for `proxyInjector.crtPEM`. If `proxyInjector.externalSecret` is set to true, this value, injectCaFrom, or injectCaFromSecret must be set, as no certificate will be generated. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector) for more information. |
+| proxyInjector.crtPEM | string | `""` | Certificate for the proxy injector. If not provided and not using an external secret then Helm will generate one. |
+| proxyInjector.externalSecret | bool | `false` | Do not create a secret resource for the proxyInjector webhook. If this is set to `true`, the value `proxyInjector.caBundle` must be set or the ca bundle must injected with cert-manager ca injector using `proxyInjector.injectCaFrom` or `proxyInjector.injectCaFromSecret` (see below). |
+| proxyInjector.injectCaFrom | string | `""` | Inject the CA bundle from a cert-manager Certificate. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-certificate-resource) for more information. |
+| proxyInjector.injectCaFromSecret | string | `""` | Inject the CA bundle from a Secret. If set, the `cert-manager.io/inject-ca-from-secret` annotation will be added to the webhook. The Secret must have the CA Bundle stored in the `ca.crt` key and have the `cert-manager.io/allow-direct-injection` annotation set to `true`. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-secret-resource) for more information. |
+| proxyInjector.keyPEM | string | `""` | Certificate key for the proxy injector. If not provided and not using an external secret then Helm will generate one. |
+| proxyInjector.namespaceSelector | object | `{"matchExpressions":[{"key":"config.linkerd.io/admission-webhooks","operator":"NotIn","values":["disabled"]},{"key":"kubernetes.io/metadata.name","operator":"NotIn","values":["kube-system","cert-manager"]}]}` | Namespace selector used by admission webhook. |
+| proxyInjector.objectSelector | object | `{"matchExpressions":[{"key":"linkerd.io/control-plane-component","operator":"DoesNotExist"},{"key":"linkerd.io/cni-resource","operator":"DoesNotExist"}]}` | Object selector used by admission webhook. |
 | proxyInjectorResources.cpu.limit | string | `""` |  |
 | proxyInjectorResources.cpu.request | string | `"100m"` |  |
 | proxyInjectorResources.memory.limit | string | `"250Mi"` |  |
 | proxyInjectorResources.memory.request | string | `"50Mi"` |  |
+| runtimeClassName | string | `""` | Runtime Class Name for all the pods |
+| spValidatorResources.cpu.limit | string | `""` |  |
+| spValidatorResources.cpu.request | string | `"100m"` |  |
+| spValidatorResources.memory.limit | string | `"250Mi"` |  |
+| spValidatorResources.memory.request | string | `"50Mi"` |  |
 | webhookFailurePolicy | string | `"Fail"` | Failure policy for the proxy injector |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.9.1](https://github.com/norwoodj/helm-docs/releases/v1.9.1)
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

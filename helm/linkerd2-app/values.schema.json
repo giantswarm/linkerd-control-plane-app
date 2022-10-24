@@ -78,6 +78,22 @@
                 }
             }
         },
+        "deploymentStrategy": {
+            "type": "object",
+            "properties": {
+                "rollingUpdate": {
+                    "type": "object",
+                    "properties": {
+                        "maxSurge": {
+                            "type": "string"
+                        },
+                        "maxUnavailable": {
+                            "type": ["integer","string"]
+                        }
+                    }
+                }
+            }
+        },
         "destinationResources": {
             "type": "object",
             "properties": {
@@ -120,8 +136,38 @@
         "enablePodAntiAffinity": {
             "type": "boolean"
         },
+        "enablePodDisruptionBudget": {
+            "type": "boolean"
+        },
         "enablePprof": {
             "type": "boolean"
+        },
+        "heartbeatResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         },
         "identity": {
             "type": "object",
@@ -153,6 +199,9 @@
                             }
                         }
                     }
+                },
+                "serviceAccountTokenProjection": {
+                    "type": "boolean"
                 }
             }
         },
@@ -203,13 +252,7 @@
         "imagePullSecrets": {
             "type": "array"
         },
-        "installNamespace": {
-            "type": "boolean"
-        },
         "linkerdVersion": {
-            "type": "string"
-        },
-        "namespace": {
             "type": "string"
         },
         "nodeSelector": {
@@ -229,9 +272,6 @@
         "policyController": {
             "type": "object",
             "properties": {
-                "defaultAllowPolicy": {
-                    "type": "string"
-                },
                 "image": {
                     "type": "object",
                     "properties": {
@@ -249,10 +289,27 @@
                 "logLevel": {
                     "type": "string"
                 },
+                "probeNetworks": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "resources": {
                     "type": "object",
                     "properties": {
                         "cpu": {
+                            "type": "object",
+                            "properties": {
+                                "limit": {
+                                    "type": "string"
+                                },
+                                "request": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "ephemeral-storage": {
                             "type": "object",
                             "properties": {
                                 "limit": {
@@ -289,6 +346,12 @@
                 },
                 "externalSecret": {
                     "type": "boolean"
+                },
+                "injectCaFrom": {
+                    "type": "string"
+                },
+                "injectCaFromSecret": {
+                    "type": "string"
                 },
                 "keyPEM": {
                     "type": "string"
@@ -331,6 +394,9 @@
                 }
             }
         },
+        "priorityClassName": {
+            "type": "string"
+        },
         "profileValidator": {
             "type": "object",
             "properties": {
@@ -342,6 +408,12 @@
                 },
                 "externalSecret": {
                     "type": "boolean"
+                },
+                "injectCaFrom": {
+                    "type": "string"
+                },
+                "injectCaFromSecret": {
+                    "type": "string"
                 },
                 "keyPEM": {
                     "type": "string"
@@ -381,6 +453,9 @@
                 },
                 "cores": {
                     "type": "integer"
+                },
+                "defaultInboundPolicy": {
+                    "type": "string"
                 },
                 "enableExternalProfiles": {
                     "type": "boolean"
@@ -448,6 +523,17 @@
                                 }
                             }
                         },
+                        "ephemeral-storage": {
+                            "type": "object",
+                            "properties": {
+                                "limit": {
+                                    "type": "string"
+                                },
+                                "request": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "memory": {
                             "type": "object",
                             "properties": {
@@ -460,6 +546,9 @@
                             }
                         }
                     }
+                },
+                "shutdownGracePeriod": {
+                    "type": "string"
                 },
                 "uid": {
                     "type": "integer"
@@ -495,6 +584,9 @@
                         }
                     }
                 },
+                "iptablesMode": {
+                    "type": "string"
+                },
                 "logFormat": {
                     "type": "string"
                 },
@@ -505,6 +597,17 @@
                     "type": "object",
                     "properties": {
                         "cpu": {
+                            "type": "object",
+                            "properties": {
+                                "limit": {
+                                    "type": "string"
+                                },
+                                "request": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "ephemeral-storage": {
                             "type": "object",
                             "properties": {
                                 "limit": {
@@ -530,6 +633,9 @@
                 },
                 "runAsRoot": {
                     "type": "boolean"
+                },
+                "runAsUser": {
+                    "type": "integer"
                 },
                 "skipSubnets": {
                     "type": "string"
@@ -559,6 +665,12 @@
                 "externalSecret": {
                     "type": "boolean"
                 },
+                "injectCaFrom": {
+                    "type": "string"
+                },
+                "injectCaFromSecret": {
+                    "type": "string"
+                },
                 "keyPEM": {
                     "type": "string"
                 },
@@ -586,10 +698,59 @@
                             }
                         }
                     }
+                },
+                "objectSelector": {
+                    "type": "object",
+                    "properties": {
+                        "matchExpressions": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "key": {
+                                        "type": "string"
+                                    },
+                                    "operator": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
         "proxyInjectorResources": {
+            "type": "object",
+            "properties": {
+                "cpu": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "memory": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string"
+                        },
+                        "request": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "runtimeClassName": {
+            "type": "string"
+        },
+        "spValidatorResources": {
             "type": "object",
             "properties": {
                 "cpu": {

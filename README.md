@@ -11,7 +11,7 @@ Linkerd2 service mesh for Giant Swarm clusters. Based on the official linkerd2 h
 ### Step 1: Pre-installation and Configuration
 
 - Install the linkerd CNI plugin by installing [`linkerd2-cni-app`](https://github.com/giantswarm/linkerd2-cni-app) on your cluster. Be sure to review the instructions for the CNI plugin.
-- A successful install will require you to generate a trust anchor and issuer certificate. The following steps loosely follow [the official instructions](https://linkerd.io/2.11/tasks/generate-certificates/).
+- A successful install will require you to generate a trust anchor and issuer certificate. The following steps loosely follow [the official instructions](https://linkerd.io/2.12/tasks/generate-certificates/).
 
 Obtain the `step` cli (we're using `step_linux_0.19.0_amd64.tar.gz` from [here](https://github.com/smallstep/cli/releases/tag/v0.19.0)) and execute the following commands. Take note of the `--not-after` flag. (8760h = 1 year)
 
@@ -34,7 +34,8 @@ identityTrustAnchorsPEM: |
   <contents of the ca.crt file>
 ```
 
-- Download the [default values.yaml file](https://github.com/giantswarm/linkerd2-app/blob/master/helm/linkerd2-app/values.yaml) and save it as `my-linkerd-values.yaml` to create a [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). Review the values in the file. With the default values, linkerd will be installed in High-Availability mode and with CNI plugin enabled.
+- (Optional) Create a file `my-linkerd-values.yaml` with your [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). The user configuration should only contain values that are additional to or diverge from the default values provided by the chart. Check the link above to see how configurations are merged.
+With the default values, Linkerd is installed in High-Availability mode and with CNI plugin enabled. Check the full list in the [README](https://github.com/giantswarm/linkerd2-app/blob/master/helm/linkerd2-app/README.md).
 
 ### Step 2: Deploy Linkerd
 
@@ -46,7 +47,7 @@ kubectl gs template app \
   --name linkerd2-app \
   --target-namespace linkerd \
   --cluster-name <your-cluster-id>  \
-  --version 0.7.4 \
+  --version 0.8.0 \
   --user-configmap my-linkerd-values.yaml \
   --user-secret my-linkerd-certificates.yaml \
   --namespace-labels "linkerd.io/is-control-plane=true,config.linkerd.io/admission-webhooks=disabled,linkerd.io/control-plane-ns=linkerd" \
@@ -108,14 +109,7 @@ and annotations listed in the `namespaceConfig` section above manually.
 
 ### Step 4: After deployment
 
-- Disable proxy injections for pods running in the `kube-system` namespace by applying certain labels and annotations
-
-```bash
-kubectl annotate namespace kube-system linkerd.io/inject=disabled
-kubectl label namespace kube-system config.linkerd.io/admission-webhooks=disabled
-```
-
-- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.2).
+- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.12.1).
 
 - Optionally you can also install the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) command.
 
@@ -144,7 +138,7 @@ linkerd viz dashboard
 
 After installation, linkerd looks for a `linkerd.io/inject: enabled` annotation on `Namespaces` or other workload resources. Adding this annotation to your workload namespaces will trigger automatic proxy container injection to your pods. You can use the [`spec.namespaceConfig.annotations`](https://docs.giantswarm.io/app-platform/namespace-configuration/) field of your other apps `App` CR to automatically apply the required annotation.
 
-More information on proxy injection can be found on the ["Automatic Proxy Injection" page](https://linkerd.io/2.11/features/proxy-injection/) in the upstream documentation.
+More information on proxy injection can be found on the ["Automatic Proxy Injection" page](https://linkerd.io/2.12/features/proxy-injection/) in the upstream documentation.
 
 **Attention**: Proxy containers are using `EmptyDir` volumes for storing ephemeral data, so all of your workload pods meshed by linkerd require a `PodSecurityPolicy` which allows use of `EmptyDir` volumes.
 
@@ -168,8 +162,15 @@ Although not recommended, it is possible to edit the default `PodSecurityPolicy`
 
 ## Usage with `linkerd` cli
 
-You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.11.2).
+You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.12.1).
+
+## Maintainer info
+
+This chart is maintained using the vendir method. You need [vendir](https://github.com/vmware-tanzu/carvel-vendir) and [yq](https://github.com/mikefarah/yq) binaries for it to work.
+
+Run `make upgrade-chart` to pull the last stable version of the chart from 
+<https://github.com/giantswarm/linkerd2-upstream>.
 
 ## Credit
 
-- <https://linkerd.io/2.11/tasks/install-helm/>
+- <https://linkerd.io/2.12/tasks/install-helm/>

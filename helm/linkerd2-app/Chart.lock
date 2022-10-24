@@ -1,0 +1,9 @@
+dependencies:
+- name: linkerd-crds
+  repository: ""
+  version: 1.4.0
+- name: partials
+  repository: ""
+  version: 0.1.0
+digest: sha256:c8a760e6944cae4c78d0ffecdd6e58bf966cb5bc798e1295a9275b466ee6cc7c
+generated: "2022-10-19T14:26:28.42283754+02:00"

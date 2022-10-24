@@ -1,0 +1,11 @@
+apiVersion: vendir.k14s.io/v1alpha1
+directories:
+- contents:
+  - git:
+      commitTitle: remove malformed yaml doc
+      sha: 267c734998cbed450619ae9c8508ef62efc2ee33
+      tags:
+      - stable-2.10.1-2039-g267c73499
+    path: linkerd
+  path: vendor
+kind: LockConfig

@@ -1,4 +1,3 @@
-{{if .Values.identity -}}
 ---
 ###
 ### Identity Controller Service RBAC
@@ -6,18 +5,17 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.namespace}}-identity
+  name: linkerd-{{.Release.Namespace}}-identity
   labels:
     linkerd.io/control-plane-component: identity
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 rules:
 - apiGroups: ["authentication.k8s.io"]
   resources: ["tokenreviews"]
   verbs: ["create"]
-- apiGroups: ["apps"]
-  resources: ["deployments"]
-  verbs: ["get"]
+# TODO(ver) Restrict this to the Linkerd namespace. See
+# https://github.com/linkerd/linkerd2/issues/9367
 - apiGroups: [""]
   resources: ["events"]
   verbs: ["create", "patch"]
@@ -25,28 +23,27 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: linkerd-{{.Values.namespace}}-identity
+  name: linkerd-{{.Release.Namespace}}-identity
   labels:
     linkerd.io/control-plane-component: identity
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: linkerd-{{.Values.namespace}}-identity
+  name: linkerd-{{.Release.Namespace}}-identity
 subjects:
 - kind: ServiceAccount
   name: linkerd-identity
-  namespace: {{.Values.namespace}}
+  namespace: {{.Release.Namespace}}
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
   name: linkerd-identity
-  namespace: {{.Values.namespace}}
+  namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-component: identity
-    linkerd.io/control-plane-ns: {{.Values.namespace}}
+    linkerd.io/control-plane-ns: {{.Release.Namespace}}
     {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
 {{- include "partials.image-pull-secrets" .Values.imagePullSecrets }}
-{{ end -}}

@@ -1,5 +1,5 @@
-apiVersion: "v1"
-appVersion: stable-2.11.4
+apiVersion: v2
+appVersion: stable-2.12.1
 description: |
   Linkerd gives you observability, reliability, and security
   for your microservices — with no code change required.
@@ -7,12 +7,17 @@ home: https://github.com/giantswarm/linkerd2-app
 icon: https://s.giantswarm.io/app-icons/linkerd2/1/light.svg
 keywords:
   - service-mesh
-kubeVersion: ">=1.17.0-0"
+kubeVersion: ">=1.21.0-0"
 maintainers:
   - email: cncf-linkerd-dev@lists.cncf.io
     name: Linkerd authors
     url: https://linkerd.io/
 name: linkerd2-app
+dependencies:
+  - name: linkerd-crds
+    version: 1.4.0
+  - name: partials
+    version: 0.1.0
 sources:
   - https://github.com/linkerd/linkerd2/
   - https://linkerd.io
