@@ -9,7 +9,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ### Changed
 
-- Bump version 2.12.2.
+- Bump version 2.12.2 ([#116](https://github.com/giantswarm/linkerd2-app/pull/116)).
 
 ## [0.7.5] - 2022-10-13
 
