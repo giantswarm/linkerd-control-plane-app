@@ -27,7 +27,7 @@ controlPlaneTracing: false
 # -- namespace to send control plane traces to
 controlPlaneTracingNamespace: linkerd-jaeger
 # -- control plane version. See Proxy section for proxy version
-linkerdVersion: stable-2.12.1
+linkerdVersion: stable-2.12.2
 # -- default kubernetes deployment strategy
 deploymentStrategy:
   rollingUpdate:
@@ -499,10 +499,26 @@ spValidatorResources: *controller_resources
 # for more information
 # tolerations:
 
-# -- postHookInitHack
-# There is a race condition in Kubernetes for cluster running a CNI different than calico as
-# primary together with Calico as a policy engine (network policies). This is a workaround
-# to make it work it. More info in https://github.com/giantswarm/roadmap/issues/1174
-postHookInitHack:
-  enabled: true
-  image: giantswarm/alpine:3.15.5
+# Prometheus Operator PodMonitor configuration
+podMonitor:
+  # -- Enables the creation of Prometheus Operator [PodMonitor](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.PodMonitor)
+  enabled: false
+  # -- Interval at which metrics should be scraped
+  scrapeInterval: 10s
+  # -- Iimeout after which the scrape is ended
+  scrapeTimeout: 10s
+  controller:
+    # -- Enables the creation of PodMonitor for the control-plane
+    enabled: true
+    # -- Selector to select which namespaces the Endpoints objects are discovered from
+    namespaceSelector: |
+      matchNames:
+        - {{ .Release.Namespace }}
+        - linkerd-viz
+        - linkerd-jaeger
+  serviceMirror:
+    # -- Enables the creation of PodMonitor for the Service Mirror component
+    enabled: true
+  proxy:
+    # -- Enables the creation of PodMonitor for the data-plane
+    enabled: true

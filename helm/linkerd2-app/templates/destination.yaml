@@ -314,17 +314,16 @@ spec:
         - mountPath: /var/run/linkerd/tls
           name: policy-tls
           readOnly: true
-      {{ if not .Values.cniEnabled -}}
       initContainers:
+      {{ if .Values.cniEnabled -}}
+      - {{- include "partials.noop" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
+      {{ else -}}
       {{- /*
         The destination controller needs to connect to the Kubernetes API before the proxy is able
         to proxy requests, so we always skip these connections.
       */}}
       {{- $_ := set $tree.Values.proxyInit "ignoreOutboundPorts" "443" }}
       - {{- include "partials.proxy-init" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
-      {{- else if .Values.postHookInitHack.enabled }}
-      initContainers:
-      - {{- include "post-hook-init-hack.container" . | indent 8 | trimPrefix (repeat 7 " ") }}
       {{ end -}}
       {{- if .Values.priorityClassName -}}
       priorityClassName: {{ .Values.priorityClassName }}

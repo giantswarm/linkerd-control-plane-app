@@ -2,10 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: remove malformed yaml doc
-      sha: 267c734998cbed450619ae9c8508ef62efc2ee33
+      commitTitle: add securityContext to noop
+      sha: c4a67634f161db2cf15091c13d774516b47dc738
       tags:
-      - stable-2.10.1-2039-g267c73499
+      - stable-2.10.1-2140-gc4a67634f
     path: linkerd
   path: vendor
 kind: LockConfig
