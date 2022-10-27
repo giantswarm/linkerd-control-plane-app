@@ -1,6 +1,6 @@
-# linkerd2-app chart
+# linkerd-control-plane chart
 
-[![CircleCI](https://circleci.com/gh/giantswarm/linkerd2-app.svg?style=shield)](https://circleci.com/gh/giantswarm/linkerd2-app)
+[![CircleCI](https://circleci.com/gh/giantswarm/linkerd-control-plane-app.svg?style=shield)](https://circleci.com/gh/giantswarm/linkerd-control-plane-app)
 
 Linkerd2 service mesh for Giant Swarm clusters. Based on the official linkerd2 helm charts with a few changes, required to deploy to Giant Swarm clusters.
 
@@ -35,7 +35,7 @@ identityTrustAnchorsPEM: |
 ```
 
 - (Optional) Create a file `my-linkerd-values.yaml` with your [user configuration](https://docs.giantswarm.io/app-platform/app-configuration/). The user configuration should only contain values that are additional to or diverge from the default values provided by the chart. Check the link above to see how configurations are merged.
-With the default values, Linkerd is installed in High-Availability mode and with CNI plugin enabled. Check the full list in the [README](https://github.com/giantswarm/linkerd2-app/blob/main/helm/linkerd2-app/README.md).
+With the default values, Linkerd is installed in High-Availability mode and with CNI plugin enabled. Check the full list in the [README](https://github.com/giantswarm/linkerd-control-plane-app/blob/main/helm/linkerd-control-plane/README.md).
 
 ### Step 2: Deploy Linkerd
 
@@ -44,7 +44,7 @@ We recommend deploying the app by applying an `App` CR (Custom Resource) onto yo
 ```bash
 kubectl gs template app \
   --catalog giantswarm \
-  --name linkerd2-app \
+  --name linkerd-control-plane \
   --target-namespace linkerd \
   --cluster-name <your-cluster-id>  \
   --version 0.8.0 \
@@ -61,13 +61,13 @@ The final `App` CR should look like this:
 apiVersion: application.giantswarm.io/v1alpha1
 kind: App
 metadata:
-  name: linkerd2-app
+  name: linkerd-control-plane
   namespace: <your-cluster-id>
 spec:
   catalog: giantswarm
   kubeConfig:
     inCluster: false
-  name: linkerd2-app
+  name: linkerd-control-plane
   namespace: linkerd
   namespaceConfig:
     annotations:
@@ -78,12 +78,12 @@ spec:
       linkerd.io/is-control-plane: "true"
   userConfig:
     configMap:
-      name: linkerd2-app-userconfig-<your-cluster-id>
+      name: linkerd-control-plane-userconfig-<your-cluster-id>
       namespace: <your-cluster-id>
     secret:
-      name: linkerd2-app-userconfig-<your-cluster-id>
+      name: linkerd-control-plane-userconfig-<your-cluster-id>
       namespace: <your-cluster-id>
-  version: 0.7.4
+  version: 0.8.0
 ```
 
 Please note, that for security reasons Giant Swarm by default forbids the usage of
@@ -109,7 +109,7 @@ and annotations listed in the `namespaceConfig` section above manually.
 
 ### Step 4: After deployment
 
-- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.12.1).
+- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.12.2).
 
 - Optionally you can also install the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) command.
 

@@ -3,7 +3,7 @@ appVersion: stable-2.12.2
 description: |
   Linkerd gives you observability, reliability, and security
   for your microservices — with no code change required.
-home: https://github.com/giantswarm/linkerd2-app
+home: https://github.com/giantswarm/linkerd-control-plane-app
 icon: https://s.giantswarm.io/app-icons/linkerd2/1/light.svg
 keywords:
   - service-mesh
@@ -12,7 +12,7 @@ maintainers:
   - email: cncf-linkerd-dev@lists.cncf.io
     name: Linkerd authors
     url: https://linkerd.io/
-name: linkerd2-app
+name: linkerd-control-plane
 dependencies:
   - name: linkerd-crds
     version: 1.4.0

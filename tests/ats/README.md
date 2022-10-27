@@ -1,4 +1,4 @@
-# linkerd2-app tests
+# linkerd-control-plane tests
 
 We want to ensure this app can be installed without any issues, so we're executing these tests.
 
@@ -13,7 +13,7 @@ We want to ensure this app can be installed without any issues, so we're executi
 
 ## Updating the test certificates
 
-These instructions loosely follow the original instructions from [this page](https://linkerd.io/2.11/tasks/generate-certificates/)
+These instructions loosely follow the original instructions from [this page](https://linkerd.io/2.12/tasks/generate-certificates/)
 
 The tests use a trust anchor certificate and an issuer certificate with its corresponding key present in the tests values file named `test-values.yaml`.
 
