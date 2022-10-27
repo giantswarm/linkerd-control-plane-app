@@ -1,6 +1,6 @@
 ##@ Chart
 
-MAIN_CHART=helm/linkerd2-app
+MAIN_CHART=helm/linkerd-control-plane
 VENDOR_CHART_LINKERD=vendor/linkerd/charts/linkerd-control-plane
 VENDOR_CHART_PARTIALS=vendor/linkerd/charts/partials
 VENDOR_CHART_CRDS=vendor/linkerd/charts/linkerd-crds

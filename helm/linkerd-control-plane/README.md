@@ -1,13 +1,13 @@
-# linkerd2-app
+# linkerd-control-plane
 
 Linkerd gives you observability, reliability, and security
 for your microservices — with no code change required.
 
 ![Version: 0.7.5](https://img.shields.io/badge/Version-0.7.5-informational?style=flat-square)
 
-![AppVersion: stable-2.12.1](https://img.shields.io/badge/AppVersion-stable--2.12.1-informational?style=flat-square)
+![AppVersion: stable-2.12.2](https://img.shields.io/badge/AppVersion-stable--2.12.2-informational?style=flat-square)
 
-**Homepage:** <https://github.com/giantswarm/linkerd2-app>
+**Homepage:** <https://github.com/giantswarm/linkerd-control-plane-app>
 
 ## Quickstart and documentation
 
@@ -169,6 +169,13 @@ Kubernetes: `>=1.21.0-0`
 | nodeSelector | object | `{"kubernetes.io/os":"linux"}` | NodeSelector section, See the [K8S documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) for more information |
 | podAnnotations | object | `{}` | Additional annotations to add to all pods |
 | podLabels | object | `{}` | Additional labels to add to all pods |
+| podMonitor.controller.enabled | bool | `true` | Enables the creation of PodMonitor for the control-plane |
+| podMonitor.controller.namespaceSelector | string | `"matchNames:\n  - {{ .Release.Namespace }}\n  - linkerd-viz\n  - linkerd-jaeger\n"` | Selector to select which namespaces the Endpoints objects are discovered from |
+| podMonitor.enabled | bool | `false` | Enables the creation of Prometheus Operator [PodMonitor](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.PodMonitor) |
+| podMonitor.proxy.enabled | bool | `true` | Enables the creation of PodMonitor for the data-plane |
+| podMonitor.scrapeInterval | string | `"10s"` | Interval at which metrics should be scraped |
+| podMonitor.scrapeTimeout | string | `"10s"` | Iimeout after which the scrape is ended |
+| podMonitor.serviceMirror.enabled | bool | `true` | Enables the creation of PodMonitor for the Service Mirror component |
 | policyController.image.name | string | `"giantswarm/linkerd2-policy-controller"` | Docker image for the policy controller |
 | policyController.image.pullPolicy | string | imagePullPolicy | Pull policy for the proxy container Docker image |
 | policyController.image.version | string | linkerdVersion | Tag for the proxy container Docker image |
@@ -188,7 +195,6 @@ Kubernetes: `>=1.21.0-0`
 | policyValidator.injectCaFromSecret | string | `""` | Inject the CA bundle from a Secret. If set, the `cert-manager.io/inject-ca-from-secret` annotation will be added to the webhook. The Secret must have the CA Bundle stored in the `ca.crt` key and have the `cert-manager.io/allow-direct-injection` annotation set to `true`. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-secret-resource) for more information. |
 | policyValidator.keyPEM | string | `""` | Certificate key for the policy validator. If not provided and not using an external secret then Helm will generate one. |
 | policyValidator.namespaceSelector | object | `{"matchExpressions":[{"key":"config.linkerd.io/admission-webhooks","operator":"NotIn","values":["disabled"]}]}` | Namespace selector used by admission webhook |
-| postHookInitHack | object | `{"enabled":true,"image":"giantswarm/alpine:3.15.5"}` | postHookInitHack There is a race condition in Kubernetes for cluster running a CNI different than calico as primary together with Calico as a policy engine (network policies). This is a workaround to make it work it. More info in https://github.com/giantswarm/roadmap/issues/1174 |
 | priorityClassName | string | `""` | Kubernetes priorityClassName for the Linkerd Pods |
 | profileValidator.caBundle | string | `""` | Bundle of CA certificates for proxy injector. If not provided nor injected with cert-manager, then Helm will use the certificate generated for `profileValidator.crtPEM`. If `profileValidator.externalSecret` is set to true, this value, injectCaFrom, or injectCaFromSecret must be set, as no certificate will be generated. See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector) for more information. |
 | profileValidator.crtPEM | string | `""` | Certificate for the service profile validator. If not provided and not using an external secret then Helm will generate one. |
