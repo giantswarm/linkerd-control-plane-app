@@ -9,6 +9,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ### Changed
 
+- Rename app as `linkerd-control-plane` ([#117](https://github.com/giantswarm/linkerd-control-plane-app/pull/117)).
 - Bump version 2.12.2 ([#116](https://github.com/giantswarm/linkerd-control-plane-app/pull/116)).
 
 ## [0.7.5] - 2022-10-13
