@@ -7,6 +7,12 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+## Changed
+- Sync with upstream repo [#120](https://github.com/giantswarm/linkerd-control-plane-app/pull/120).
+  - Add templated values for noop image 
+  - Move giantswarm labels into partials chart
+  - Fix workflow for automated PR creation
+
 ## [0.8.0] - 2022-10-27
 
 ### Changed
