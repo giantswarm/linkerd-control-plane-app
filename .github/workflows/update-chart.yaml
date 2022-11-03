@@ -32,7 +32,7 @@ jobs:
         id: gather_facts
         run: |
           head="${{ inputs.branch || github.event.ref }}"
-          echo "name=branch=${head}" >> $GITHUB_OUTPUT
+          echo "branch=${head}" >> $GITHUB_OUTPUT
 
           head="${head#refs/heads/}" # Strip "refs/heads/" prefix.
           if [[ $(echo "$head" | grep -o '#' | wc -l) -gt 1 ]]; then
@@ -107,4 +107,4 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           base: "${{ needs.gather_facts.outputs.base }}"
         run: |
-          echo hub pull-request -f -m "Update chart" -a ${{ github.actor }} -b ${{ env.base }} -h ${{ needs.gather_facts.outputs.branch }}
+          hub pull-request -f -m "Update chart" -a ${{ github.actor }} -b ${{ env.base }} -h ${{ needs.gather_facts.outputs.branch }}
