@@ -2,7 +2,8 @@ name: Create Update PR
 on:
   push:
     branches:
-      - 'update-chart'
+      - 'main#update'
+      - 'master#update'
   workflow_call:
     inputs:
       branch:
@@ -35,7 +36,7 @@ jobs:
           echo "branch=${head}" >> $GITHUB_OUTPUT
 
           head="${head#refs/heads/}" # Strip "refs/heads/" prefix.
-          if [[ $(echo "$head" | grep -o '#' | wc -l) -gt 1 ]]; then
+          if [[ $(echo "$head" | grep -o '#' | wc -l) -ge 1 ]]; then
             base="$(echo $head | cut -d '#' -f 1)"
           else
             base="${{ github.event.base_ref }}"
