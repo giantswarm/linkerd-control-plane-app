@@ -527,4 +527,4 @@ podMonitor:
 noop:
   image:
     name: giantswarm/pause
-    tag: "3.8"
+    version: "3.8"

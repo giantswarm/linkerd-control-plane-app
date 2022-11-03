@@ -272,7 +272,7 @@
                         "name": {
                             "type": "string"
                         },
-                        "tag": {
+                        "version": {
                             "type": "string"
                         }
                     }
