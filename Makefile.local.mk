@@ -14,12 +14,12 @@ update-chart: ## Run vendir sync
 	$(MAKE) update-deps
 
 update-deps:
-	new_version=`yq .version $(MAIN_CHART)/charts/linkerd-crds/Chart.yaml` && \
-	yq -i e "with(.dependencies[]; select(.name == \"linkerd-crds\") | .version = \"$$new_version\")" $(MAIN_CHART)/Chart.yaml
+	new_version=`docker run --rm -u $$(id -u) -v "$${PWD}":/workdir mikefarah/yq .version $(MAIN_CHART)/charts/linkerd-crds/Chart.yaml` && \
+	docker run --rm -u $$(id -u) -v "$${PWD}":/workdir mikefarah/yq -i e "with(.dependencies[]; select(.name == \"linkerd-crds\") | .version = \"$$new_version\")" $(MAIN_CHART)/Chart.yaml
 	cd $(MAIN_CHART) && helm dependency update
 
 helm-docs:
-	helm-docs -c $(MAIN_CHART) -g $(MAIN_CHART)
+	docker run --rm --volume "`pwd`:/helm-docs" -u `id -u` jnorwood/helm-docs:latest -c $(MAIN_CHART) -g $(MAIN_CHART)
 
 apply-vendor:
 	mkdir -p $(MAIN_CHART)/charts
