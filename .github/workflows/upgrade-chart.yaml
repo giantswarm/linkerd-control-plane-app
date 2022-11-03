@@ -80,12 +80,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ needs.gather_facts.outputs.branch }}
-      - name: Install deps
+      - name: Install vendir
         run: |
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
-          sudo add-apt-repository ppa:rmescandon/yq
-          sudo apt update
-          sudo apt install yq -y
           wget https://github.com/vmware-tanzu/carvel-vendir/releases/download/v0.32.0/vendir-linux-amd64 -O /tmp/vendir
           SHA_VENDIR=`shasum -a 256 /tmp/vendir | cut -d ' ' -f1`
           [ "$SHA_VENDIR" != "0b52c170f4a30c2b6213ff0048ecc89c9c25c3e4da56eb1e095fcdb335bd82ed" ] && echo "invalid vendir binary" && exit -1
