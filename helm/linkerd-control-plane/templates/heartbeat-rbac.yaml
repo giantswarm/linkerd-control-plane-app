@@ -10,7 +10,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
 rules:
 - apiGroups: [""]
   resources: ["configmaps"]
@@ -24,7 +24,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
 roleRef:
   kind: Role
   name: linkerd-heartbeat
@@ -40,7 +40,7 @@ metadata:
   name: linkerd-heartbeat
   labels:
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
 rules:
 - apiGroups: [""]
   resources: ["namespaces"]
@@ -55,7 +55,7 @@ metadata:
   name: linkerd-heartbeat
   labels:
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
 roleRef:
   kind: ClusterRole
   name: linkerd-heartbeat
@@ -73,6 +73,6 @@ metadata:
   labels:
     linkerd.io/control-plane-component: heartbeat
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
 {{- include "partials.image-pull-secrets" .Values.imagePullSecrets }}
 {{- end }}

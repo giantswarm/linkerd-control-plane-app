@@ -11,7 +11,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 data:
@@ -28,7 +28,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 data:
@@ -43,7 +43,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 spec:
@@ -63,7 +63,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 spec:
@@ -84,7 +84,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 spec:
@@ -109,7 +109,7 @@ metadata:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
     giantswarm.io/monitoring_basic_sli: "true"
-    {{- include "linkerd.giantswarm-labels" . | nindent 4 }}
+    {{- include "partials.giantswarm-labels" . | nindent 4 }}
   name: linkerd-identity
   namespace: {{ .Release.Namespace }}
 spec:
@@ -134,7 +134,7 @@ spec:
         linkerd.io/control-plane-component: identity
         linkerd.io/control-plane-ns: {{.Release.Namespace}}
         linkerd.io/workload-ns: {{.Release.Namespace}}
-        {{- include "linkerd.giantswarm-labels" . | nindent 8 }}
+        {{- include "partials.giantswarm-labels" . | nindent 8 }}
         {{- include "partials.proxy.labels" $tree.Values.proxy | nindent 8}}
         {{- with .Values.podLabels }}{{ toYaml . | trim | nindent 8 }}{{- end }}
     spec:

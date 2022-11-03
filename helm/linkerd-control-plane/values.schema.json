@@ -85,10 +85,10 @@
                     "type": "object",
                     "properties": {
                         "maxSurge": {
-                            "type": "string"
+                            "type": [ "integer", "string" ]
                         },
                         "maxUnavailable": {
-                            "type": ["integer","string"]
+                            "type": [ "integer", "string" ]
                         }
                     }
                 }
@@ -260,6 +260,22 @@
             "properties": {
                 "kubernetes.io/os": {
                     "type": "string"
+                }
+            }
+        },
+        "noop": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },

@@ -1,5 +1,6 @@
-linkerd2-app*.tgz
-linkerd2-app*.tgz-meta/
+linkerd-control-plane*.tgz
+linkerd-control-plane*.tgz-meta/
+*.kube.config
 test_results_*.xml
 .pytest_cache
 linkerd-cli
