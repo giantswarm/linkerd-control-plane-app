@@ -88,7 +88,7 @@
                             "type": "string"
                         },
                         "maxUnavailable": {
-                            "type": ["integer","string"]
+                            "type": "integer"
                         }
                     }
                 }
@@ -260,6 +260,22 @@
             "properties": {
                 "kubernetes.io/os": {
                     "type": "string"
+                }
+            }
+        },
+        "noop": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "tag": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },

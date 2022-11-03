@@ -522,3 +522,9 @@ podMonitor:
   proxy:
     # -- Enables the creation of PodMonitor for the data-plane
     enabled: true
+
+# Noop image
+noop:
+  image:
+    name: giantswarm/pause
+    tag: "3.8"
