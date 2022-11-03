@@ -32,7 +32,7 @@ jobs:
         id: gather_facts
         run: |
           head="${{ inputs.branch || github.event.ref }}"
-          echo "::set-output name=branch::${head}"
+          echo "name=branch=${head}" >> $GITHUB_OUTPUT
 
           head="${head#refs/heads/}" # Strip "refs/heads/" prefix.
           if [[ $(echo "$head" | grep -o '#' | wc -l) -gt 1 ]]; then
@@ -45,9 +45,9 @@ jobs:
 
           repo_name="$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')"
           echo "repo_name=\"$repo_name\" base=\"$base\" head=\"$head\""
-          echo "::set-output name=repo_name::${repo_name}"
-          echo "::set-output name=base::${base}"
-          echo "::set-output name=head::${head}"
+          echo "repo_name=${repo_name}" >> $GITHUB_OUTPUT
+          echo "base=${base}" >> $GITHUB_OUTPUT
+          echo "head=${head}" >> $GITHUB_OUTPUT
       - name: Check if PR exists
         id: pr_exists
         env:
@@ -55,9 +55,9 @@ jobs:
         run: |
           if gh pr view --repo ${{ github.repository }} ${{ steps.gather_facts.outputs.branch }} | grep -i 'state:[[:space:]]*open' >/dev/null; then
             gh pr view --repo ${{ github.repository }} ${{ steps.gather_facts.outputs.branch }}
-            echo "::set-output name=skip::true"
+            echo "skip=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=skip::false"
+            echo "skip=false" >> $GITHUB_OUTPUT
           fi
   create_update_pr:
     name: Create update PR
