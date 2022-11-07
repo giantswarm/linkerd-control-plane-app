@@ -11,3 +11,18 @@ directories:
     - charts/linkerd-control-plane/**/*
     - charts/linkerd-crds/**/*
     - charts/partials/**/*
+- path: helm/linkerd-control-plane/templates
+  contents:
+  - path: .
+    directory:
+      path: vendor/linkerd/charts/linkerd-control-plane/templates
+- path: helm/linkerd-control-plane/charts/partials
+  contents:
+  - path: .
+    directory:
+      path: vendor/linkerd/charts/partials
+- path: helm/linkerd-control-plane/charts/linkerd-crds
+  contents:
+  - path: .
+    directory:
+      path: vendor/linkerd/charts/linkerd-crds
