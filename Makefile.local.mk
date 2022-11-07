@@ -1,7 +1,7 @@
 ##@ Chart
 
-YQ=docker run --rm -u $$(id -u) -v $${PWD}:/workdir mikefarah/yq
-HELM_DOCS=docker run --rm -u $$(id -u) -v $${PWD}:/helm-docs jnorwood/helm-docs:latest
+YQ=docker run --rm -u $$(id -u) -v $${PWD}:/workdir mikefarah/yq:4.29.2
+HELM_DOCS=docker run --rm -u $$(id -u) -v $${PWD}:/helm-docs jnorwood/helm-docs:v1.11.0
 
 MAIN_CHART=helm/linkerd-control-plane
 DEPS := $(shell ls $(MAIN_CHART)/charts)
