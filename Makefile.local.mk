@@ -7,17 +7,18 @@ MAIN_CHART=helm/linkerd-control-plane
 DEPS := $(shell ls $(MAIN_CHART)/charts)
 
 .PHONY: update-chart helm-docs update-deps $(DEPS)
-update-chart: ## Run vendir sync
+
+update-chart: ## Sync chat with upstream repo.
 	@echo "====> $@"
 	vendir sync
 	$(MAKE) update-deps
 
-update-deps: $(DEPS)
+update-deps: $(DEPS) ## Update Helm dependencies.
 	cd $(MAIN_CHART) && helm dependency update
 
-$(DEPS):
+$(DEPS): ## Update main Chart.yaml with new local dep versions.
 	new_version=`$(YQ) .version $(MAIN_CHART)/charts/$@/Chart.yaml` && \
 	$(YQ) -i e "with(.dependencies[]; select(.name == \"$@\") | .version = \"$$new_version\")" $(MAIN_CHART)/Chart.yaml
 
-helm-docs:
+helm-docs: ## Update $(MAIN_CHART) README.
 	$(HELM_DOCS) -c $(MAIN_CHART) -g $(MAIN_CHART)
