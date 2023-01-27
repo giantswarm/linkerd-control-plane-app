@@ -10,6 +10,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 ### Changed
 
 - Bump version 2.12.1.
+- Avoids the proxy-injector to inspect giantswarm namespace and try to inject linkerd proxy on the chart-operator
 
 ## [0.7.5] - 2022-10-13
 
