@@ -13,7 +13,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
   - Add templated values for noop image 
   - Move giantswarm labels into partials chart
   - Fix workflow for automated PR creation
-- Avoids the proxy-injector to inspect giantswarm namespace and try to inject linkerd proxy on the chart-operator
+- Avoids the proxy-injector to inspect giantswarm namespace. To mitigate issues we saw with the chart-operator running there.
 
 ## [0.8.0] - 2022-10-27
 
