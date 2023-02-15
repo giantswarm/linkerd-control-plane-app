@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Changes linkerd priority class to "giantswarm-critical" to improve scheduling.
+
 ## [0.9.0] - 2023-01-31
 
 ### Changed
