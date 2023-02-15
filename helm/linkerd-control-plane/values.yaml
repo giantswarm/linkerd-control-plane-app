@@ -58,7 +58,7 @@ podAnnotations: {}
 # -- Additional labels to add to all pods
 podLabels: {}
 # -- Kubernetes priorityClassName for the Linkerd Pods
-priorityClassName: ""
+priorityClassName: "giantswarm-critical"
 # -- Runtime Class Name for all the pods
 runtimeClassName: ""
 
