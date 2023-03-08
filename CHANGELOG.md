@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade to linkerd v2.12.4
+
 ## [0.10.0] - 2023-03-07
 
 ### Changed
