@@ -107,26 +107,11 @@ kubectl apply -f linkerd-manifest.yaml
 When installing via the Giant Swarm web UI, you'll need to apply the labels
 and annotations listed in the `namespaceConfig` section above manually.
 
-### Step 4: After deployment
+### Step 3: After deployment
 
-- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.12.2).
+- Optional but recommended: You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.12.4).
 
-- Optionally you can also install the `linkerd viz` extension using the [`linkerd`](#usage-with-linkerd-cli) command.
-
-Unfortunately, the template this generates uses some user IDs that are by default
-not permitted by the default cluster's PSP. It also needs to permit the usage
-of `emptyDir` volumes. To allow for that in the default cluster's PSP, run:
-
-```bash
-kubectl patch psp restricted --type='json' -p='[{"op": "add", "path": "/spec/volumes/-", "value": "emptyDir"}]' # if you haven't done this before
-kubectl patch psp restricted --type='json' -p='[{"op": "add", "path": "/spec/volumes/-", "value": "emptyDir"},{"op": "replace", "path":"/spec/runAsUser/ranges/0/min", "value": 472}]' # grafana from 'linkerd viz' uses UID 472
-```
-
-Now, you can deploy the viz extensions:
-
-```bash
-linkerd viz install | kubectl apply -f -
-```
+- Optionally you can also install the `linkerd-viz` extension using the [`linkerd-viz App`](https://github.com/giantswarm/linkerd-viz-app/).
 
 After installation, you can open the dashboard by executing
 
