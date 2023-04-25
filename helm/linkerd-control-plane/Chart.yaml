@@ -4,7 +4,7 @@ description: |
   Linkerd gives you observability, reliability, and security
   for your microservices — with no code change required.
 home: https://github.com/giantswarm/linkerd-control-plane-app
-icon: https://s.giantswarm.io/app-icons/linkerd2/1/light.svg
+icon: https://s.giantswarm.io/app-icons/linkerd2/2/icon_dark.svg
 keywords:
   - service-mesh
 kubeVersion: ">=1.21.0-0"
@@ -27,3 +27,4 @@ restrictions:
   fixedNamespace: linkerd
 annotations:
   application.giantswarm.io/team: cabbage
+  ui.giantswarm.io/logo: https://s.giantswarm.io/app-icons/linkerd2/2/logo_dark.svg
