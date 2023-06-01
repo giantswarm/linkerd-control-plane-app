@@ -13,5 +13,6 @@ metadata:
     linkerd.io/is-control-plane: "true"
     config.linkerd.io/admission-webhooks: disabled
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
+    {{- /* linkerd-init requires extended capabilities and so requires priviledged mode */}}
+    pod-security.kubernetes.io/enforce: {{ ternary "restricted" "privileged" .Values.cniEnabled }}
 {{ end -}}

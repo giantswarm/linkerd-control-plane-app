@@ -1,8 +1,10 @@
 {{if .Values.identity -}}
+---
 ###
 ### Identity Controller Service
 ###
 {{ if and (.Values.identity.issuer) (eq .Values.identity.issuer.scheme "linkerd.io/tls") -}}
+---
 kind: Secret
 apiVersion: v1
 metadata:
@@ -11,7 +13,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 data:
@@ -28,11 +30,11 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 data:
-  ca-bundle.crt: |{{.Values.identityTrustAnchorsPEM | trim | nindent 4}}
+  ca-bundle.crt: |-{{.Values.identityTrustAnchorsPEM | trim | nindent 4}}
 {{- end}}
 ---
 kind: Service
@@ -43,7 +45,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 spec:
@@ -63,7 +65,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 spec:
@@ -84,7 +86,7 @@ metadata:
   labels:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
   annotations:
     {{ include "partials.annotations.created-by" . }}
 spec:
@@ -97,6 +99,7 @@ spec:
 {{- $tree := deepCopy . }}
 {{ $_ := set $tree.Values.proxy "workloadKind" "deployment" -}}
 {{ $_ := set $tree.Values.proxy "component" "linkerd-identity" -}}
+{{ $_ := set $tree.Values.proxy "waitBeforeExitSeconds" 0 -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -109,7 +112,7 @@ metadata:
     linkerd.io/control-plane-component: identity
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
     giantswarm.io/monitoring_basic_sli: "true"
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
   name: linkerd-identity
   namespace: {{ .Release.Namespace }}
 spec:
@@ -134,7 +137,6 @@ spec:
         linkerd.io/control-plane-component: identity
         linkerd.io/control-plane-ns: {{.Release.Namespace}}
         linkerd.io/workload-ns: {{.Release.Namespace}}
-        {{- include "partials.giantswarm-labels" . | nindent 8 }}
         {{- include "partials.proxy.labels" $tree.Values.proxy | nindent 8}}
         {{- with .Values.podLabels }}{{ toYaml . | trim | nindent 8 }}{{- end }}
     spec:
@@ -184,9 +186,14 @@ spec:
         {{- include "partials.resources" .Values.identityResources | nindent 8 }}
         {{- end }}
         securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
           runAsUser: {{.Values.controllerUID}}
-          readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
         volumeMounts:
         - mountPath: /var/run/linkerd/identity/issuer
           name: identity-issuer
@@ -205,10 +212,11 @@ spec:
       */}}
       {{- $_ := set $tree.Values.proxy "defaultInboundPolicy" "all-unauthenticated" }}
       {{- $_ := set $tree.Values.proxy "requireTLSOnInboundPorts" "8080" }}
+      {{- $_ := set $tree.Values.proxy "capabilities" (dict "drop" (list "ALL")) }}
       - {{- include "partials.proxy" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
       initContainers:
       {{ if .Values.cniEnabled -}}
-      - {{- include "partials.noop" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
+      - {{- include "partials.network-validator" $tree | indent 8 | trimPrefix (repeat 7 " ") }}
       {{ else -}}
       {{- /*
         The identity controller needs to connect to the Kubernetes API before the proxy is able to
@@ -221,6 +229,9 @@ spec:
       {{- if .Values.priorityClassName -}}
       priorityClassName: {{ .Values.priorityClassName }}
       {{ end -}}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: linkerd-identity
       volumes:
       - name: identity-issuer

@@ -8,7 +8,6 @@ metadata:
   labels:
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
 spec:
   group: policy.linkerd.io
   scope: Namespaced
@@ -16,7 +15,7 @@ spec:
     kind: ServerAuthorization
     plural: serverauthorizations
     singular: serverauthorization
-    shortNames: [saz]
+    shortNames: [saz, serverauthz, srvauthz]
   versions:
     - name: v1alpha1
       served: true

@@ -8,7 +8,6 @@ metadata:
   labels:
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     linkerd.io/control-plane-ns: {{.Release.Namespace}}
-    {{- include "partials.giantswarm-labels" . | nindent 4 }}
 spec:
   group: policy.linkerd.io
   names:

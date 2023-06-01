@@ -2,10 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: Merge tag 'refs/tags/stable-2.12.4' into upgrade-2.12.4...
-      sha: 6a3b38f5edf1aa4781ad1b60f899bba020b47b44
+      commitTitle: add GS label for monitoring...
+      sha: e8450a784aae64566b0a0c05d094f50c8b102fb0
       tags:
-      - stable-2.10.1-2189-g6a3b38f5e
+      - stable-2.10.1-2929-ge8450a784
     path: linkerd
   path: vendor
 - contents:
