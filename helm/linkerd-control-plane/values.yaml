@@ -57,6 +57,10 @@ identityTrustDomain: *cluster_domain
 podAnnotations: {}
 # -- Additional labels to add to all pods
 podLabels: {}
+# -- Labels to apply to all resources
+commonLabels:
+  giantswarm.io/service-type: managed
+  application.giantswarm.io/team: cabbage
 # -- Kubernetes priorityClassName for the Linkerd Pods
 priorityClassName: "giantswarm-critical"
 # -- Runtime Class Name for all the pods
@@ -122,7 +126,7 @@ proxy:
     # @default -- linkerdVersion
     version: ""
   # -- Log level for the proxy
-  logLevel: warn,linkerd=info
+  logLevel: warn,linkerd=info,trust_dns=error
   # -- Log format (`plain` or `json`) for the proxy
   logFormat: plain
   ports:
@@ -156,9 +160,10 @@ proxy:
       request: ""
   # -- User id under which the proxy runs
   uid: 2102
-  # -- If set the proxy sidecar will stay alive for at
-  # least the given period before receiving SIGTERM signal from Kubernetes but
-  # no longer than pod's `terminationGracePeriodSeconds`. See [Lifecycle
+  # -- If set the injected proxy sidecars in the data plane will stay alive for
+  # at least the given period before receiving the SIGTERM signal from
+  # Kubernetes but no longer than the pod's `terminationGracePeriodSeconds`.
+  # See [Lifecycle
   # hooks](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks)
   # for more info on container lifecycle hooks.
   waitBeforeExitSeconds: 0
@@ -213,7 +218,7 @@ proxyInit:
     # @default -- imagePullPolicy
     pullPolicy: ""
     # -- Tag for the proxy-init container Docker image
-    version: v2.0.0
+    version: v2.2.1
   resources:
     cpu:
       # -- Maximum amount of CPU units that the proxy-init container can use
@@ -245,6 +250,23 @@ proxyInit:
   xtMountPath:
     mountPath: /run
     name: linkerd-proxy-init-xtables-lock
+
+# network validator configuration
+# This runs on a host that uses iptables to reroute network traffic. The validator
+# ensures that iptables is correctly routing requests before we start linkerd.
+networkValidator:
+  # -- Log level for the network-validator
+  # @default -- debug
+  logLevel: debug
+  # -- Log format (`plain` or `json`) for network-validator
+  # @default -- plain
+  logFormat: plain
+  # -- Address to which the network-validator will attempt to connect. we expect this to be rewritten
+  connectAddr: "1.1.1.1:20001"
+  # -- Address to which network-validator listens to requests from itself
+  listenAddr: "0.0.0.0:4140"
+  # -- Timeout before network-validator fails to validate the pod's network connectivity
+  timeout: "10s"
 
 # -- For Private docker registries, authentication is needed.
 #  Registry secrets are applied to the respective service accounts
@@ -510,6 +532,11 @@ spValidatorResources: *controller_resources
 # for more information
 # tolerations:
 
+# -|- NodeAffinity section, See the
+# [K8S documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity)
+# for more information
+# nodeAffinity:
+
 # Prometheus Operator PodMonitor configuration
 podMonitor:
   # -- Enables the creation of Prometheus Operator [PodMonitor](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.PodMonitor)
@@ -533,9 +560,3 @@ podMonitor:
   proxy:
     # -- Enables the creation of PodMonitor for the data-plane
     enabled: true
-
-# Noop image
-noop:
-  image:
-    name: giantswarm/pause
-    version: "3.8"
