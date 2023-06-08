@@ -1,6 +1,6 @@
 {{- define "partials.network-validator" -}}
 name: linkerd-network-validator
-image: {{.Values.image.registry}}{{.Values.proxy.image.name}}:{{.Values.proxy.image.version | default .Values.linkerdVersion }}
+image: {{.Values.image.registry}}/{{.Values.proxy.image.name}}:{{.Values.proxy.image.version | default .Values.linkerdVersion }}
 imagePullPolicy: {{.Values.proxy.image.pullPolicy | default .Values.imagePullPolicy}}
 {{ include "partials.resources" .Values.proxyInit.resources }}
 securityContext:
