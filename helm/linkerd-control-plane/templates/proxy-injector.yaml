@@ -106,6 +106,7 @@ spec:
           runAsNonRoot: true
           runAsUser: {{.Values.controllerUID}}
           allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           seccompProfile:
             type: RuntimeDefault
         volumeMounts:

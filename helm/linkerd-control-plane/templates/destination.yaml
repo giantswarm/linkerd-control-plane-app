@@ -233,6 +233,7 @@ spec:
           runAsNonRoot: true
           runAsUser: {{.Values.controllerUID}}
           allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           seccompProfile:
             type: RuntimeDefault
       - args:
@@ -268,6 +269,7 @@ spec:
           runAsNonRoot: true
           runAsUser: {{.Values.controllerUID}}
           allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           seccompProfile:
             type: RuntimeDefault
         volumeMounts:
@@ -322,6 +324,7 @@ spec:
           runAsNonRoot: true
           runAsUser: {{.Values.controllerUID}}
           allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           seccompProfile:
             type: RuntimeDefault
         volumeMounts:

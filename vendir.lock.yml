@@ -2,10 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: add GS label for monitoring...
-      sha: e8450a784aae64566b0a0c05d094f50c8b102fb0
+      commitTitle: 'Add `readOnlyRootFilesystem: true` to all workload...'
+      sha: 6b74cca2f677989fb3d21d930003f9e2792c2622
       tags:
-      - stable-2.10.1-2929-ge8450a784
+      - stable-2.10.1-2930-g6b74cca2f
     path: linkerd
   path: vendor
 - contents:
