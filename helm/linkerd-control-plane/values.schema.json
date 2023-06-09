@@ -11,6 +11,9 @@
         "cniEnabled": {
             "type": "boolean"
         },
+        "commonLabels": {
+            "type": "object"
+        },
         "controlPlaneTracing": {
             "type": "boolean"
         },
@@ -255,27 +258,31 @@
         "linkerdVersion": {
             "type": "string"
         },
+        "networkValidator": {
+            "type": "object",
+            "properties": {
+                "connectAddr": {
+                    "type": "string"
+                },
+                "listenAddr": {
+                    "type": "string"
+                },
+                "logFormat": {
+                    "type": "string"
+                },
+                "logLevel": {
+                    "type": "string"
+                },
+                "timeout": {
+                    "type": "string"
+                }
+            }
+        },
         "nodeSelector": {
             "type": "object",
             "properties": {
                 "kubernetes.io/os": {
                     "type": "string"
-                }
-            }
-        },
-        "noop": {
-            "type": "object",
-            "properties": {
-                "image": {
-                    "type": "object",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "version": {
-                            "type": "string"
-                        }
-                    }
                 }
             }
         },
@@ -523,6 +530,9 @@
                 "inboundConnectTimeout": {
                     "type": "string"
                 },
+                "inboundDiscoveryCacheUnusedTimeout": {
+                    "type": "string"
+                },
                 "logFormat": {
                     "type": "string"
                 },
@@ -533,6 +543,9 @@
                     "type": "string"
                 },
                 "outboundConnectTimeout": {
+                    "type": "string"
+                },
+                "outboundDiscoveryCacheUnusedTimeout": {
                     "type": "string"
                 },
                 "ports": {
@@ -633,11 +646,17 @@
                 "iptablesMode": {
                     "type": "string"
                 },
+                "kubeAPIServerPorts": {
+                    "type": "string"
+                },
                 "logFormat": {
                     "type": "string"
                 },
                 "logLevel": {
                     "type": "string"
+                },
+                "privileged": {
+                    "type": "boolean"
                 },
                 "resources": {
                     "type": "object",
