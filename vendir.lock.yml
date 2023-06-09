@@ -2,10 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: Merge tag 'refs/tags/stable-2.12.4' into upgrade-2.12.4...
-      sha: 6a3b38f5edf1aa4781ad1b60f899bba020b47b44
+      commitTitle: fix network validator image...
+      sha: 45d117f776cefbcca84b3464d30ee94d9d5a4650
       tags:
-      - stable-2.10.1-2189-g6a3b38f5e
+      - stable-2.10.1-2931-g45d117f77
     path: linkerd
   path: vendor
 - contents:
