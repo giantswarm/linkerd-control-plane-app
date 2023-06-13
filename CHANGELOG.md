@@ -11,6 +11,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 - Replace icon and add logo.
 - Upgrade to Linkerd v2.13.4.
+- Update CNI version in tests.
 
 ## [0.11.0] - 2023-03-09
 
