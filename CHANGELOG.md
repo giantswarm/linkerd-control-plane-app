@@ -10,7 +10,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 ### Changed
 
 - Replace icon and add logo.
-- Upgrade to Linkerd v2.13.3.
+- Upgrade to Linkerd v2.13.4.
 
 ## [0.11.0] - 2023-03-09
 
