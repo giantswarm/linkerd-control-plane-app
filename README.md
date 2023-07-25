@@ -145,6 +145,10 @@ Your workload must be able to create `EmptyDir` volumes, so you'll need to creat
 
 Although not recommended, it is possible to edit the default `PodSecurityPolicy` named `restricted` to allow usage of`EmptyDir` volumes for all workloads without an own `PodSecurityPolicy`.
 
+### Failed Scheduling
+
+The app is set up for 'High Availability' by default, with 3 replicas and pod anti-affinity enabled. However, on small clusters (with less than 3 worker nodes), this can cause scheduling failures when rolling pods or nodes. To prevent this, temporarily reduce .Values.controllerReplicas to 2.
+
 ## Usage with `linkerd` cli
 
 You can use the `linkerd` cli as usual with this app as we're using the default namespaces. (`linkerd` and `linkerd-cni`). You can download it from the [linkerd release page](https://github.com/linkerd/linkerd2/releases/tag/stable-2.12.1).
