@@ -2,10 +2,11 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: Merge branch 'release/stable-2.13' into stable-2.13.x
-      sha: f35bd7d4086dda12a3c4b4f667aa8abf3847489d
+      commitTitle: Merge remote-tracking branch 'upstream/release/stable-2.13' into
+        stable-2.13.x
+      sha: ea513a4b04dd1515dec9e6ee0b44cafa4785fd63
       tags:
-      - stable-2.10.1-2933-gf35bd7d40
+      - stable-2.10.1-2949-gea513a4b0
     path: linkerd
   path: vendor
 - contents:
