@@ -285,6 +285,9 @@ enableH2Upgrade: true
 # -- Add a PSP resource and bind it to the control plane ServiceAccounts. Note
 # PSP has been deprecated since k8s v1.21
 enablePSP: true
+global:
+  podSecurityStandards:
+    enforced: false
 
 # -- Failure policy for the proxy injector
 webhookFailurePolicy: Fail

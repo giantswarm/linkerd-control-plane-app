@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Add PSS flag for PSP->PSS migration.
+
 ## [1.1.0] - 2023-08-29
 
 ### Changed
