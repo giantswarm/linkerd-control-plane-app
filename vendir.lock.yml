@@ -2,11 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: Merge remote-tracking branch 'upstream/release/stable-2.13' into
-        stable-2.13.x
-      sha: ea513a4b04dd1515dec9e6ee0b44cafa4785fd63
+      commitTitle: add PSS flag for PSP->PSS migration (#559)...
+      sha: 81d4bbad3f3b9c4628b62134b014859c4e80ad15
       tags:
-      - stable-2.10.1-2949-gea513a4b0
+      - stable-2.10.1-2950-g81d4bbad3
     path: linkerd
   path: vendor
 - contents:

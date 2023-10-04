@@ -1,4 +1,4 @@
-{{ if .Values.enablePSP -}}
+{{ if and .Values.enablePSP (not .Values.global.podSecurityStandards.enforced) -}}
 ---
 ###
 ### Control Plane PSP

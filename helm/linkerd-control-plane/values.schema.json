@@ -145,6 +145,19 @@
         "enablePprof": {
             "type": "boolean"
         },
+        "global": {
+            "type": "object",
+            "properties": {
+                "podSecurityStandards": {
+                    "type": "object",
+                    "properties": {
+                        "enforced": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "heartbeatResources": {
             "type": "object",
             "properties": {
