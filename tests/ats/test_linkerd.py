@@ -137,7 +137,7 @@ def linkerd_app_cr(
         chart_version,
         f"chartmuseum-test-time",
         linkerd_namespace,
-        "http://chartmuseum-chartmuseum:8080/charts/",
+        "http://chartmuseum.giantswarm.svc.cluster.local.:8080/",
         timeout_sec=timeout,
         namespace=linkerd_namespace,
         deployment_namespace=linkerd_namespace,
