@@ -1,4 +1,4 @@
-chart-dir: helm/linkerd2-app
+chart-dir: helm/linkerd-control-plane
 replace-chart-version-with-git: true
 replace-app-version-with-git: false
 generate-metadata: true

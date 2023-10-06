@@ -4,9 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-pytest-helm-charts = ">=0.7.0"
-pytest = ">=6.2.5"
-pykube-ng = ">=21.10.0"
+pytest-helm-charts = ">=1.1.2"
+pytest = "~=7.4.2"
+pykube-ng = "~=23.6.0"
 pyyaml = "~=6.0"
 pytest-rerunfailures = ">=10.2"
 requests = "~=2.31.0"
