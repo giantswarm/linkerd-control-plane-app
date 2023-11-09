@@ -15,7 +15,7 @@ maintainers:
 name: linkerd-control-plane
 dependencies:
   - name: linkerd-crds
-    version: 1.6.1
+    version: 1.8.0
   - name: partials
     version: 0.1.0
 sources:

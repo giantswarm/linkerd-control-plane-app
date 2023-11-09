@@ -2,10 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: add PSS flag for PSP->PSS migration (#559)...
-      sha: 81d4bbad3f3b9c4628b62134b014859c4e80ad15
+      commitTitle: add nodetaint remover container...
+      sha: 05a70b5ffc1de5df36af2f4d447bad30c096dca6
       tags:
-      - stable-2.10.1-2950-g81d4bbad3
+      - stable-2.10.1-3185-g05a70b5ff
     path: linkerd
   path: vendor
 - contents:

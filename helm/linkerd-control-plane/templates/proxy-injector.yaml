@@ -33,9 +33,6 @@ spec:
   template:
     metadata:
       annotations:
-        {{- if empty .Values.cliVersion }}
-        linkerd.io/helm-release-version: {{.Release.Revision | quote}}
-        {{- end }}
         {{ include "partials.annotations.created-by" . }}
         {{- include "partials.proxy.annotations" . | nindent 8}}
         {{- with .Values.podAnnotations }}{{ toYaml . | trim | nindent 8 }}{{- end }}
@@ -105,6 +102,7 @@ spec:
           capabilities:
             drop:
             - ALL
+          readOnlyRootFilesystem: true
           runAsNonRoot: true
           runAsUser: {{.Values.controllerUID}}
           allowPrivilegeEscalation: false
