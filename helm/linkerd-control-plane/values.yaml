@@ -27,7 +27,7 @@ controlPlaneTracing: false
 # -- namespace to send control plane traces to
 controlPlaneTracingNamespace: linkerd-jaeger
 # -- control plane version. See Proxy section for proxy version
-linkerdVersion: stable-2.13.6
+linkerdVersion: stable-2.14.3
 # -- default kubernetes deployment strategy
 deploymentStrategy:
   rollingUpdate:
@@ -224,7 +224,7 @@ proxyInit:
     # @default -- imagePullPolicy
     pullPolicy: ""
     # -- Tag for the proxy-init container Docker image
-    version: v2.2.1
+    version: v2.2.3
   resources:
     cpu:
       # -- Maximum amount of CPU units that the proxy-init container can use
@@ -273,6 +273,8 @@ networkValidator:
   listenAddr: "0.0.0.0:4140"
   # -- Timeout before network-validator fails to validate the pod's network connectivity
   timeout: "10s"
+  # -- Include a securityContext in the network-validator pod spec
+  enableSecurityContext: true
 
 # -- For Private docker registries, authentication is needed.
 #  Registry secrets are applied to the respective service accounts
@@ -390,6 +392,7 @@ proxyInjector:
       - kube-system
       - cert-manager
       - giantswarm
+      - kyverno
 
   # -- Object selector used by admission webhook.
   objectSelector:
@@ -524,6 +527,9 @@ policyValidator:
   # See the cert-manager [CA Injector Docs](https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-secret-resource)
   # for more information.
   injectCaFromSecret: ""
+
+# -|- CPU, Memory and Ephemeral Storage resources required by the policy controller 
+policyControllerResources: *controller_resources
 
 # -- NodeSelector section, See the [K8S
 # documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
