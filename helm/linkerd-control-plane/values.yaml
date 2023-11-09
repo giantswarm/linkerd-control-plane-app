@@ -528,7 +528,7 @@ policyValidator:
   # for more information.
   injectCaFromSecret: ""
 
-# -|- CPU, Memory and Ephemeral Storage resources required by the policy controller 
+# -|- CPU, Memory and Ephemeral Storage resources required by the policy controller
 policyControllerResources: *controller_resources
 
 # -- NodeSelector section, See the [K8S
