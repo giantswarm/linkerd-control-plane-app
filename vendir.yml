@@ -6,7 +6,7 @@ directories:
   - path: linkerd
     git:
       url: https://github.com/giantswarm/linkerd2-upstream
-      ref: stable-2.13.x
+      ref: stable-2.14.x
     includePaths:
     - charts/linkerd-control-plane/**/*
     - charts/linkerd-crds/**/*
