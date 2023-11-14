@@ -9,6 +9,7 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ### Changed
 
+- Upgrade to Linkerd v2.14.3.
 - Update ATS to v0.4.1
 
 ## [1.2.0] - 2023-10-05
