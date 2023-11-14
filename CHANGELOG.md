@@ -7,6 +7,8 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+## [1.3.0] - 2023-11-14
+
 ### Changed
 
 - Upgrade to Linkerd v2.14.3.
@@ -170,7 +172,8 @@ Please be aware that linkerd will never recreate existing pods to update the inj
 
 - Update chart to v2.7.1.
 
-[Unreleased]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v0.11.0...v1.0.0
