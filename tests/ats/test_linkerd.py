@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 timeout: int = 360
 cni_app_version = "1.4.1"
-cni_app_catalog_url = "https://giantswarm.github.io/giantswarm-catalog/"
+cni_app_catalog_url = "oci://giantswarmpublic.azurecr.io/giantswarm-catalog"
 linkerd_namespace = "linkerd"
 linkerd_app_name = "linkerd-control-plane"
 cni_namespace = "linkerd-cni"
