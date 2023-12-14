@@ -8,7 +8,7 @@ clusterDomain: &cluster_domain cluster.local
 # -- Registry switch
 # Do not overwrite this as it is automatically set based on the installation region
 image:
-  registry: quay.io
+  registry: gsoci.azurecr.io
 
 # -- The cluster networks for which service discovery is performed. This should
 # include the pod and service networks, but need not include the node network.
