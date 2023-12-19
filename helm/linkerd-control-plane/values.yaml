@@ -554,7 +554,7 @@ spValidatorResources: *controller_resources
 # Prometheus Operator PodMonitor configuration
 podMonitor:
   # -- Enables the creation of Prometheus Operator [PodMonitor](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.PodMonitor)
-  enabled: false
+  enabled: true
   # -- Interval at which metrics should be scraped
   scrapeInterval: 10s
   # -- Iimeout after which the scrape is ended
@@ -570,7 +570,17 @@ podMonitor:
         - linkerd-jaeger
   serviceMirror:
     # -- Enables the creation of PodMonitor for the Service Mirror component
-    enabled: true
+    enabled: false
   proxy:
     # -- Enables the creation of PodMonitor for the data-plane
     enabled: true
+  # -- Add custom relabeling rules to PodMonitor
+  relabelings:
+    - action: replace
+      sourceLabels:
+      - __meta_kubernetes_pod_label_app
+      targetLabel: app
+    - action: replace
+      sourceLabels:
+      - __meta_kubernetes_pod_node_name
+      targetLabel: node
