@@ -7,6 +7,10 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+### Changed
+
+- Add custom relabling rules to PodMonitor and enable PodMonitor ([#188](https://github.com/giantswarm/linkerd-control-plane-app/pull/188)).
+
 ## [1.3.1] - 2023-12-14
 
 ### Changed
