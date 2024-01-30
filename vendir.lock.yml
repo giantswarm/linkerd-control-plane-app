@@ -2,10 +2,10 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: add nodetaint remover container...
-      sha: 05a70b5ffc1de5df36af2f4d447bad30c096dca6
+      commitTitle: '[GS] add VPA for control plane deployments...'
+      sha: f29eb569a347d02b6776b71e3dda619b2dc57cb5
       tags:
-      - stable-2.10.1-3185-g05a70b5ff
+      - stable-2.10.1-3188-gf29eb569a
     path: linkerd
   path: vendor
 - contents:

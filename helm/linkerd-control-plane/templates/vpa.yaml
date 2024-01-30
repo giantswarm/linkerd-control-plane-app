@@ -1,0 +1,90 @@
+{{ if .Values.vpa.enabled }}
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: destination
+  namespace: {{ .Release.Namespace }}
+  labels:
+    linkerd.io/control-plane-component: destination
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
+spec:
+  resourcePolicy:
+    containerPolicies:
+    - containerName: destination
+      controlledValues: RequestsAndLimits
+      mode: Auto
+      {{- with .Values.vpa.destination.minAllowed }}
+      minAllowed:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.vpa.destination.maxAllowed }}
+      maxAllowed:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name:  linkerd-destination
+  updatePolicy:
+    updateMode: Auto
+---
+
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: proxy-injector
+  namespace: {{ .Release.Namespace }}
+  labels:
+    linkerd.io/control-plane-component: proxy-injector
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
+spec:
+  resourcePolicy:
+    containerPolicies:
+    - containerName: proxy-injector
+      controlledValues: RequestsAndLimits
+      mode: Auto
+      {{- with .Values.vpa.proxyInjector.minAllowed }}
+      minAllowed:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.vpa.proxyInjector.maxAllowed }}
+      maxAllowed:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: linkerd-proxy-injector
+  updatePolicy:
+    updateMode: Auto
+---
+
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: identity
+  namespace: {{ .Release.Namespace }}
+  labels:
+    linkerd.io/control-plane-component: identity
+    {{- with .Values.commonLabels }}{{ toYaml . | trim | nindent 4 }}{{- end }}
+spec:
+  resourcePolicy:
+    containerPolicies:
+    - containerName: identity
+      controlledValues: RequestsAndLimits
+      mode: Auto
+      {{- with .Values.vpa.identity.minAllowed }}
+      minAllowed:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.vpa.identity.maxAllowed }}
+      maxAllowed:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name:  linkerd-identity
+  updatePolicy:
+    updateMode: Auto
+{{ end }}
