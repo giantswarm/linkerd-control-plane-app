@@ -7,6 +7,8 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [Unreleased]
 
+## [1.4.0] - 2024-01-31
+
 ### Changed
 
 - Add custom relabling rules to PodMonitor and enable PodMonitor ([#188](https://github.com/giantswarm/linkerd-control-plane-app/pull/188)).
@@ -183,7 +185,8 @@ Please be aware that linkerd will never recreate existing pods to update the inj
 
 - Update chart to v2.7.1.
 
-[Unreleased]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/giantswarm/linkerd-control-plane-app/compare/v1.1.0...v1.2.0
