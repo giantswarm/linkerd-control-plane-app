@@ -584,3 +584,21 @@ podMonitor:
       sourceLabels:
       - __meta_kubernetes_pod_node_name
       targetLabel: node
+
+vpa:
+  enabled: true
+  proxyInjector:
+    minAllowed:
+      Cpu: 100m
+      Memory: 50Mi
+    maxAllowed: {}
+  destination:
+    minAllowed:
+      Cpu: 100m
+      Memory: 50Mi
+    maxAllowed: {}
+  identity:
+    minAllowed:
+      Cpu: 100m
+      Memory: 50Mi
+    maxAllowed: {}

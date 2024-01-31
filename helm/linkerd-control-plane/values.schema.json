@@ -277,6 +277,9 @@
                 "connectAddr": {
                     "type": "string"
                 },
+                "enableSecurityContext": {
+                    "type": "boolean"
+                },
                 "listenAddr": {
                     "type": "string"
                 },
@@ -852,6 +855,14 @@
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "vpa": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
                 }
             }
         },
